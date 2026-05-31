@@ -1,28 +1,52 @@
 package com.dao;
 
 import com.vo.UsuarioVO;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 public class UsuarioDAO {
-    // Simulando o banco de dados em memória para os testes da Semana 2 
-    private static List<UsuarioVO> bancoDeUsuarios = new ArrayList<>();
-    private static int geradorId = 1;
 
-    public void salvar(UsuarioVO user) {
-        // Cria um novo usuário com um ID gerado
-        UsuarioVO novoUser = new UsuarioVO(geradorId++, user.getNome(), user.getEmail(), user.getSenha());
-        bancoDeUsuarios.add(novoUser);
-        System.out.println("Usuário " + novoUser.getNome() + " salvo no banco de dados simulado!");
+    public void salvar(UsuarioVO user) throws Exception {
+        String sql = "INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)";
+        
+        try (Connection conn = ConexaoDB.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             
+            stmt.setString(1, user.getNome());
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, user.getSenha());
+            
+            stmt.executeUpdate(); 
+        } catch (Exception e) {
+            throw new Exception("Erro ao salvar no banco: " + e.getMessage());
+        }
     }
 
-    // Método essencial para o Login 
-    public UsuarioVO buscarPorEmailESenha(String email, String senha) {
-        for (UsuarioVO u : bancoDeUsuarios) {
-            if (u.getEmail().equals(email) && u.getSenha().equals(senha)) {
-                return u; // Encontrou o usuário
+    public UsuarioVO buscarPorEmailESenha(String email, String senha) throws Exception {
+        String sql = "SELECT * FROM usuarios WHERE email = ? AND senha = ?";
+        UsuarioVO usuarioEncontrado = null;
+        
+        try (Connection conn = ConexaoDB.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             
+            stmt.setString(1, email);
+            stmt.setString(2, senha);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    usuarioEncontrado = new UsuarioVO(
+                        rs.getInt("id"),
+                        rs.getString("nome"),
+                        rs.getString("email"),
+                        rs.getString("senha")
+                    );
+                }
             }
+        } catch (Exception e) {
+            throw new Exception("Erro ao consultar o banco de dados: " + e.getMessage());
         }
-        return null; // Não encontrou
+        
+        return usuarioEncontrado; 
     }
 }
