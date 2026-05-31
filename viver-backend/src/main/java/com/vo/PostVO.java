@@ -19,4 +19,5 @@ public class PostVO {
     public String getConteudo() { return conteudo; }
     public UsuarioVO getAutor() { return autor; }
     public Date getData() { return data; }
+    public int getId() { return id; }
 }

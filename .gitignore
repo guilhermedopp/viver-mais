@@ -1,0 +1,24 @@
+# =========================
+# Backend (Java / Maven)
+# =========================
+viver-backend/target/
+*.class
+*.jar
+*.war
+
+# =========================
+# Editores de Código (VS Code, IntelliJ, Eclipse)
+# =========================
+.vscode/
+.idea/
+*.iml
+.metadata/
+.classpath
+.project
+.settings/
+
+# =========================
+# Ficheiros do Sistema Operativo
+# =========================
+.DS_Store
+Thumbs.db
