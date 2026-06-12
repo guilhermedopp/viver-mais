@@ -3,6 +3,7 @@ package com.vo;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore; // <-- A nova importação do Jackson
 import com.observer.Observer;
 
 public class UsuarioVO {
@@ -10,10 +11,10 @@ public class UsuarioVO {
     private String nome; 
     private String email;
     private String senha;
-    private LocalDate dataNascimento; // Novo atributo de idade
+    private LocalDate dataNascimento; 
     private List<Observer> seguidores = new ArrayList<>();
 
-    // Construtor completo (para o Cadastro)
+    // Construtor completo 
     public UsuarioVO(int id, String nome, String email, String senha, LocalDate dataNascimento) {
         this.id = id;
         this.nome = nome;
@@ -38,5 +39,8 @@ public class UsuarioVO {
     public String getEmail() { return email; }
     public String getSenha() { return senha; }
     public int getId() { return id; }
+    
+    // A anotação que esconde a data na hora de gerar o JSON para o Frontend
+    @JsonIgnore
     public LocalDate getDataNascimento() { return dataNascimento; }
 }
