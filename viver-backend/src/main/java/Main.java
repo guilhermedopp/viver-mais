@@ -2,15 +2,13 @@ import com.bo.UsuarioBO;
 import com.dao.PostDAO;
 import com.vo.PostVO;
 import com.vo.UsuarioVO;
-
 import io.javalin.Javalin;
+import java.time.LocalDate; // Importante para a data de nascimento
 
 public class Main {
     public static void main(String[] args) {
         
-        // 1. Inicia o servidor Javalin na porta 8080
         Javalin app = Javalin.create(config -> {
-            // Permite que o nosso Frontend (HTML/JS) consiga comunicar com o Java sem ser bloqueado (CORS)
             config.bundledPlugins.enableCors(cors -> {
                 cors.addRule(it -> it.anyHost());
             });
@@ -18,11 +16,10 @@ public class Main {
 
         System.out.println("Servidor Backend VIVER+ iniciado com sucesso na porta 8080!");
 
-        // Instâncias das camadas de Negócio e Dados
         UsuarioBO usuarioBO = new UsuarioBO();
         PostDAO postDAO = new PostDAO();
 
-        // 2. Rota que recebe os pedidos de Login do Frontend
+        // Rota de Login
         app.post("/api/login", ctx -> {
             try {
                 DadosLogin dados = ctx.bodyAsClass(DadosLogin.class);
@@ -33,11 +30,11 @@ public class Main {
             }
         });
 
-        // 3. Rota que recebe os pedidos de Cadastro do Frontend
+        // Rota de Cadastro (Agora com Data de Nascimento)
         app.post("/api/cadastro", ctx -> {
             try {
                 DadosCadastro dados = ctx.bodyAsClass(DadosCadastro.class);
-                UsuarioVO novoUsuario = new UsuarioVO(0, dados.nome, dados.email, dados.senha);
+                UsuarioVO novoUsuario = new UsuarioVO(0, dados.nome, dados.email, dados.senha, LocalDate.parse(dados.dataNascimento));
                 UsuarioVO usuarioCadastrado = usuarioBO.cadastrar(novoUsuario);
                 ctx.status(201).json(usuarioCadastrado);
             } catch (Exception e) {
@@ -45,7 +42,7 @@ public class Main {
             }
         });
 
-        // 4. Rota para ir buscar todos os momentos publicados (Feed)
+        // Rota do Feed
         app.get("/api/posts", ctx -> {
             try {
                 ctx.status(200).json(postDAO.listarTodos());
@@ -54,7 +51,7 @@ public class Main {
             }
         });
 
-        // 5. Rota para publicar um novo momento
+        // Rota para Publicar
         app.post("/api/posts", ctx -> {
             try {
                 DadosPost dados = ctx.bodyAsClass(DadosPost.class);
@@ -64,10 +61,9 @@ public class Main {
                 ctx.status(400).result(e.getMessage());
             }
         });
+    } 
 
-    } // <-- O método main AGORA fecha aqui, englobando todas as variáveis e rotas!
-
-    // Classes auxiliares estáticas para mapeamento de JSON
+    // Classes auxiliares para mapeamento de JSON
     public static class DadosLogin {
         public String email;
         public String senha;
@@ -77,6 +73,7 @@ public class Main {
         public String nome;
         public String email;
         public String senha;
+        public String dataNascimento; // Novo campo
     }
 
     public static class DadosPost {

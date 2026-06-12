@@ -3,6 +3,7 @@ package com.dao;
 import com.vo.PostVO;
 import com.vo.UsuarioVO;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +32,8 @@ public class PostDAO {
     }
 
     public List<PostVO> listarTodos() throws Exception {
-        String sql = "SELECT p.id, p.conteudo, p.data_criacao, u.id AS user_id, u.nome, u.email " +
+        // Atualizado para puxar também a data de nascimento do utilizador
+        String sql = "SELECT p.id, p.conteudo, p.data_criacao, u.id AS user_id, u.nome, u.email, u.data_nascimento " +
                      "FROM postagens p " +
                      "INNER JOIN usuarios u ON p.usuario_id = u.id " +
                      "ORDER BY p.data_criacao DESC";
@@ -43,11 +45,15 @@ public class PostDAO {
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
+                // Prepara a data de nascimento para não dar erro se vier vazia
+                LocalDate dataNasc = rs.getDate("data_nascimento") != null ? rs.getDate("data_nascimento").toLocalDate() : null;
+                
                 UsuarioVO autor = new UsuarioVO(
                     rs.getInt("user_id"),
                     rs.getString("nome"),
                     rs.getString("email"),
-                    "" // Oculta a senha por segurança
+                    "", // Oculta a senha por segurança no Feed
+                    dataNasc // <-- Passando o novo campo obrigatório
                 );
                 
                 PostVO post = new PostVO(rs.getInt("id"), rs.getString("conteudo"), autor);
