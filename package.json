@@ -1,0 +1,12 @@
+{
+  "name": "viver-mais",
+  "version": "2.0.0",
+  "description": "Rede Social VIVER+",
+  "scripts": {
+    "dev": "iniciar.bat",
+    "backend": "cd viver-backend && mvn clean compile exec:java -Dexec.mainClass=Main",
+    "watch": "npx nodemon --watch viver-backend/src --ext java --exec \"npm run backend\"",
+    "frontend": "npx serve viver-frontend",
+    "clean": "cd viver-backend && mvn clean"
+  }
+}
