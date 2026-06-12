@@ -63,12 +63,6 @@
             document.getElementById('saudacao').textContent = `Olá, ${usuarioLogado.nome}! 👋`;
         }
 
-        // Ação de Sair (Logout)
-        document.getElementById('btn-sair').addEventListener('click', () => {
-            localStorage.removeItem('usuarioLogado');
-            window.location.href = 'index.html';
-        });
-
         // Função para carregar os posts vindos da API Java
         async function carregarPosts() {
             try {
@@ -114,5 +108,7 @@
         // Carrega as publicações assim que abre a página
         carregarPosts();
     </script>
+
+    <script src="js/pwa-setup.js"></script>
 </body>
 </html>
