@@ -3,7 +3,7 @@ import com.dao.PostDAO;
 import com.vo.PostVO;
 import com.vo.UsuarioVO;
 import io.javalin.Javalin;
-import java.time.LocalDate; // Importante para a data de nascimento
+import java.time.LocalDate; 
 
 public class Main {
     public static void main(String[] args) {
@@ -14,7 +14,8 @@ public class Main {
             });
         }).start(8080);
 
-        System.out.println("Servidor Backend VIVER+ iniciado com sucesso na porta 8080!");
+        // Nova mensagem com link clicável
+        System.out.println("🔥 Servidor Backend VIVER+ online! API a correr em: http://localhost:8080");
 
         UsuarioBO usuarioBO = new UsuarioBO();
         PostDAO postDAO = new PostDAO();
@@ -30,7 +31,7 @@ public class Main {
             }
         });
 
-        // Rota de Cadastro (Agora com Data de Nascimento)
+        // Rota de Cadastro 
         app.post("/api/cadastro", ctx -> {
             try {
                 DadosCadastro dados = ctx.bodyAsClass(DadosCadastro.class);
@@ -73,7 +74,7 @@ public class Main {
         public String nome;
         public String email;
         public String senha;
-        public String dataNascimento; // Novo campo
+        public String dataNascimento; 
     }
 
     public static class DadosPost {
