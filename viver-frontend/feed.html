@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,9 +9,9 @@
 </head>
 <body>
 
-    <main class="tela-acesso" style="max-width: 650px; padding-bottom: 90px;">
+    <main class="tela-acesso" style="max-width: 650px; padding-bottom: 90px; justify-content: flex-start;">
         
-        <header class="cabecalho-simples" style="justify-content: space-between; margin-bottom: 20px; align-items: center; display: flex;">
+        <header class="cabecalho-simples" style="justify-content: space-between; margin-bottom: 20px; align-items: center; display: flex; padding-top: 20px;">
             <div style="display: flex; align-items: center; gap: 15px;">
                 <img src="img/logo.png" alt="Logótipo Oficial do VIVER+" style="height: 55px; width: auto; object-fit: contain;">
                 <div>
@@ -21,7 +21,7 @@
             </div>
         </header>
 
-        <section>
+        <section style="width: 100%;">
             <h2 style="font-size: 1.8rem; text-align: left; margin-bottom: 15px;">Momentos da nossa Rede</h2>
             <div id="container-posts">
                 <p style="font-size: 1.2rem; color: var(--cor-texto-suave);">A carregar os momentos...</p>
@@ -56,14 +56,16 @@
         const API_URL = 'http://localhost:8080/api';
         const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
 
-        // Proteção: Se não estiver logado, volta para o login
+        // Proteção de acesso
         if (!usuarioLogado) {
             window.location.href = 'index.html';
         } else {
             document.getElementById('saudacao').textContent = `Olá, ${usuarioLogado.nome}! 👋`;
         }
 
-        // Função para carregar os posts vindos da API Java
+        // ==========================================
+        // LÓGICA DE CARREGAMENTO DO FEED
+        // ==========================================
         async function carregarPosts() {
             try {
                 const resposta = await fetch(`${API_URL}/posts`);
@@ -79,7 +81,7 @@
 
                     posts.forEach(post => {
                         const dataFormatada = new Date(post.data).toLocaleDateString('pt-PT', {
-                            hour: '2-digit', minute: '2-digit'
+                            hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short'
                         });
 
                         const card = document.createElement('article');
@@ -87,28 +89,83 @@
                         card.style.border = '3px solid #e9ecef';
                         card.style.borderRadius = '14px';
                         card.style.padding = '20px';
-                        card.style.marginBottom = '15px';
+                        card.style.marginBottom = '20px';
                         card.style.textAlign = 'left';
+                        card.style.width = '100%';
 
+                        // Aqui construímos visualmente o Post com as opções de Curtir e Responder
                         card.innerHTML = `
                             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                 <strong style="font-size: 1.25rem; color: var(--cor-azul, #0f5d82);">${post.autor.nome}</strong>
                                 <span style="font-size: 0.95rem; color: gray;">${dataFormatada}</span>
                             </div>
-                            <p style="font-size: 1.3rem; line-height: 1.4; font-weight: 500; color: #111;">${post.conteudo}</p>
+                            <p style="font-size: 1.3rem; line-height: 1.4; font-weight: 500; color: #111; margin-bottom: 15px;">${post.conteudo}</p>
+                            
+                            <div style="display: flex; gap: 20px; border-top: 1px solid #e9ecef; padding-top: 12px;">
+                                <button onclick="curtirPost(${post.id})" id="btn-curtir-${post.id}" style="background: none; border: none; font-size: 1.2rem; font-weight: bold; cursor: pointer; color: var(--cor-texto-suave); display: flex; align-items: center; gap: 6px;">
+                                    🤍 Curtir
+                                </button>
+                                <button onclick="abrirResposta(${post.id})" style="background: none; border: none; font-size: 1.2rem; font-weight: bold; cursor: pointer; color: var(--cor-texto-suave); display: flex; align-items: center; gap: 6px;">
+                                    💬 Responder
+                                </button>
+                            </div>
+                            
+                            <div id="area-resposta-${post.id}" style="display: none; margin-top: 15px; background: #f7fbfd; padding: 12px; border-radius: 8px; border: 1px solid #e9ecef;">
+                                <textarea id="texto-resposta-${post.id}" placeholder="Deixe uma palavra de carinho..." style="width: 100%; min-height: 60px; padding: 10px; border: 2px solid var(--cor-borda); border-radius: 8px; font-size: 1.1rem; resize: none;"></textarea>
+                                <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
+                                    <button onclick="enviarResposta(${post.id})" class="btn-secundario" style="padding: 8px 20px; border: none; border-radius: 20px; font-weight: bold; font-size: 1.1rem; cursor: pointer;">Publicar Comentário</button>
+                                </div>
+                            </div>
                         `;
                         container.appendChild(card);
                     });
+                } else {
+                    console.error("Erro na resposta da API.");
                 }
             } catch (erro) {
                 console.error("Erro ao ir buscar posts:", erro);
             }
         }
 
-        // Carrega as publicações assim que abre a página
+        // ==========================================
+        // LÓGICA DE INTERAÇÃO (Simulação Visual)
+        // ==========================================
+        
+        function curtirPost(postId) {
+            const btn = document.getElementById(`btn-curtir-${postId}`);
+            
+            // Efeito de "Toggle" (Ligar/Desligar) a curtida visualmente
+            if (btn.innerText.includes('🤍')) {
+                btn.innerHTML = '❤️ Curtiu';
+                btn.style.color = '#e03131';
+            } else {
+                btn.innerHTML = '🤍 Curtir';
+                btn.style.color = 'var(--cor-texto-suave)';
+            }
+        }
+
+        function abrirResposta(postId) {
+            const area = document.getElementById(`area-resposta-${postId}`);
+            area.style.display = area.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function enviarResposta(postId) {
+            const caixaTexto = document.getElementById(`texto-resposta-${postId}`);
+            const texto = caixaTexto.value.trim();
+            
+            if(!texto) {
+                alert('Por favor, escreva algo antes de publicar o comentário.');
+                return;
+            }
+            
+            // Simula o envio bem-sucedido e limpa o ecrã
+            alert(`Comentário enviado: "${texto}"\n(Na próxima fase, isto será guardado na base de dados!)`);
+            caixaTexto.value = '';
+            abrirResposta(postId); 
+        }
+
+        // Inicia o carregamento assim que abre a página
         carregarPosts();
     </script>
-
-    <script src="js/pwa-setup.js"></script>
 </body>
 </html>
