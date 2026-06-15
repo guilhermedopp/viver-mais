@@ -53,6 +53,9 @@ CREATE TABLE respostas (
 INSERT INTO postagens (conteudo, usuario_id) 
 VALUES ('Olá, esta é a minha primeira publicação no VIVER+! Que alegria estar aqui.', 1);
 
+-- ==========================================
+-- COMUNIDADES / GRUPOS
+-- ==========================================
 
 -- 1. Criar a tabela de Comunidades
 CREATE TABLE IF NOT EXISTS comunidades (
@@ -62,10 +65,10 @@ CREATE TABLE IF NOT EXISTS comunidades (
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 2. Adicionar colunas polimórficas na tabela de posts
+-- 2. Adicionar colunas polimórficas na tabela de postagens
 -- destino_tipo: 'USUARIO' se for no feed pessoal, 'COMUNIDADE' se for dentro de um grupo
-ALTER TABLE posts ADD COLUMN destino_tipo VARCHAR(20) DEFAULT 'USUARIO';
-ALTER TABLE posts ADD COLUMN destino_id INT;
+ALTER TABLE postagens ADD COLUMN destino_tipo VARCHAR(20) DEFAULT 'USUARIO';
+ALTER TABLE postagens ADD COLUMN destino_id INT;
 
 -- Para não quebrar os posts antigos, vinculamos o destino_id ao próprio autor do post
-UPDATE posts SET destino_id = usuario_id WHERE destino_id IS NULL;
+UPDATE postagens SET destino_id = usuario_id WHERE destino_id IS NULL;
