@@ -3,25 +3,24 @@ package com.vo;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.observer.Observer;
 
-public class UsuarioVO {
-    private int id; 
-    private String nome; 
+public class UsuarioVO extends Perfil {
     private String email;
     private String senha;
     private LocalDate dataNascimento; 
     private List<Observer> seguidores = new ArrayList<>();
 
-    // Construtor vazio exigido pelo Jackson para conversão de JSON (Resolve o erro "no Creators, like default constructor")
+    // Construtor vazio exigido pelo Jackson
     public UsuarioVO() {
+        super();
     }
 
-    // Construtor completo 
+    // Construtor completo utilizando reaproveitamento da Superclasse
     public UsuarioVO(int id, String nome, String email, String senha, LocalDate dataNascimento) {
-        this.id = id;
-        this.nome = nome;
+        super(id, nome); // Inicializa o ID e Nome na classe Perfil
         this.email = email;
         this.senha = senha;
         this.dataNascimento = dataNascimento;
@@ -38,13 +37,14 @@ public class UsuarioVO {
         }
     }
 
-    // Getters
-    public String getNome() { return nome; }
+    // Getters e Setters específicos de Usuário
     public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
     public String getSenha() { return senha; }
-    public int getId() { return id; }
+    public void setSenha(String senha) { this.senha = senha; }
     
-    // A anotação que esconde a data na hora de gerar o JSON para o Frontend
     @JsonIgnore
     public LocalDate getDataNascimento() { return dataNascimento; }
+    public void setDataNascimento(LocalDate dataNascimento) { this.dataNascimento = dataNascimento; }
 }
