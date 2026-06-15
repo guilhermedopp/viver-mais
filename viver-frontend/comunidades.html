@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIVER+ - Comunidades</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="img/logo.png">
+</head>
+<body>
+
+    <main class="tela-acesso" style="max-width: 650px; padding-bottom: 90px; justify-content: flex-start;">
+        
+        <header class="cabecalho-simples" style="margin-bottom: 20px; border-bottom: 2px solid var(--cor-borda); padding-bottom: 15px; padding-top: 20px;">
+            <h1 style="font-size: 2rem; color: var(--cor-azul);">Grupos VIVER+</h1>
+        </header>
+
+        <section style="background: #eefaf0; padding: 20px; border-radius: 12px; margin-bottom: 30px; border: 2px solid var(--cor-primaria);">
+            <h3 style="font-size: 1.4rem; color: var(--cor-primaria-escura); margin-bottom: 15px;">Criar um Novo Grupo</h3>
+            <form id="form-criar-grupo">
+                <div class="grupo-input" style="margin-bottom: 10px;">
+                    <input type="text" id="nome-grupo" placeholder="Nome do Grupo (Ex: Caminhada no Parque)" required style="width: 100%; padding: 12px; font-size: 1.2rem; border: 2px solid var(--cor-borda); border-radius: 8px;">
+                </div>
+                <div class="grupo-input" style="margin-bottom: 10px;">
+                    <textarea id="desc-grupo" placeholder="Sobre o que vamos conversar aqui?" required style="width: 100%; padding: 12px; font-size: 1.2rem; border: 2px solid var(--cor-borda); border-radius: 8px; resize: none; min-height: 60px;"></textarea>
+                </div>
+                <button type="submit" class="btn-primario" style="width: 100%; padding: 12px; font-size: 1.2rem; border: none; border-radius: 8px; cursor: pointer;">+ Criar Grupo</button>
+            </form>
+        </section>
+
+        <section style="width: 100%;">
+            <h2 style="font-size: 1.6rem; text-align: left; margin-bottom: 15px; color: var(--cor-texto);">Grupos Disponíveis</h2>
+            <div id="container-comunidades">
+                <p style="font-size: 1.2rem; color: var(--cor-texto-suave);">A procurar grupos...</p>
+            </div>
+        </section>
+
+        <nav class="barra-navegacao">
+            <a href="feed.html" class="item-nav">
+                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                <span>Início</span>
+            </a>
+            
+            <a href="comunidades.html" class="item-nav ativo">
+                <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                <span>Grupos</span>
+            </a>
+
+            <a href="publicar.html" class="item-nav">
+                <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                <span>Publicar</span>
+            </a>
+
+            <a href="perfil.html" class="item-nav">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                <span>Perfil</span>
+            </a>
+        </nav>
+
+    </main>
+
+    <script>
+        const API_URL = 'http://localhost:8080/api';
+        const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
+
+        if (!usuarioLogado) {
+            window.location.href = 'index.html';
+        }
+
+        // 1. Lógica para Criar uma Comunidade
+        document.getElementById('form-criar-grupo').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nome = document.getElementById('nome-grupo').value.trim();
+            const descricao = document.getElementById('desc-grupo').value.trim();
+
+            try {
+                const resposta = await fetch(`${API_URL}/comunidades`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome: nome, descricao: descricao })
+                });
+
+                if (resposta.ok) {
+                    alert('Grupo criado com sucesso!');
+                    document.getElementById('nome-grupo').value = '';
+                    document.getElementById('desc-grupo').value = '';
+                    carregarComunidades(); // Recarrega a lista
+                } else {
+                    alert('Erro ao criar grupo.');
+                }
+            } catch (erro) {
+                console.error('Erro:', erro);
+            }
+        });
+
+        // 2. Lógica para Listar as Comunidades
+        async function carregarComunidades() {
+            try {
+                const resposta = await fetch(`${API_URL}/comunidades`);
+                if (resposta.ok) {
+                    const comunidades = await resposta.json();
+                    const container = document.getElementById('container-comunidades');
+                    container.innerHTML = '';
+
+                    if (comunidades.length === 0) {
+                        container.innerHTML = '<p style="font-size: 1.2rem;">Ainda não existem grupos. Seja o primeiro a criar um!</p>';
+                        return;
+                    }
+
+                    comunidades.forEach(com => {
+                        const card = document.createElement('article');
+                        card.style.background = '#ffffff';
+                        card.style.border = '2px solid #e9ecef';
+                        card.style.borderRadius = '12px';
+                        card.style.padding = '15px';
+                        card.style.marginBottom = '15px';
+                        card.style.display = 'flex';
+                        card.style.justifyContent = 'space-between';
+                        card.style.alignItems = 'center';
+
+                        card.innerHTML = `
+                            <div>
+                                <strong style="font-size: 1.4rem; color: var(--cor-azul); display: block;">${com.nome}</strong>
+                                <span style="font-size: 1.1rem; color: var(--cor-texto-suave);">${com.descricao}</span>
+                            </div>
+                            <button onclick="entrarGrupo(${com.id}, '${com.nome}')" class="btn-secundario" style="padding: 8px 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Entrar</button>
+                        `;
+                        container.appendChild(card);
+                    });
+                }
+            } catch (erro) {
+                console.error("Erro ao buscar grupos:", erro);
+            }
+        }
+
+        // 3. Lógica para Entrar no Grupo (Abre o Feed filtrado)
+        function entrarGrupo(id, nome) {
+            // Guarda o grupo ativo na memória do navegador e redireciona para o Feed
+            localStorage.setItem('comunidadeAtiva', JSON.stringify({ id: id, nome: nome }));
+            window.location.href = 'feed.html';
+        }
+
+        // Inicia o carregamento
+        carregarComunidades();
+    </script>
+</body>
+</html>
