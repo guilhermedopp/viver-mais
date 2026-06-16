@@ -1,130 +1,91 @@
 const API_URL = 'http://localhost:8080/api';
 
-// Função auxiliar de Validação de CPF (Algoritmo Oficial)
+// ── Validação de CPF (Algoritmo oficial — Módulo 11) ──────────────────
 function validarCPF(cpf) {
-    cpf = cpf.replace(/[^\d]+/g,'');
-    if(cpf == '' || cpf.length != 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+    cpf = cpf.replace(/[^\d]+/g, '');
+    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
     let add = 0;
-    for (let i=0; i < 9; i ++) add += parseInt(cpf.charAt(i)) * (10 - i);
+    for (let i = 0; i < 9; i++) add += parseInt(cpf[i]) * (10 - i);
     let rev = 11 - (add % 11);
-    if (rev == 10 || rev == 11) rev = 0;
-    if (rev != parseInt(cpf.charAt(9))) return false;
+    if (rev >= 10) rev = 0;
+    if (rev !== parseInt(cpf[9])) return false;
     add = 0;
-    for (let i = 0; i < 10; i ++) add += parseInt(cpf.charAt(i)) * (11 - i);
+    for (let i = 0; i < 10; i++) add += parseInt(cpf[i]) * (11 - i);
     rev = 11 - (add % 11);
-    if (rev == 10 || rev == 11) rev = 0;
-    if (rev != parseInt(cpf.charAt(10))) return false;
-    return true;
+    if (rev >= 10) rev = 0;
+    return rev === parseInt(cpf[10]);
 }
 
-// ===================== LOGIN =====================
+// ── LOGIN ─────────────────────────────────────────────────────────────
 const formLogin = document.getElementById('form-login');
-
 if (formLogin) {
-    formLogin.addEventListener('submit', async function(event) {
-        event.preventDefault();
-
+    formLogin.addEventListener('submit', async (e) => {
+        e.preventDefault();
         const email = document.getElementById('email').value.trim();
         const senha = document.getElementById('senha').value;
-
         try {
-            const resposta = await fetch(`${API_URL}/login`, {
+            const resp = await fetch(`${API_URL}/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: email, senha: senha })
+                body: JSON.stringify({ email, senha })
             });
-
-            if (resposta.ok) {
-                const dadosUsuario = await resposta.json();
-                localStorage.setItem('usuarioLogado', JSON.stringify(dadosUsuario));
+            if (resp.ok) {
+                localStorage.setItem('usuarioLogado', JSON.stringify(await resp.json()));
                 window.location.href = 'feed.html';
             } else {
-                const mensagemErro = await resposta.text();
-                alert('Aviso: ' + mensagemErro);
+                alert('Aviso: ' + await resp.text());
             }
-        } catch (erro) {
-            alert('Não foi possível conectar ao VIVER+. Verifique a sua internet ou contacte o suporte.');
-            console.error('Erro na API:', erro);
+        } catch (err) {
+            alert('Não foi possível conectar ao VIVER+. Verifique se o servidor Java está ligado.');
         }
     });
 }
 
-// ===================== CADASTRO =====================
+// ── CADASTRO ──────────────────────────────────────────────────────────
 const formCadastro = document.getElementById('form-cadastro');
-
 if (formCadastro) {
-    formCadastro.addEventListener('submit', async function(event) {
-        event.preventDefault();
-
-        const nome = document.getElementById('nome').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const senha = document.getElementById('senha').value;
-        const confirmarSenha = document.getElementById('confirmarSenha').value;
+    formCadastro.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nome           = document.getElementById('nome').value.trim();
+        const cpf            = document.getElementById('cpf').value.replace(/\D/g, '');
+        const email          = document.getElementById('email').value.trim();
         const dataNascimento = document.getElementById('dataNascimento').value;
-        const cpf = document.getElementById('cpf') ? document.getElementById('cpf').value : '';
+        const senha          = document.getElementById('senha').value;
+        const confirmar      = document.getElementById('confirmarSenha').value;
+        const msg            = document.getElementById('mensagem-cadastro');
 
-        const mensagem = document.getElementById('mensagem-cadastro');
-
-        // 1. Validar se as senhas são iguais
-        if (senha !== confirmarSenha) {
-            mensagem.textContent = 'As senhas não coincidem. Verifique e tente novamente.';
-            mensagem.className = 'mensagem mensagem-erro';
-            return;
+        // Validações no frontend
+        if (senha !== confirmar) {
+            msg.textContent = 'As senhas não coincidem. Verifique e tente novamente.';
+            msg.className = 'mensagem mensagem-erro'; return;
         }
-
-        // 2. Validar CPF
         if (!validarCPF(cpf)) {
-            mensagem.textContent = 'O CPF inserido é inválido. Por favor, verifique os números.';
-            mensagem.className = 'mensagem mensagem-erro';
-            return;
+            msg.textContent = 'CPF inválido. Verifique os números digitados.';
+            msg.className = 'mensagem mensagem-erro'; return;
         }
 
-        if (mensagem) {
-            mensagem.textContent = 'A validar dados...';
-            mensagem.className = 'mensagem';
-        }
+        msg.textContent = 'A validar dados...';
+        msg.className = 'mensagem';
 
         try {
-            const resposta = await fetch(`${API_URL}/cadastro`, {
+            const resp = await fetch(`${API_URL}/cadastro`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    nome: nome, 
-                    email: email, 
-                    senha: senha, 
-                    dataNascimento: dataNascimento 
-                    // Nota: O CPF foi validado no frontend. Poderia ser enviado ao backend se tivesse criado a coluna no MySQL.
-                })
+                body: JSON.stringify({ nome, email, senha, dataNascimento, cpf })   // ← CPF enviado
             });
-
-            if (resposta.ok) {
-                const usuario = await resposta.json();
-                if (mensagem) {
-                    mensagem.textContent = 'Conta criada com sucesso, ' + usuario.nome + '!';
-                    mensagem.className = 'mensagem mensagem-sucesso';
-                }
-                
-                // Grava o e-mail temporariamente para autocompletar na página de login
+            if (resp.ok) {
+                const usuario = await resp.json();
+                msg.textContent = 'Conta criada com sucesso, ' + usuario.nome + '!';
+                msg.className = 'mensagem mensagem-sucesso';
                 localStorage.setItem('emailRecenteCadastro', email);
-
-                setTimeout(function() {
-                    window.location.href = 'index.html';
-                }, 1500);
+                setTimeout(() => window.location.href = 'index.html', 1500);
             } else {
-                const mensagemErro = await resposta.text();
-                if (mensagem) {
-                    mensagem.textContent = mensagemErro;
-                    mensagem.className = 'mensagem mensagem-erro';
-                } else {
-                    alert('Aviso: ' + mensagemErro);
-                }
+                msg.textContent = await resp.text();
+                msg.className = 'mensagem mensagem-erro';
             }
-        } catch (erro) {
-            if (mensagem) {
-                mensagem.textContent = 'Não foi possível ligar ao servidor.';
-                mensagem.className = 'mensagem mensagem-erro';
-            }
-            console.error('Erro na API:', erro);
+        } catch (err) {
+            msg.textContent = 'Não foi possível ligar ao servidor.';
+            msg.className = 'mensagem mensagem-erro';
         }
     });
 }
