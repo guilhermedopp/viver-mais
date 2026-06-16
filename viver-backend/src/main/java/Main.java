@@ -97,6 +97,14 @@ public class Main {
 
         // ── PERFIL ────────────────────────────────────────────────────────
         // Perfil público de qualquer usuário
+
+        app.get("/api/usuarios/{id}/estatisticas", ctx -> {
+            try {
+                int id = Integer.parseInt(ctx.pathParam("id"));
+                ctx.json(usuarioDAO.buscarEstatisticas(id));
+            } catch (Exception e) { ctx.status(500).result(e.getMessage()); }
+        });
+        
         app.get("/api/usuarios/{id}", ctx -> {
             try {
                 int id = Integer.parseInt(ctx.pathParam("id"));
