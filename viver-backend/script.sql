@@ -1,4 +1,4 @@
--- VIVER+ — Script Completo do Banco de Dados
+-- VIVER+ — Script Completo do Banco de Dados (ATUALIZADO)
 DROP DATABASE IF EXISTS viver_db;
 CREATE DATABASE viver_db;
 USE viver_db;
@@ -10,7 +10,7 @@ CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
-    senha VARCHAR(50) NOT NULL,
+    senha VARCHAR(255) NOT NULL, -- Aumentado para 255 (boas práticas para futuras criptografias)
     data_nascimento DATE NOT NULL,
     foto_perfil MEDIUMTEXT DEFAULT NULL
 );
@@ -31,10 +31,6 @@ CREATE TABLE postagens (
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
-INSERT INTO postagens (conteudo, usuario_id, destino_tipo, destino_id)
-VALUES ('Olá! Que alegria estar aqui no VIVER+! 🌱', 1, 'USUARIO', 1);
-
--- ─────────────────────────────────────────
 -- 3. TABELA DE COMUNIDADES
 -- ─────────────────────────────────────────
 CREATE TABLE comunidades (
