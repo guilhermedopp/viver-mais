@@ -21,9 +21,15 @@
             <p style="font-size: 0.9rem; color: var(--cor-texto-suave); margin-bottom: 15px; cursor: pointer;" onclick="document.getElementById('input-foto').click()">Tocar para alterar foto</p>
 
             <h1 id="nome-perfil" style="font-size: 2.2rem; color: var(--cor-azul); margin-bottom: 5px;">Carregando...</h1>
-            <p id="email-perfil" style="font-size: 1.2rem; color: var(--cor-texto-suave);">...</p>
+            <p id="email-perfil" style="font-size: 1.2rem; color: var(--cor-texto-suave); margin-bottom: 20px;">...</p>
             
-            <button id="btn-sair-perfil" class="btn-primario" style="margin-top: 20px; padding: 10px 30px; border-radius: 99px; background: #eefaf0; color: var(--cor-erro); border: 2px solid var(--cor-erro); font-weight: bold; box-shadow: none;">Terminar Sessão</button>
+            <div style="display: flex; gap: 25px; margin-bottom: 20px;">
+                <div style="text-align: center;"><strong id="num-posts" style="display: block; font-size: 1.4rem;">0</strong> posts</div>
+                <div style="text-align: center;"><strong id="num-seguidores" style="display: block; font-size: 1.4rem;">0</strong> seguidores</div>
+                <div style="text-align: center;"><strong id="num-seguindo" style="display: block; font-size: 1.4rem;">0</strong> seguindo</div>
+            </div>
+            
+            <button id="btn-sair-perfil" class="btn-primario" style="padding: 10px 30px; border-radius: 99px; background: #eefaf0; color: var(--cor-erro); border: 2px solid var(--cor-erro); font-weight: bold;">Terminar Sessão</button>
         </header>
 
         <div style="width: 100%; height: 3px; background: var(--cor-borda); margin-bottom: 25px; border-radius: 2px;"></div>
@@ -36,37 +42,13 @@
         </section>
 
         <nav class="barra-navegacao">
-            <a href="feed.html" class="item-nav">
-                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-                <span style="font-size: 0.9rem;">Início</span>
-            </a>
-            
-            <a href="#" class="item-nav" onclick="alert('Página de Mensagens em construção!')">
-                <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
-                <span style="font-size: 0.9rem;">Chat</span>
-            </a>
-
-            <a href="publicar.html" class="item-nav">
-                <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                <span style="font-size: 0.9rem;">Publicar</span>
-            </a>
-
-            <a href="comunidades.html" class="item-nav">
-                <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-                <span style="font-size: 0.9rem;">Grupos</span>
-            </a>
-
-            <a href="notificacoes.html" class="item-nav">
-                <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/></svg>
-                <span style="font-size: 0.9rem;">Avisos</span>
-            </a>
-
-            <a href="perfil.html" class="item-nav ativo">
-                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                <span style="font-size: 0.9rem;">Perfil</span>
-            </a>
+            <a href="feed.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>Início</span></a>
+            <a href="#" class="item-nav" onclick="alert('Página de Mensagens em construção!')"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg><span>Chat</span></a>
+            <a href="publicar.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>Publicar</span></a>
+            <a href="comunidades.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><span>Grupos</span></a>
+            <a href="notificacoes.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><span>Avisos</span></a>
+            <a href="perfil.html" class="item-nav ativo"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span>Perfil</span></a>
         </nav>
-
     </main>
 
     <script>
@@ -79,98 +61,59 @@
             document.getElementById('nome-perfil').textContent = usuarioLogado.nome;
             document.getElementById('email-perfil').textContent = usuarioLogado.email;
             
-            // Verifica se o utilizador já tem foto guardada na memória
             if (usuarioLogado.fotoPerfil) {
                 document.getElementById('avatar-perfil').innerHTML = `<img src="${usuarioLogado.fotoPerfil}" style="width: 100%; height: 100%; object-fit: cover;">`;
             } else {
                 document.getElementById('letra-avatar').textContent = usuarioLogado.nome.charAt(0).toUpperCase();
             }
+            
+            carregarEstatisticas();
+            carregarMeusPosts();
         }
 
-        // ==========================================
-        // LÓGICA DE UPLOAD DE FOTO DE PERFIL
-        // ==========================================
-        document.getElementById('input-foto').addEventListener('change', function(event) {
-            const ficheiro = event.target.files[0];
-            if (!ficheiro) return;
-
-            // O FileReader converte a imagem num texto Base64
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                const base64Image = e.target.result;
-                
-                // Mostra a foto imediatamente para dar feedback visual rápido
-                document.getElementById('avatar-perfil').innerHTML = `<img src="${base64Image}" style="width: 100%; height: 100%; object-fit: cover;">`;
-
-                try {
-                    // Envia para a API Java
-                    const resposta = await fetch(`${API_URL}/usuarios/${usuarioLogado.id}/foto`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ base64: base64Image })
-                    });
-
-                    if (resposta.ok) {
-                        // Se sucesso, atualiza o localStorage para que a foto não desapareça ao mudar de página
-                        usuarioLogado.fotoPerfil = base64Image;
-                        localStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
-                    } else {
-                        alert("Erro ao gravar a foto no servidor.");
-                    }
-                } catch (erro) {
-                    console.error("Erro no upload da foto:", erro);
-                }
-            };
-            reader.readAsDataURL(ficheiro);
-        });
-
-        document.getElementById('btn-sair-perfil').addEventListener('click', () => {
-            localStorage.removeItem('usuarioLogado');
-            window.location.href = 'index.html';
-        });
-
-        // Buscar apenas as publicações deste utilizador
-        async function carregarMeusPosts() {
+        async function carregarEstatisticas() {
             try {
-                const resposta = await fetch(`${API_URL}/posts?usuarioId=${usuarioLogado.id}`);
-                if (resposta.ok) {
-                    const todosPosts = await resposta.json();
-                    const meusPosts = todosPosts.filter(post => post.autor.id === usuarioLogado.id);
-                    
-                    const container = document.getElementById('container-meus-posts');
-                    container.innerHTML = '';
-
-                    if (meusPosts.length === 0) {
-                        container.innerHTML = '<p style="font-size: 1.2rem; text-align: center; margin-top: 20px;">Ainda não partilhou nenhum momento. Vá à aba "Publicar" para começar!</p>';
-                        return;
-                    }
-
-                    meusPosts.forEach(post => {
-                        const dataFormatada = new Date(post.data).toLocaleDateString('pt-PT', {
-                            day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
-                        });
-
-                        const card = document.createElement('article');
-                        card.style.background = '#ffffff';
-                        card.style.border = '3px solid #e9ecef';
-                        card.style.borderRadius = '14px';
-                        card.style.padding = '20px';
-                        card.style.marginBottom = '15px';
-                        card.style.textAlign = 'left';
-
-                        card.innerHTML = `
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                <span style="font-size: 0.95rem; color: gray; font-weight: bold;">${dataFormatada}</span>
-                            </div>
-                            <p style="font-size: 1.3rem; line-height: 1.4; font-weight: 500; color: #111;">${post.conteudo}</p>
-                        `;
-                        container.appendChild(card);
-                    });
+                const r = await fetch(`${API_URL}/usuarios/${usuarioLogado.id}/estatisticas`);
+                if (r.ok) {
+                    const stats = await r.json();
+                    document.getElementById('num-posts').textContent = stats.totalPosts;
+                    document.getElementById('num-seguidores').textContent = stats.totalSeguidores;
+                    document.getElementById('num-seguindo').textContent = stats.totalSeguindo;
                 }
-            } catch (erro) { console.error("Erro:", erro); }
+            } catch (e) { console.error("Erro ao carregar stats:", e); }
         }
 
-        carregarMeusPosts();
+        // ... (resto da sua lógica de upload de foto e carregamento de posts) ...
+        document.getElementById('input-foto').addEventListener('change', async function(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const base64 = event.target.result;
+                document.getElementById('avatar-perfil').innerHTML = `<img src="${base64}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                await fetch(`${API_URL}/usuarios/${usuarioLogado.id}/foto`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({base64})
+                });
+                usuarioLogado.fotoPerfil = base64;
+                localStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
+            };
+            reader.readAsDataURL(file);
+        });
+
+        async function carregarMeusPosts() {
+            const r = await fetch(`${API_URL}/posts?usuarioId=${usuarioLogado.id}`);
+            if (r.ok) {
+                const posts = await r.json();
+                const meus = posts.filter(p => p.autor.id === usuarioLogado.id);
+                const container = document.getElementById('container-meus-posts');
+                container.innerHTML = meus.map(p => `
+                    <article style="background: white; border: 3px solid #e9ecef; border-radius: 14px; padding: 20px; margin-bottom: 15px;">
+                        <p style="font-size: 1.3rem;">${p.conteudo}</p>
+                    </article>
+                `).join('');
+            }
+        }
     </script>
 </body>
 </html>
