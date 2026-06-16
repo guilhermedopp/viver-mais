@@ -1,74 +1,106 @@
--- Cria a base de dados do projeto VIVER+
+-- VIVER+ — Script Completo do Banco de Dados
 DROP DATABASE IF EXISTS viver_db;
 CREATE DATABASE viver_db;
 USE viver_db;
 
--- Cria a tabela de utilizadores (agora com suporte à data de nascimento real)
+-- ─────────────────────────────────────────
+-- TABELA DE USUÁRIOS
+-- ─────────────────────────────────────────
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     senha VARCHAR(50) NOT NULL,
-    data_nascimento DATE NOT NULL
+    data_nascimento DATE NOT NULL,
+    foto_perfil MEDIUMTEXT DEFAULT NULL   -- Foto em base64 (para o perfil)
 );
 
--- Insere uma utilizadora de teste para podermos fazer o primeiro login
-INSERT INTO usuarios (nome, email, senha, data_nascimento) 
+INSERT INTO usuarios (nome, email, senha, data_nascimento)
 VALUES ('Dona Maria', 'maria@viver.com', '1234', '1950-05-20');
 
--- Cria a tabela de postagens (Feed de Momentos)
+-- ─────────────────────────────────────────
+-- TABELA DE POSTAGENS (com destino polimórfico)
+-- ─────────────────────────────────────────
 CREATE TABLE postagens (
     id INT AUTO_INCREMENT PRIMARY KEY,
     conteudo TEXT NOT NULL,
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     usuario_id INT NOT NULL,
+    destino_tipo VARCHAR(20) DEFAULT 'USUARIO',
+    destino_id INT,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
--- ==========================================
--- NOVAS TABELAS PARA INTERAÇÃO SOCIAL
--- ==========================================
+-- Post de exemplo para o feed não ficar vazio
+INSERT INTO postagens (conteudo, usuario_id, destino_tipo, destino_id)
+VALUES ('Olá! Que alegria estar aqui no VIVER+! 🌱', 1, 'USUARIO', 1);
 
--- Tabela para guardar as Curtidas (Gostos)
+-- ─────────────────────────────────────────
+-- CURTIDAS
+-- ─────────────────────────────────────────
 CREATE TABLE curtidas (
     usuario_id INT NOT NULL,
-    post_id INT NOT NULL,
+    post_id    INT NOT NULL,
     PRIMARY KEY (usuario_id, post_id),
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
-    FOREIGN KEY (post_id) REFERENCES postagens(id) ON DELETE CASCADE
+    FOREIGN KEY (post_id)    REFERENCES postagens(id) ON DELETE CASCADE
 );
 
--- Tabela para guardar as Respostas (Comentários)
+-- ─────────────────────────────────────────
+-- RESPOSTAS / COMENTÁRIOS
+-- ─────────────────────────────────────────
 CREATE TABLE respostas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     conteudo TEXT NOT NULL,
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     usuario_id INT NOT NULL,
-    post_id INT NOT NULL,
+    post_id    INT NOT NULL,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
-    FOREIGN KEY (post_id) REFERENCES postagens(id) ON DELETE CASCADE
+    FOREIGN KEY (post_id)    REFERENCES postagens(id) ON DELETE CASCADE
 );
 
--- Insere um post de teste para o feed não ficar vazio
-INSERT INTO postagens (conteudo, usuario_id) 
-VALUES ('Olá, esta é a minha primeira publicação no VIVER+! Que alegria estar aqui.', 1);
-
--- ==========================================
+-- ─────────────────────────────────────────
 -- COMUNIDADES / GRUPOS
--- ==========================================
-
--- 1. Criar a tabela de Comunidades
-CREATE TABLE IF NOT EXISTS comunidades (
+-- ─────────────────────────────────────────
+CREATE TABLE comunidades (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     descricao TEXT,
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 2. Adicionar colunas polimórficas na tabela de postagens
--- destino_tipo: 'USUARIO' se for no feed pessoal, 'COMUNIDADE' se for dentro de um grupo
-ALTER TABLE postagens ADD COLUMN destino_tipo VARCHAR(20) DEFAULT 'USUARIO';
-ALTER TABLE postagens ADD COLUMN destino_id INT;
+-- ─────────────────────────────────────────
+-- SEGUIDORES (para o Observer)
+-- ─────────────────────────────────────────
+CREATE TABLE seguidores (
+    seguidor_id INT NOT NULL,
+    seguido_id  INT NOT NULL,
+    PRIMARY KEY (seguidor_id, seguido_id),
+    FOREIGN KEY (seguidor_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (seguido_id)  REFERENCES usuarios(id) ON DELETE CASCADE,
+    CHECK (seguidor_id <> seguido_id)
+);
 
--- Para não quebrar os posts antigos, vinculamos o destino_id ao próprio autor do post
-UPDATE postagens SET destino_id = usuario_id WHERE destino_id IS NULL;
+-- ─────────────────────────────────────────
+-- NOTIFICAÇÕES (geradas pelo Observer)
+-- ─────────────────────────────────────────
+CREATE TABLE notificacoes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id   INT NOT NULL,               -- quem recebe a notificação
+    mensagem     TEXT NOT NULL,
+    lida         BOOLEAN DEFAULT FALSE,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+-- ─────────────────────────────────────────
+-- VISUALIZAÇÕES (filtro vistos / não vistos)
+-- ─────────────────────────────────────────
+CREATE TABLE visualizacoes (
+    usuario_id INT NOT NULL,
+    post_id    INT NOT NULL,
+    data_vista TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (usuario_id, post_id),
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (post_id)    REFERENCES postagens(id) ON DELETE CASCADE
+);
