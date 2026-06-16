@@ -1,6 +1,7 @@
 package com.dao;
 
 import com.vo.UsuarioVO;
+import com.vo.EstatisticasPerfilVO; // Importante: importar o novo VO
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +71,6 @@ public class UsuarioDAO {
         return null;
     }
 
-    // Atualiza a foto de perfil (base64)
     public void atualizarFoto(int usuarioId, String base64) throws Exception {
         String sql = "UPDATE usuarios SET foto_perfil = ? WHERE id = ?";
         try (Connection conn = ConexaoDB.conectar();
@@ -83,7 +83,6 @@ public class UsuarioDAO {
         }
     }
 
-    // Lista todos os usuários (para a aba de "Ver Pessoas")
     public List<UsuarioVO> listarTodos() throws Exception {
         String sql = "SELECT id, nome, email, foto_perfil FROM usuarios ORDER BY nome ASC";
         List<UsuarioVO> lista = new ArrayList<>();
@@ -99,6 +98,32 @@ public class UsuarioDAO {
             throw new Exception("Erro ao listar usuários: " + e.getMessage());
         }
         return lista;
+    }
+
+    // --- NOVA FUNCIONALIDADE: ESTATÍSTICAS DE PERFIL ---
+    public EstatisticasPerfilVO buscarEstatisticas(int usuarioId) throws Exception {
+        String sql = "SELECT " +
+                     "(SELECT COUNT(*) FROM postagens WHERE usuario_id = ?) as posts, " +
+                     "(SELECT COUNT(*) FROM seguidores WHERE seguido_id = ?) as seguidores, " +
+                     "(SELECT COUNT(*) FROM seguidores WHERE seguidor_id = ?) as seguindo";
+        
+        try (Connection conn = ConexaoDB.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, usuarioId);
+            stmt.setInt(2, usuarioId);
+            stmt.setInt(3, usuarioId);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new EstatisticasPerfilVO(
+                        rs.getInt("posts"), 
+                        rs.getInt("seguidores"), 
+                        rs.getInt("seguindo")
+                    );
+                }
+            }
+        }
+        return new EstatisticasPerfilVO(0, 0, 0);
     }
 
     private UsuarioVO mapear(ResultSet rs) throws Exception {
