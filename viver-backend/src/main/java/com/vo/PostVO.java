@@ -9,12 +9,12 @@ public class PostVO {
     private String conteudo;
     private Date data;
     private UsuarioVO autor;
-    private boolean visto; 
+    private boolean visto;
+    private int totalCurtidas;
+    private boolean curtidoPeloUsuario;
     private List<RespostaVO> respostas = new ArrayList<>();
-    
-    // ATRIBUTOS POLIMÓRFICOS
-    private Perfil destino; 
-    private String destinoTipo; // "USUARIO" ou "COMUNIDADE"
+    private Perfil destino;
+    private String destinoTipo;
 
     public PostVO() {}
 
@@ -24,33 +24,31 @@ public class PostVO {
         this.autor = autor;
         this.data = new Date();
         this.visto = false;
-        // Padrão: post vai para o feed do próprio autor
         this.destino = autor;
         this.destinoTipo = "USUARIO";
     }
 
-    // Getters e Setters
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    // Getters
+    public int getId()                    { return id; }
+    public String getConteudo()           { return conteudo; }
+    public Date getData()                 { return data; }
+    public UsuarioVO getAutor()           { return autor; }
+    public boolean isVisto()              { return visto; }
+    public int getTotalCurtidas()         { return totalCurtidas; }
+    public boolean isCurtidoPeloUsuario() { return curtidoPeloUsuario; }
+    public List<RespostaVO> getRespostas(){ return respostas; }
+    public Perfil getDestino()            { return destino; }
+    public String getDestinoTipo()        { return destinoTipo; }
 
-    public String getConteudo() { return conteudo; }
-    public void setConteudo(String conteudo) { this.conteudo = conteudo; }
-
-    public Date getData() { return data; }
-    public void setData(Date data) { this.data = data; }
-
-    public UsuarioVO getAutor() { return autor; }
-    public void setAutor(UsuarioVO autor) { this.autor = autor; }
-
-    public boolean isVisto() { return visto; }
-    public void setVisto(boolean visto) { this.visto = visto; }
-
-    public List<RespostaVO> getRespostas() { return respostas; }
-    public void setRespostas(List<RespostaVO> respostas) { this.respostas = respostas; }
-
-    public Perfil getDestino() { return destino; }
-    public void setDestino(Perfil destino) { this.destino = destino; }
-
-    public String getDestinoTipo() { return destinoTipo; }
-    public void setDestinoTipo(String destinoTipo) { this.destinoTipo = destinoTipo; }
+    // Setters
+    public void setId(int id)                              { this.id = id; }
+    public void setConteudo(String c)                      { this.conteudo = c; }
+    public void setData(Date d)                            { this.data = d; }
+    public void setAutor(UsuarioVO a)                      { this.autor = a; }
+    public void setVisto(boolean v)                        { this.visto = v; }
+    public void setTotalCurtidas(int t)                    { this.totalCurtidas = t; }
+    public void setCurtidoPeloUsuario(boolean c)           { this.curtidoPeloUsuario = c; }
+    public void setRespostas(List<RespostaVO> r)           { this.respostas = r; }
+    public void setDestino(Perfil d)                       { this.destino = d; }
+    public void setDestinoTipo(String t)                   { this.destinoTipo = t; }
 }
