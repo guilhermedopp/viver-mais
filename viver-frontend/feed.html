@@ -1,181 +1,270 @@
 <!DOCTYPE html>
 <html lang="pt-PT">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIVER+ - Feed de Momentos</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="icon" type="image/png" href="img/logo.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VIVER+ - Feed de Momentos</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="img/logo.png">
+  <style>
+    .filtro-bar { display:flex; gap:10px; margin-bottom:18px; }
+    .btn-filtro { flex:1; padding:10px; font-size:1.1rem; font-weight:700; border:3px solid var(--cor-borda);
+                  border-radius:99px; background:#fff; cursor:pointer; transition:.2s; }
+    .btn-filtro.ativo { background:var(--cor-primaria); color:#fff; border-color:var(--cor-primaria); }
+    .avatar { width:42px; height:42px; border-radius:50%; object-fit:cover;
+              background:var(--cor-primaria); color:#fff; display:flex; align-items:center;
+              justify-content:center; font-size:1.3rem; font-weight:700; flex-shrink:0; }
+    .badge-notif { background:red; color:#fff; border-radius:99px; font-size:0.7rem;
+                   padding:1px 5px; position:absolute; top:-4px; right:-6px; font-weight:700; }
+    .nav-item-wrap { position:relative; }
+  </style>
 </head>
 <body>
+<main class="tela-acesso" style="max-width:650px; padding-bottom:90px; justify-content:flex-start;">
 
-    <main class="tela-acesso" style="max-width: 650px; padding-bottom: 90px; justify-content: flex-start;">
-        
-        <header class="cabecalho-simples" style="justify-content: space-between; margin-bottom: 20px; align-items: center; display: flex; padding-top: 20px;">
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <img src="img/logo.png" alt="Logótipo Oficial do VIVER+" style="height: 55px; width: auto; object-fit: contain;">
-                <div>
-                    <h1 style="margin: 0; font-size: 1.8rem;">VIVER+</h1>
-                    <p id="saudacao" style="margin: 0; margin-top: 2px;">Olá, ...</p>
-                </div>
-            </div>
-        </header>
+  <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding-top:20px;">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <img src="img/logo.png" style="height:50px; object-fit:contain;">
+      <div>
+        <h1 style="font-size:1.8rem; margin:0;">VIVER+</h1>
+        <p id="saudacao" style="margin:0; color:var(--cor-texto-suave);">Olá...</p>
+      </div>
+    </div>
+  </header>
 
-        <section style="width: 100%;">
-            <h2 style="font-size: 1.8rem; text-align: left; margin-bottom: 15px;">Momentos da nossa Rede</h2>
-            <div id="container-posts">
-                <p style="font-size: 1.2rem; color: var(--cor-texto-suave);">A carregar os momentos...</p>
-            </div>
-        </section>
+  <!-- Filtro vistos / não vistos -->
+  <div class="filtro-bar">
+    <button class="btn-filtro ativo" id="btn-todos"     onclick="filtrar('todos')">Todos</button>
+    <button class="btn-filtro"       id="btn-novos"     onclick="filtrar('novos')">🆕 Novos</button>
+    <button class="btn-filtro"       id="btn-ja-vistos" onclick="filtrar('vistos')">✅ Já vistos</button>
+  </div>
 
-        <nav class="barra-navegacao">
-            <a href="feed.html" class="item-nav">
-                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-                <span style="font-size: 0.9rem;">Início</span>
-            </a>
-            
-            <a href="#" class="item-nav" onclick="alert('Página de Mensagens em construção!')">
-                <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
-                <span style="font-size: 0.9rem;">Chat</span>
-            </a>
+  <section style="width:100%;">
+    <div id="container-posts">
+      <p style="font-size:1.2rem; color:var(--cor-texto-suave);">A carregar os momentos...</p>
+    </div>
+  </section>
 
-            <a href="publicar.html" class="item-nav">
-                <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                <span style="font-size: 0.9rem;">Publicar</span>
-            </a>
+  <nav class="barra-navegacao">
+    <a href="feed.html" class="item-nav ativo">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <span style="font-size:.9rem;">Início</span>
+    </a>
+    <a href="comunidades.html" class="item-nav">
+      <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      <span style="font-size:.9rem;">Grupos</span>
+    </a>
+    <a href="publicar.html" class="item-nav">
+      <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      <span style="font-size:.9rem;">Publicar</span>
+    </a>
+    <a href="notificacoes.html" class="item-nav nav-item-wrap">
+      <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+      <span id="badge-notif" class="badge-notif" style="display:none;">0</span>
+      <span style="font-size:.9rem;">Avisos</span>
+    </a>
+    <a href="perfil.html" class="item-nav">
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      <span style="font-size:.9rem;">Perfil</span>
+    </a>
+  </nav>
+</main>
 
-            <a href="comunidades.html" class="item-nav">
-                <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-                <span style="font-size: 0.9rem;">Grupos</span>
-            </a>
+<script>
+const API_URL = 'http://localhost:8080/api';
+const usuario = JSON.parse(localStorage.getItem('usuarioLogado'));
+if (!usuario) window.location.href = 'index.html';
+else document.getElementById('saudacao').textContent = `Olá, ${usuario.nome}! 👋`;
 
-            <a href="#" class="item-nav" onclick="alert('Notificações em construção!')">
-                <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/></svg>
-                <span style="font-size: 0.9rem;">Avisos</span>
-            </a>
+let todosPosts = [];
+let filtroAtual = 'todos';
 
-            <a href="perfil.html" class="item-nav">
-                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                <span style="font-size: 0.9rem;">Perfil</span>
-            </a>
-        </nav>
+// ── Badge de notificações ─────────────────────────────────────────
+async function carregarBadgeNotif() {
+  try {
+    const r = await fetch(`${API_URL}/notificacoes/${usuario.id}/nao-lidas`);
+    if (r.ok) {
+      const { total } = await r.json();
+      const badge = document.getElementById('badge-notif');
+      if (total > 0) { badge.textContent = total; badge.style.display = 'inline'; }
+      else badge.style.display = 'none';
+    }
+  } catch (_) {}
+}
 
-    </main>
+// ── Filtro ────────────────────────────────────────────────────────
+function filtrar(tipo) {
+  filtroAtual = tipo;
+  ['todos','novos','ja-vistos'].forEach(id =>
+    document.getElementById('btn-' + id).classList.toggle('ativo', id === tipo.replace('vistos','ja-vistos'))
+  );
+  renderizarPosts();
+}
 
-    <script>
-        const API_URL = 'http://localhost:8080/api';
-        const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
+function renderizarPosts() {
+  const container = document.getElementById('container-posts');
+  let posts = todosPosts;
+  if (filtroAtual === 'novos')   posts = todosPosts.filter(p => !p.visto);
+  if (filtroAtual === 'vistos')  posts = todosPosts.filter(p => p.visto);
 
-        // Proteção de acesso
-        if (!usuarioLogado) {
-            window.location.href = 'index.html';
-        } else {
-            document.getElementById('saudacao').textContent = `Olá, ${usuarioLogado.nome}! 👋`;
-        }
+  if (posts.length === 0) {
+    container.innerHTML = `<p style="font-size:1.2rem; color:var(--cor-texto-suave); text-align:center; margin-top:20px;">
+      ${filtroAtual === 'novos' ? 'Nenhum momento novo! Você está em dia. ✅' :
+        filtroAtual === 'vistos' ? 'Ainda não viu nenhum momento.' :
+        'Ainda não há partilhas. Seja o primeiro!'}
+    </p>`;
+    return;
+  }
 
-        // ==========================================
-        // LÓGICA DE CARREGAMENTO DO FEED
-        // ==========================================
-        async function carregarPosts() {
-            try {
-                const resposta = await fetch(`${API_URL}/posts`);
-                if (resposta.ok) {
-                    const posts = await resposta.json();
-                    const container = document.getElementById('container-posts');
-                    container.innerHTML = '';
+  container.innerHTML = '';
+  posts.forEach(post => renderCard(post, container));
+}
 
-                    if (posts.length === 0) {
-                        container.innerHTML = '<p style="font-size: 1.2rem;">Ainda não há partilhas. Seja o primeiro!</p>';
-                        return;
-                    }
+function renderCard(post, container) {
+  const data = new Date(post.data).toLocaleDateString('pt-PT', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+  const coracao = post.curtidoPeloUsuario ? '❤️' : '🤍';
+  const corBtn  = post.curtidoPeloUsuario ? '#e03131' : 'var(--cor-texto-suave)';
 
-                    posts.forEach(post => {
-                        const dataFormatada = new Date(post.data).toLocaleDateString('pt-PT', {
-                            hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short'
-                        });
+  // Avatar do autor
+  const fotoSrc = post.autor.fotoPerfil
+    ? `<img src="${post.autor.fotoPerfil}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;">`
+    : `<div class="avatar">${post.autor.nome.charAt(0).toUpperCase()}</div>`;
 
-                        const card = document.createElement('article');
-                        card.style.background = '#ffffff';
-                        card.style.border = '3px solid #e9ecef';
-                        card.style.borderRadius = '14px';
-                        card.style.padding = '20px';
-                        card.style.marginBottom = '20px';
-                        card.style.textAlign = 'left';
-                        card.style.width = '100%';
+  // Respostas/comentários
+  let respostasHtml = '';
+  if (post.respostas && post.respostas.length > 0) {
+    respostasHtml = `<div style="margin-top:10px; padding-top:10px; border-top:1px solid #f0f0f0;">`;
+    post.respostas.forEach(r => {
+      respostasHtml += `<div style="display:flex;gap:8px;margin-bottom:6px;align-items:flex-start;">
+        <div class="avatar" style="width:30px;height:30px;font-size:0.9rem;">${r.autor.nome.charAt(0)}</div>
+        <div style="background:#f7fbfd;border-radius:8px;padding:6px 10px;flex:1;">
+          <strong style="font-size:0.95rem;color:var(--cor-azul);">${r.autor.nome}</strong>
+          <p style="font-size:1rem;margin:2px 0;">${r.conteudo}</p>
+        </div>
+      </div>`;
+    });
+    respostasHtml += `</div>`;
+  }
 
-                        // Aqui construímos visualmente o Post com as opções de Curtir e Responder
-                        card.innerHTML = `
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                                <strong style="font-size: 1.25rem; color: var(--cor-azul, #0f5d82);">${post.autor.nome}</strong>
-                                <span style="font-size: 0.95rem; color: gray;">${dataFormatada}</span>
-                            </div>
-                            <p style="font-size: 1.3rem; line-height: 1.4; font-weight: 500; color: #111; margin-bottom: 15px;">${post.conteudo}</p>
-                            
-                            <div style="display: flex; gap: 20px; border-top: 1px solid #e9ecef; padding-top: 12px;">
-                                <button onclick="curtirPost(${post.id})" id="btn-curtir-${post.id}" style="background: none; border: none; font-size: 1.2rem; font-weight: bold; cursor: pointer; color: var(--cor-texto-suave); display: flex; align-items: center; gap: 6px;">
-                                    🤍 Curtir
-                                </button>
-                                <button onclick="abrirResposta(${post.id})" style="background: none; border: none; font-size: 1.2rem; font-weight: bold; cursor: pointer; color: var(--cor-texto-suave); display: flex; align-items: center; gap: 6px;">
-                                    💬 Responder
-                                </button>
-                            </div>
-                            
-                            <div id="area-resposta-${post.id}" style="display: none; margin-top: 15px; background: #f7fbfd; padding: 12px; border-radius: 8px; border: 1px solid #e9ecef;">
-                                <textarea id="texto-resposta-${post.id}" placeholder="Deixe uma palavra de carinho..." style="width: 100%; min-height: 60px; padding: 10px; border: 2px solid var(--cor-borda); border-radius: 8px; font-size: 1.1rem; resize: none;"></textarea>
-                                <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
-                                    <button onclick="enviarResposta(${post.id})" class="btn-secundario" style="padding: 8px 20px; border: none; border-radius: 20px; font-weight: bold; font-size: 1.1rem; cursor: pointer;">Publicar Comentário</button>
-                                </div>
-                            </div>
-                        `;
-                        container.appendChild(card);
-                    });
-                } else {
-                    console.error("Erro na resposta da API.");
-                }
-            } catch (erro) {
-                console.error("Erro ao ir buscar posts:", erro);
-            }
-        }
+  const card = document.createElement('article');
+  card.id = `post-${post.id}`;
+  card.style.cssText = 'background:#fff;border:3px solid #e9ecef;border-radius:14px;padding:18px;margin-bottom:18px;';
+  if (!post.visto) card.style.borderColor = 'var(--cor-primaria)';
 
-        // ==========================================
-        // LÓGICA DE INTERAÇÃO (Simulação Visual)
-        // ==========================================
-        
-        function curtirPost(postId) {
-            const btn = document.getElementById(`btn-curtir-${postId}`);
-            
-            // Efeito de "Toggle" (Ligar/Desligar) a curtida visualmente
-            if (btn.innerText.includes('🤍')) {
-                btn.innerHTML = '❤️ Curtiu';
-                btn.style.color = '#e03131';
-            } else {
-                btn.innerHTML = '🤍 Curtir';
-                btn.style.color = 'var(--cor-texto-suave)';
-            }
-        }
+  card.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+      <div style="display:flex;gap:10px;align-items:center;">
+        <a href="perfil-publico.html?id=${post.autor.id}" style="text-decoration:none;">${fotoSrc}</a>
+        <div>
+          <a href="perfil-publico.html?id=${post.autor.id}" style="font-size:1.2rem;font-weight:700;color:var(--cor-azul);text-decoration:none;">${post.autor.nome}</a>
+          ${!post.visto ? '<span style="font-size:0.8rem;background:var(--cor-primaria);color:#fff;padding:1px 7px;border-radius:99px;margin-left:6px;">Novo</span>' : ''}
+        </div>
+      </div>
+      <span style="font-size:0.9rem;color:gray;">${data}</span>
+    </div>
+    <p style="font-size:1.3rem;line-height:1.4;font-weight:500;color:#111;margin-bottom:12px;">${post.conteudo}</p>
+    ${respostasHtml}
+    <div style="display:flex;gap:20px;border-top:1px solid #e9ecef;padding-top:10px;margin-top:10px;">
+      <button id="btn-curtir-${post.id}" onclick="curtirPost(${post.id})"
+        style="background:none;border:none;font-size:1.2rem;font-weight:700;cursor:pointer;color:${corBtn};display:flex;align-items:center;gap:5px;">
+        ${coracao} <span id="n-curtidas-${post.id}">${post.totalCurtidas}</span>
+      </button>
+      <button onclick="abrirResposta(${post.id})"
+        style="background:none;border:none;font-size:1.2rem;font-weight:700;cursor:pointer;color:var(--cor-texto-suave);">
+        💬 ${post.respostas ? post.respostas.length : 0}
+      </button>
+    </div>
+    <div id="area-resp-${post.id}" style="display:none;margin-top:12px;">
+      <textarea id="txt-resp-${post.id}" placeholder="Deixe uma palavra de carinho..."
+        style="width:100%;min-height:60px;padding:10px;border:2px solid var(--cor-borda);border-radius:8px;font-size:1.1rem;resize:none;"></textarea>
+      <button onclick="enviarResposta(${post.id})" class="btn-primario"
+        style="width:100%;margin-top:6px;min-height:44px;padding:8px;font-size:1.1rem;border:none;border-radius:8px;cursor:pointer;">
+        Publicar Comentário
+      </button>
+    </div>
+  `;
+  container.appendChild(card);
+}
 
-        function abrirResposta(postId) {
-            const area = document.getElementById(`area-resposta-${postId}`);
-            area.style.display = area.style.display === 'none' ? 'block' : 'none';
-        }
+// ── Curtir (chamada real à API) ───────────────────────────────────
+async function curtirPost(postId) {
+  try {
+    const r = await fetch(`${API_URL}/posts/${postId}/curtir`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ usuarioId: usuario.id })
+    });
+    if (r.ok) {
+      const resultado = await r.text();
+      const btn = document.getElementById(`btn-curtir-${postId}`);
+      const nEl = document.getElementById(`n-curtidas-${postId}`);
+      let n = parseInt(nEl.textContent);
+      if (resultado === 'curtiu') {
+        btn.innerHTML = `❤️ <span id="n-curtidas-${postId}">${n + 1}</span>`;
+        btn.style.color = '#e03131';
+      } else {
+        btn.innerHTML = `🤍 <span id="n-curtidas-${postId}">${Math.max(0, n - 1)}</span>`;
+        btn.style.color = 'var(--cor-texto-suave)';
+      }
+    }
+  } catch (_) { alert('Erro ao processar curtida.'); }
+}
 
-        function enviarResposta(postId) {
-            const caixaTexto = document.getElementById(`texto-resposta-${postId}`);
-            const texto = caixaTexto.value.trim();
-            
-            if(!texto) {
-                alert('Por favor, escreva algo antes de publicar o comentário.');
-                return;
-            }
-            
-            // Simula o envio bem-sucedido e limpa o ecrã
-            alert(`Comentário enviado: "${texto}"\n(Na próxima fase, isto será guardado na base de dados!)`);
-            caixaTexto.value = '';
-            abrirResposta(postId); 
-        }
+function abrirResposta(postId) {
+  const area = document.getElementById(`area-resp-${postId}`);
+  area.style.display = area.style.display === 'none' ? 'block' : 'none';
+}
 
-        // Inicia o carregamento assim que abre a página
-        carregarPosts();
-    </script>
+// ── Responder (chamada real à API) ────────────────────────────────
+async function enviarResposta(postId) {
+  const txt = document.getElementById(`txt-resp-${postId}`).value.trim();
+  if (!txt) { alert('Escreva algo antes de comentar.'); return; }
+  try {
+    const r = await fetch(`${API_URL}/posts/${postId}/responder`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ usuarioId: usuario.id, texto: txt })
+    });
+    if (r.ok) {
+      document.getElementById(`txt-resp-${postId}`).value = '';
+      abrirResposta(postId);
+      carregarFeed(); // Recarrega para mostrar o novo comentário
+    } else {
+      alert(await r.text());
+    }
+  } catch (_) { alert('Erro ao enviar comentário.'); }
+}
+
+// ── Marcar como visto ─────────────────────────────────────────────
+async function marcarVistos(posts) {
+  const naoVistos = posts.filter(p => !p.visto);
+  for (const p of naoVistos) {
+    try {
+      await fetch(`${API_URL}/posts/${p.id}/ver`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usuarioId: usuario.id })
+      });
+    } catch (_) {}
+  }
+}
+
+// ── Carregar feed ─────────────────────────────────────────────────
+async function carregarFeed() {
+  try {
+    const r = await fetch(`${API_URL}/posts?usuarioId=${usuario.id}`);
+    if (r.ok) {
+      todosPosts = await r.json();
+      renderizarPosts();
+      // Marca os posts visíveis como vistos após 2 segundos
+      setTimeout(() => marcarVistos(todosPosts.filter(p => !p.visto)), 2000);
+    }
+  } catch (_) { document.getElementById('container-posts').innerHTML = '<p>Erro ao carregar.</p>'; }
+}
+
+carregarFeed();
+carregarBadgeNotif();
+</script>
+<script src="js/pwa-setup.js"></script>
 </body>
 </html>
