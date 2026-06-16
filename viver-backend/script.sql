@@ -4,7 +4,7 @@ CREATE DATABASE viver_db;
 USE viver_db;
 
 -- ─────────────────────────────────────────
--- TABELA DE USUÁRIOS
+-- 1. TABELA DE USUÁRIOS
 -- ─────────────────────────────────────────
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -12,14 +12,14 @@ CREATE TABLE usuarios (
     email VARCHAR(100) NOT NULL UNIQUE,
     senha VARCHAR(50) NOT NULL,
     data_nascimento DATE NOT NULL,
-    foto_perfil MEDIUMTEXT DEFAULT NULL   -- Foto em base64 (para o perfil)
+    foto_perfil MEDIUMTEXT DEFAULT NULL
 );
 
 INSERT INTO usuarios (nome, email, senha, data_nascimento)
 VALUES ('Dona Maria', 'maria@viver.com', '1234', '1950-05-20');
 
 -- ─────────────────────────────────────────
--- TABELA DE POSTAGENS (com destino polimórfico)
+-- 2. TABELA DE POSTAGENS (Destino Polimórfico)
 -- ─────────────────────────────────────────
 CREATE TABLE postagens (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -31,12 +31,21 @@ CREATE TABLE postagens (
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
--- Post de exemplo para o feed não ficar vazio
 INSERT INTO postagens (conteudo, usuario_id, destino_tipo, destino_id)
 VALUES ('Olá! Que alegria estar aqui no VIVER+! 🌱', 1, 'USUARIO', 1);
 
 -- ─────────────────────────────────────────
--- CURTIDAS
+-- 3. TABELA DE COMUNIDADES
+-- ─────────────────────────────────────────
+CREATE TABLE comunidades (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    descricao TEXT,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ─────────────────────────────────────────
+-- 4. RELACIONAMENTOS E INTERAÇÕES
 -- ─────────────────────────────────────────
 CREATE TABLE curtidas (
     usuario_id INT NOT NULL,
@@ -46,9 +55,6 @@ CREATE TABLE curtidas (
     FOREIGN KEY (post_id)    REFERENCES postagens(id) ON DELETE CASCADE
 );
 
--- ─────────────────────────────────────────
--- RESPOSTAS / COMENTÁRIOS
--- ─────────────────────────────────────────
 CREATE TABLE respostas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     conteudo TEXT NOT NULL,
@@ -60,21 +66,12 @@ CREATE TABLE respostas (
 );
 
 -- ─────────────────────────────────────────
--- COMUNIDADES / GRUPOS
--- ─────────────────────────────────────────
-CREATE TABLE comunidades (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
-    descricao TEXT,
-    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- ─────────────────────────────────────────
--- SEGUIDORES (para o Observer)
+-- 5. SOCIAL (SEGUIDORES)
 -- ─────────────────────────────────────────
 CREATE TABLE seguidores (
     seguidor_id INT NOT NULL,
     seguido_id  INT NOT NULL,
+    data_seguimento TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (seguidor_id, seguido_id),
     FOREIGN KEY (seguidor_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (seguido_id)  REFERENCES usuarios(id) ON DELETE CASCADE,
@@ -82,11 +79,11 @@ CREATE TABLE seguidores (
 );
 
 -- ─────────────────────────────────────────
--- NOTIFICAÇÕES (geradas pelo Observer)
+-- 6. SISTEMA DE NOTIFICAÇÕES (OBSERVER PATTERN)
 -- ─────────────────────────────────────────
 CREATE TABLE notificacoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    usuario_id   INT NOT NULL,               -- quem recebe a notificação
+    usuario_id   INT NOT NULL,
     mensagem     TEXT NOT NULL,
     lida         BOOLEAN DEFAULT FALSE,
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -94,7 +91,7 @@ CREATE TABLE notificacoes (
 );
 
 -- ─────────────────────────────────────────
--- VISUALIZAÇÕES (filtro vistos / não vistos)
+-- 7. VISUALIZAÇÕES
 -- ─────────────────────────────────────────
 CREATE TABLE visualizacoes (
     usuario_id INT NOT NULL,
