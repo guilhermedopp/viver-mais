@@ -5,10 +5,11 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConexaoDB {
-    // Configurações padrão para MySQL local
     private static final String URL = "jdbc:mysql://localhost:3306/viver_db?allowPublicKeyRetrieval=true&useSSL=false";
     private static final String USER = "root";
-    private static final String PASS = "131104mhfp";
+    
+    // Agora o Java vai puxar a palavra-passe de forma invisível e segura
+    private static final String PASS = System.getenv("DB_PASSWORD") != null ? System.getenv("DB_PASSWORD") : "";
     
     public static Connection conectar() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASS);
