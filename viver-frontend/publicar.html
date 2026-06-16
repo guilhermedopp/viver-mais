@@ -11,15 +11,23 @@
 
     <main class="tela-acesso" style="max-width: 650px; padding-bottom: 90px; justify-content: flex-start;">
         
-        <header class="cabecalho-simples" style="margin-bottom: 30px; border-bottom: 2px solid var(--cor-borda); padding-bottom: 15px;">
+        <header class="cabecalho-simples" style="margin-bottom: 30px; border-bottom: 2px solid var(--cor-borda); padding-bottom: 15px; padding-top: 20px;">
             <h1 style="font-size: 2rem; color: var(--cor-azul);">Novo Momento</h1>
         </header>
 
         <section class="area-formulario" style="box-shadow: none; padding: 0;">
             <form id="form-publicar">
+                
+                <div class="grupo-input" style="margin-bottom: 20px;">
+                    <label for="destino-post" style="font-size: 1.4rem; margin-bottom: 10px; display: block; color: var(--cor-azul);">Onde quer partilhar?</label>
+                    <select id="destino-post" style="width: 100%; padding: 15px; font-size: 1.2rem; border: 3px solid var(--cor-borda); border-radius: 12px; background-color: #fff; cursor: pointer; color: var(--cor-texto);">
+                        <option value="0">🌎 No meu Feed (Público)</option>
+                        </select>
+                </div>
+
                 <div class="grupo-input">
-                    <label for="texto-post" style="font-size: 1.4rem; margin-bottom: 15px; display: block;">O que gostaria de partilhar hoje?</label>
-                    <textarea id="texto-post" placeholder="Escreva aqui o seu pensamento, memória ou carinho..." required style="width: 100%; min-height: 180px; padding: 20px; font-size: 1.3rem; border: 3px solid var(--cor-borda); border-radius: 12px; font-family: Arial, sans-serif; resize: none; background-color: #fff;"></textarea>
+                    <label for="texto-post" style="font-size: 1.4rem; margin-bottom: 15px; display: block; color: var(--cor-azul);">O que gostaria de partilhar hoje?</label>
+                    <textarea id="texto-post" placeholder="Escreva aqui o seu pensamento, memória ou carinho..." required style="width: 100%; min-height: 180px; padding: 20px; font-size: 1.3rem; border: 3px solid var(--cor-borda); border-radius: 12px; font-family: Arial, sans-serif; resize: none; background-color: #f7fbfd;"></textarea>
                 </div>
                 
                 <button type="submit" class="btn-primario btn-grande" id="btn-enviar" style="min-height: 65px; margin-top: 10px;">PUBLICAR</button>
@@ -27,57 +35,55 @@
         </section>
 
         <nav class="barra-navegacao">
-            <a href="feed.html" class="item-nav">
-                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-                <span style="font-size: 0.9rem;">Início</span>
-            </a>
-            
-            <a href="#" class="item-nav" onclick="alert('Página de Mensagens em construção!')">
-                <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
-                <span style="font-size: 0.9rem;">Chat</span>
-            </a>
-
-            <a href="publicar.html" class="item-nav">
-                <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                <span style="font-size: 0.9rem;">Publicar</span>
-            </a>
-
-            <a href="comunidades.html" class="item-nav">
-                <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-                <span style="font-size: 0.9rem;">Grupos</span>
-            </a>
-
-            <a href="#" class="item-nav" onclick="alert('Notificações em construção!')">
-                <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/></svg>
-                <span style="font-size: 0.9rem;">Avisos</span>
-            </a>
-
-            <a href="perfil.html" class="item-nav">
-                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                <span style="font-size: 0.9rem;">Perfil</span>
-            </a>
+            <a href="feed.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span style="font-size: 0.9rem;">Início</span></a>
+            <a href="comunidades.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><span style="font-size: 0.9rem;">Grupos</span></a>
+            <a href="publicar.html" class="item-nav ativo"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span style="font-size: 0.9rem;">Publicar</span></a>
+            <a href="notificacoes.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><span style="font-size: 0.9rem;">Avisos</span></a>
+            <a href="perfil.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span style="font-size: 0.9rem;">Perfil</span></a>
         </nav>
-
     </main>
 
     <script>
         const API_URL = 'http://localhost:8080/api';
         const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
 
-        // Proteção: Se não estiver logado, volta para o login
-        if (!usuarioLogado) {
-            window.location.href = 'index.html';
+        if (!usuarioLogado) window.location.href = 'index.html';
+
+        // 1. Ir buscar as comunidades e preencher a caixa de seleção
+        async function carregarGruposNoSelect() {
+            try {
+                const resposta = await fetch(`${API_URL}/comunidades`);
+                if (resposta.ok) {
+                    const comunidades = await resposta.json();
+                    const select = document.getElementById('destino-post');
+                    
+                    comunidades.forEach(com => {
+                        const opcao = document.createElement('option');
+                        opcao.value = com.id;
+                        opcao.textContent = `👥 Grupo: ${com.nome}`;
+                        select.appendChild(opcao);
+                    });
+                }
+            } catch (erro) { console.error("Erro ao carregar os grupos:", erro); }
         }
 
-        // Submissão do novo post
+        // 2. Submissão do novo post com o destino correto
         document.getElementById('form-publicar').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const btnEnviar = document.getElementById('btn-enviar');
-            const campoTexto = document.getElementById('texto-post');
-            const texto = campoTexto.value.trim();
+            const texto = document.getElementById('texto-post').value.trim();
+            const destinoSelecionado = document.getElementById('destino-post').value;
 
-            // Feedback visual de carregamento
+            // Determinar o Polimorfismo
+            let destinoTipo = 'USUARIO';
+            let destinoId = usuarioLogado.id;
+
+            if (destinoSelecionado !== "0") {
+                destinoTipo = 'COMUNIDADE';
+                destinoId = parseInt(destinoSelecionado);
+            }
+
             btnEnviar.textContent = 'A PUBLICAR...';
             btnEnviar.style.opacity = '0.7';
             btnEnviar.disabled = true;
@@ -88,16 +94,17 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         texto: texto,
-                        autor: usuarioLogado
+                        autor: usuarioLogado,
+                        destinoTipo: destinoTipo,
+                        destinoId: destinoId
                     })
                 });
 
                 if (resposta.ok) {
-                    // Sucesso! Redireciona de volta para o feed para ver a publicação
                     window.location.href = 'feed.html';
                 } else {
                     const msgErro = await resposta.text();
-                    alert(msgErro); // Mostra o alerta anti-fraude caso contenha links
+                    alert(msgErro); 
                     btnEnviar.textContent = 'PUBLICAR';
                     btnEnviar.style.opacity = '1';
                     btnEnviar.disabled = false;
@@ -109,6 +116,8 @@
                 btnEnviar.disabled = false;
             }
         });
+
+        carregarGruposNoSelect();
     </script>
 </body>
 </html>
