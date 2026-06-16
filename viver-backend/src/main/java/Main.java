@@ -40,7 +40,8 @@ public class Main {
             try {
                 DadosCadastro d = ctx.bodyAsClass(DadosCadastro.class);
                 UsuarioVO vo = new UsuarioVO(0, d.nome, d.email, d.senha, LocalDate.parse(d.dataNascimento));
-                ctx.status(201).json(usuarioBO.cadastrar(vo, d.cpf));
+                // Chamada simplificada sem CPF
+                ctx.status(201).json(usuarioBO.cadastrar(vo)); 
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
 
@@ -183,7 +184,7 @@ public class Main {
 
     // ── DTOs ──────────────────────────────────────────────────────────────
     public static class DadosLogin          { public String email, senha; public DadosLogin() {} }
-    public static class DadosCadastro       { public String nome, email, senha, dataNascimento, cpf; public DadosCadastro() {} }
+    public static class DadosCadastro       { public String nome, email, senha, dataNascimento; public DadosCadastro() {} }
     public static class DadosInteracao      { public int usuarioId; public String texto; public DadosInteracao() {} }
     public static class DadosPost           { public String texto, destinoTipo; public int destinoId; public UsuarioVO autor; public DadosPost() {} }
     public static class DadosNovaComunidade { public String nome, descricao; public DadosNovaComunidade() {} }

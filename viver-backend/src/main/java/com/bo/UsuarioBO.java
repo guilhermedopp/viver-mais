@@ -2,10 +2,7 @@ package com.bo;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
 import com.dao.NotificacaoDAO;
 import com.dao.PostDAO;
 import com.dao.SeguidorDAO;
@@ -20,41 +17,26 @@ public class UsuarioBO {
     private SeguidorDAO  seguidorDao  = new SeguidorDAO();
     private NotificacaoDAO notifDao   = new NotificacaoDAO();
 
-    // ── Simulação de consulta à Receita Federal ───────────────────────
-    private boolean consultarReceitaFederal(String cpf, LocalDate dataNasc) {
-        Map<String, LocalDate> base = new HashMap<>();
-        base.put("12345678900", LocalDate.of(1955, 5, 20));
-        base.put("98765432100", LocalDate.of(1960, 10, 15));
-        // Para testes: qualquer CPF válido que não esteja na base ainda é aceito
-        // (remover a linha abaixo em produção real)
-        if (!base.containsKey(cpf)) return true;
-        return base.get(cpf).equals(dataNasc);
-    }
+    // ── Cadastro (Sem CPF, com validação de e-mail Regex) ─────────────
+    public UsuarioVO cadastrar(UsuarioVO vo) throws Exception {
+        // Validação de formato de e-mail (Regex)
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+        if (vo.getEmail() == null || !vo.getEmail().matches(emailRegex))
+            throw new Exception("O e-mail fornecido não é válido.");
 
-    // ── Cadastro ──────────────────────────────────────────────────────
-    public UsuarioVO cadastrar(UsuarioVO vo, String cpf) throws Exception {
         if (vo.getNome() == null || vo.getNome().trim().isEmpty())
             throw new Exception("O nome não pode estar vazio.");
-        if (vo.getEmail() == null || !vo.getEmail().contains("@"))
-            throw new Exception("Insira um e-mail válido.");
         if (vo.getSenha() == null || vo.getSenha().length() < 3)
             throw new Exception("Senha muito curta. Mínimo 3 caracteres.");
         if (vo.getDataNascimento() == null)
             throw new Exception("Data de nascimento obrigatória.");
-        if (cpf == null || cpf.trim().isEmpty())
-            throw new Exception("CPF obrigatório.");
-
-        cpf = cpf.replaceAll("[^0-9]", "");
-
-        if (!consultarReceitaFederal(cpf, vo.getDataNascimento()))
-            throw new Exception("ALERTA: CPF não corresponde à data de nascimento informada.");
 
         int idade = Period.between(vo.getDataNascimento(), LocalDate.now()).getYears();
         if (idade < 60)
             throw new Exception("O VIVER+ é exclusivo para pessoas com 60 anos ou mais.");
 
         if (dao.buscarPorEmail(vo.getEmail()) != null)
-            throw new Exception("Este e-mail já está cadastrado. Tente fazer login.");
+            throw new Exception("Este e-mail já está registado.");
 
         return dao.salvar(vo);
     }
@@ -78,18 +60,15 @@ public class UsuarioBO {
         PostVO post = postDao.salvar(new PostVO(0, texto, autor));
 
         // ── OBSERVER ATIVO ──────────────────────────────────────────
-        // Busca seguidores do autor no banco e notifica cada um deles
         List<UsuarioVO> seguidores = seguidorDao.listarSeguidores(autor.getId());
         for (UsuarioVO s : seguidores) {
-            autor.adicionarSeguidor(new Seguidor(s));   // Seguidor salva no BD
+            autor.adicionarSeguidor(new Seguidor(s));
         }
         if (!seguidores.isEmpty()) {
             autor.notificarSeguidores(
                 autor.getNome() + " publicou: \"" + texto.substring(0, Math.min(texto.length(), 40)) + "...\""
             );
         }
-        // ────────────────────────────────────────────────────────────
-
         return post;
     }
 
@@ -105,13 +84,12 @@ public class UsuarioBO {
 
         postDao.salvarResposta(usuarioId, postId, texto);
 
-        // Notifica o autor do post que recebeu um comentário
         try {
             UsuarioVO comentador = dao.buscarPorId(usuarioId);
             PostVO post = postDao.buscarPorId(postId);
             if (post != null && post.getAutor() != null && comentador != null) {
                 int autorPostId = post.getAutor().getId();
-                if (autorPostId != usuarioId) {   // Não notifica a si mesmo
+                if (autorPostId != usuarioId) {
                     notifDao.salvar(autorPostId,
                         comentador.getNome() + " comentou no seu momento: \"" +
                         texto.substring(0, Math.min(texto.length(), 40)) + "...\"");
@@ -135,7 +113,6 @@ public class UsuarioBO {
             return "deixou";
         } else {
             seguidorDao.seguir(seguidorId, seguidoId);
-            // Notifica o usuário seguido
             UsuarioVO seguidor = dao.buscarPorId(seguidorId);
             if (seguidor != null) {
                 notifDao.salvar(seguidoId, seguidor.getNome() + " começou a seguir você! 🌱");
