@@ -7,6 +7,7 @@ import java.util.List;
 public class PostVO {
     private int id;
     private String conteudo;
+    private String imagem;          // base64 da imagem (pode ser null)
     private Date data;
     private UsuarioVO autor;
     private boolean visto;
@@ -28,9 +29,9 @@ public class PostVO {
         this.destinoTipo = "USUARIO";
     }
 
-    // Getters
     public int getId()                    { return id; }
     public String getConteudo()           { return conteudo; }
+    public String getImagem()             { return imagem; }
     public Date getData()                 { return data; }
     public UsuarioVO getAutor()           { return autor; }
     public boolean isVisto()              { return visto; }
@@ -40,15 +41,15 @@ public class PostVO {
     public Perfil getDestino()            { return destino; }
     public String getDestinoTipo()        { return destinoTipo; }
 
-    // Setters
-    public void setId(int id)                              { this.id = id; }
-    public void setConteudo(String c)                      { this.conteudo = c; }
-    public void setData(Date d)                            { this.data = d; }
-    public void setAutor(UsuarioVO a)                      { this.autor = a; }
-    public void setVisto(boolean v)                        { this.visto = v; }
-    public void setTotalCurtidas(int t)                    { this.totalCurtidas = t; }
-    public void setCurtidoPeloUsuario(boolean c)           { this.curtidoPeloUsuario = c; }
-    public void setRespostas(List<RespostaVO> r)           { this.respostas = r; }
-    public void setDestino(Perfil d)                       { this.destino = d; }
-    public void setDestinoTipo(String t)                   { this.destinoTipo = t; }
+    public void setId(int id)                    { this.id = id; }
+    public void setConteudo(String c)            { this.conteudo = c; }
+    public void setImagem(String i)              { this.imagem = i; }
+    public void setData(Date d)                  { this.data = d; }
+    public void setAutor(UsuarioVO a)            { this.autor = a; }
+    public void setVisto(boolean v)              { this.visto = v; }
+    public void setTotalCurtidas(int t)          { this.totalCurtidas = t; }
+    public void setCurtidoPeloUsuario(boolean c) { this.curtidoPeloUsuario = c; }
+    public void setRespostas(List<RespostaVO> r) { this.respostas = r; }
+    public void setDestino(Perfil d)             { this.destino = d; }
+    public void setDestinoTipo(String t)         { this.destinoTipo = t; }
 }
