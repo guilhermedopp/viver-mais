@@ -1,29 +1,25 @@
--- VIVER+ — Script Completo do Banco de Dados (ATUALIZADO)
+-- VIVER+ — Script Completo do Banco de Dados (versão final)
 DROP DATABASE IF EXISTS viver_db;
 CREATE DATABASE viver_db;
 USE viver_db;
 
--- ─────────────────────────────────────────
--- 1. TABELA DE USUÁRIOS
--- ─────────────────────────────────────────
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
-    senha VARCHAR(255) NOT NULL, -- Aumentado para 255 (boas práticas para futuras criptografias)
+    senha VARCHAR(255) NOT NULL,
     data_nascimento DATE NOT NULL,
     foto_perfil MEDIUMTEXT DEFAULT NULL
 );
 
 INSERT INTO usuarios (nome, email, senha, data_nascimento)
-VALUES ('Dona Maria', 'maria@viver.com', '1234', '1950-05-20');
+VALUES ('Dona Maria', 'maria@viver.com', '1234', '1950-05-20'),
+       ('Seu José',   'jose@viver.com',  '1234', '1945-03-10');
 
--- ─────────────────────────────────────────
--- 2. TABELA DE POSTAGENS (Destino Polimórfico)
--- ─────────────────────────────────────────
 CREATE TABLE postagens (
     id INT AUTO_INCREMENT PRIMARY KEY,
     conteudo TEXT NOT NULL,
+    imagem MEDIUMTEXT DEFAULT NULL,
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     usuario_id INT NOT NULL,
     destino_tipo VARCHAR(20) DEFAULT 'USUARIO',
@@ -31,18 +27,8 @@ CREATE TABLE postagens (
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
--- 3. TABELA DE COMUNIDADES
--- ─────────────────────────────────────────
-CREATE TABLE comunidades (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
-    descricao TEXT,
-    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+INSERT INTO postagens (conteudo, usuario_id) VALUES ('Que bom estar aqui no VIVER+! 🌱', 1);
 
--- ─────────────────────────────────────────
--- 4. RELACIONAMENTOS E INTERAÇÕES
--- ─────────────────────────────────────────
 CREATE TABLE curtidas (
     usuario_id INT NOT NULL,
     post_id    INT NOT NULL,
@@ -61,9 +47,6 @@ CREATE TABLE respostas (
     FOREIGN KEY (post_id)    REFERENCES postagens(id) ON DELETE CASCADE
 );
 
--- ─────────────────────────────────────────
--- 5. SOCIAL (SEGUIDORES)
--- ─────────────────────────────────────────
 CREATE TABLE seguidores (
     seguidor_id INT NOT NULL,
     seguido_id  INT NOT NULL,
@@ -74,9 +57,6 @@ CREATE TABLE seguidores (
     CHECK (seguidor_id <> seguido_id)
 );
 
--- ─────────────────────────────────────────
--- 6. SISTEMA DE NOTIFICAÇÕES (OBSERVER PATTERN)
--- ─────────────────────────────────────────
 CREATE TABLE notificacoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     usuario_id   INT NOT NULL,
@@ -86,9 +66,6 @@ CREATE TABLE notificacoes (
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
--- ─────────────────────────────────────────
--- 7. VISUALIZAÇÕES
--- ─────────────────────────────────────────
 CREATE TABLE visualizacoes (
     usuario_id INT NOT NULL,
     post_id    INT NOT NULL,
@@ -96,4 +73,61 @@ CREATE TABLE visualizacoes (
     PRIMARY KEY (usuario_id, post_id),
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (post_id)    REFERENCES postagens(id) ON DELETE CASCADE
+);
+
+-- COMUNIDADES com criador
+CREATE TABLE comunidades (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    descricao TEXT,
+    criador_id INT,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (criador_id) REFERENCES usuarios(id) ON DELETE SET NULL
+);
+
+-- Membros de comunidades (ADMIN = criador, MEMBRO = convidado que aceitou)
+CREATE TABLE membros_comunidade (
+    usuario_id    INT NOT NULL,
+    comunidade_id INT NOT NULL,
+    papel         ENUM('ADMIN','MEMBRO') DEFAULT 'MEMBRO',
+    data_entrada  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (usuario_id, comunidade_id),
+    FOREIGN KEY (usuario_id)    REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (comunidade_id) REFERENCES comunidades(id) ON DELETE CASCADE
+);
+
+-- Convites para grupos (PENDENTE → ACEITO ou RECUSADO)
+CREATE TABLE convites (
+    id            INT AUTO_INCREMENT PRIMARY KEY,
+    comunidade_id INT NOT NULL,
+    convidante_id INT NOT NULL,
+    convidado_id  INT NOT NULL,
+    status        ENUM('PENDENTE','ACEITO','RECUSADO') DEFAULT 'PENDENTE',
+    data_criacao  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (comunidade_id) REFERENCES comunidades(id) ON DELETE CASCADE,
+    FOREIGN KEY (convidante_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (convidado_id)  REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+-- Chat privado entre dois usuários
+CREATE TABLE mensagens (
+    id             INT AUTO_INCREMENT PRIMARY KEY,
+    remetente_id   INT NOT NULL,
+    destinatario_id INT NOT NULL,
+    conteudo       TEXT NOT NULL,
+    lida           BOOLEAN DEFAULT FALSE,
+    data_criacao   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (remetente_id)    REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (destinatario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+
+-- Chat de grupos
+CREATE TABLE mensagens_grupo (
+    id            INT AUTO_INCREMENT PRIMARY KEY,
+    comunidade_id INT NOT NULL,
+    usuario_id    INT NOT NULL,
+    conteudo      TEXT NOT NULL,
+    data_criacao  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (comunidade_id) REFERENCES comunidades(id) ON DELETE CASCADE,
+    FOREIGN KEY (usuario_id)    REFERENCES usuarios(id) ON DELETE CASCADE
 );
