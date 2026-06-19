@@ -27,4 +27,12 @@ public class MensagemVO {
     public String getConteudo()           { return conteudo; }
     public boolean isLida()               { return lida; }
     public Date getDataCriacao()          { return dataCriacao; }
+
+    
+    public void setId(int id) { this.id = id; }
+    public void setRemetente(UsuarioVO remetente) { this.remetente = remetente; }
+    public void setDestinatario(UsuarioVO destinatario) { this.destinatario = destinatario; }
+    public void setConteudo(String conteudo) { this.conteudo = conteudo; }
+    public void setLida(boolean lida) { this.lida = lida; }
+    public void setDataCriacao(Date dataCriacao) { this.dataCriacao = dataCriacao; }
 }
