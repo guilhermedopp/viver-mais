@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VIVER+ - Login</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="img/logo.png">
+</head>
+<body class="auth-page auth-login">
+    <main class="tela-acesso auth-shell">
+        <div class="auth-glow auth-glow-left" aria-hidden="true"></div>
+        <div class="auth-glow auth-glow-right" aria-hidden="true"></div>
+        <section class="area-formulario auth-card auth-card-login">
+            <header class="marca">
+                <img src="img/arvore_logo_transparente.png" alt="Logotipo Oficial do VIVER+" class="marca-icone">
+                <div>
+                    <h1>VIVER+</h1>
+                    <p>Rede Social de Carinho e Conex&atilde;o</p>
+                </div>
+            </header>
+
+            <h2>FAZER LOGIN</h2>
+            <p class="auth-subtitle">Que bom te ver de novo!</p>
+
+            <form id="form-login">
+                <div class="grupo-input">
+                    <label for="email">E-mail</label>
+                    <div class="campo-com-icone">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5Z"/></svg>
+                        <input type="email" id="email" autocomplete="email" placeholder="Digite seu e-mail" required>
+                    </div>
+                </div>
+
+                <div class="grupo-input">
+                    <label for="senha">Senha</label>
+                    <div class="campo-com-icone">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 9h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h1V7a5 5 0 0 1 10 0v2Zm-8 0h6V7a3 3 0 0 0-6 0v2Zm3 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg>
+                        <input type="password" id="senha" autocomplete="current-password" placeholder="Digite sua senha" required>
+                        <button type="button" class="btn-olho" onclick="toggleSenha()" aria-label="Mostrar ou ocultar senha">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5c5.1 0 8.7 4.1 9.8 5.6a2.3 2.3 0 0 1 0 2.8C20.7 14.9 17.1 19 12 19s-8.7-4.1-9.8-5.6a2.3 2.3 0 0 1 0-2.8C3.3 9.1 6.9 5 12 5Zm0 2C7.8 7 4.8 10.4 3.9 11.8a.3.3 0 0 0 0 .4C4.8 13.6 7.8 17 12 17s7.2-3.4 8.1-4.8a.3.3 0 0 0 0-.4C19.2 10.4 16.2 7 12 7Zm0 2.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5Z"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="auth-options">
+                    <label class="check-line">
+                        <input type="checkbox">
+                        <span>Lembrar-me</span>
+                    </label>
+                    <button type="button" class="link-button" onclick="alert('Procure a equipe VIVER+ para recuperar sua senha.')">Esqueceu sua senha?</button>
+                </div>
+
+                <button type="submit" class="btn-primario btn-grande">ENTRAR</button>
+            </form>
+
+            <div class="auth-divider"><span>ou</span></div>
+
+            <div class="area-links">
+                <p>Ainda n&atilde;o tem uma conta?</p>
+                <a href="cadastro.html">Criar conta</a>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/api.js"></script>
+    <script src="js/pwa-setup.js"></script>
+    <script>
+        function toggleSenha() {
+            const input = document.getElementById('senha');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        window.addEventListener('load', () => {
+            const emailSalvo = localStorage.getItem('emailRecenteCadastro');
+            if (emailSalvo) {
+                document.getElementById('email').value = emailSalvo;
+                document.getElementById('senha').focus();
+                localStorage.removeItem('emailRecenteCadastro');
+            }
+        });
+    </script>
+</body>
+</html>

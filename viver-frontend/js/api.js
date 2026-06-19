@@ -19,6 +19,7 @@ if (formLogin) {
                 },
                 body: JSON.stringify({ email: email, senha: senha })
             });
+<<<<<<< Updated upstream
 
             // 3. Verifica a resposta do servidor
             if (resposta.ok) {
@@ -32,6 +33,15 @@ if (formLogin) {
                 alert('Bem-vindo(a) ao VIVER+, ' + dadosUsuario.nome + '!');
                 window.location.href = 'feed.html'; // Avança de forma dinâmica para o feed
                 
+=======
+            
+            if (resp.ok) {
+                const usuario = await resp.json();
+                msg.textContent = 'Conta criada com sucesso, ' + usuario.nome + '!';
+                msg.className = 'mensagem mensagem-sucesso';
+                localStorage.setItem('emailRecenteCadastro', email);
+                setTimeout(() => window.location.href = 'login.html', 1500);
+>>>>>>> Stashed changes
             } else {
                 // Erro: E-mail ou palavra-passe incorretos (regra do UsuarioBO)
                 const mensagemErro = await resposta.text();
