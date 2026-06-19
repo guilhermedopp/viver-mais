@@ -3,13 +3,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.bo.UsuarioBO;
-import com.dao.ComunidadeDAO;
-import com.dao.NotificacaoDAO;
-import com.dao.PostDAO;
-import com.dao.UsuarioDAO;
-import com.vo.ComunidadeVO;
-import com.vo.PostVO;
-import com.vo.UsuarioVO;
+import com.dao.*;
+import com.vo.*;
 
 import io.javalin.Javalin;
 
@@ -22,13 +17,15 @@ public class Main {
 
         System.out.println("🔥 VIVER+ online em: http://localhost:8080");
 
-        UsuarioBO    usuarioBO    = new UsuarioBO();
-        PostDAO      postDAO      = new PostDAO();
-        UsuarioDAO   usuarioDAO   = new UsuarioDAO();
-        ComunidadeDAO comDAO      = new ComunidadeDAO();
-        NotificacaoDAO notifDAO   = new NotificacaoDAO();
+        UsuarioBO       usuarioBO    = new UsuarioBO();
+        PostDAO         postDAO      = new PostDAO();
+        UsuarioDAO      usuarioDAO   = new UsuarioDAO();
+        ComunidadeDAO   comDAO       = new ComunidadeDAO();
+        NotificacaoDAO  notifDAO     = new NotificacaoDAO();
+        MensagemDAO     msgDAO       = new MensagemDAO();
+        MensagemGrupoDAO msgGrupoDAO = new MensagemGrupoDAO();
 
-        // ── AUTENTICAÇÃO ──────────────────────────────────────────────────
+        // ── AUTH ──────────────────────────────────────────────────────────
         app.post("/api/login", ctx -> {
             try {
                 DadosLogin d = ctx.bodyAsClass(DadosLogin.class);
@@ -40,34 +37,27 @@ public class Main {
             try {
                 DadosCadastro d = ctx.bodyAsClass(DadosCadastro.class);
                 UsuarioVO vo = new UsuarioVO(0, d.nome, d.email, d.senha, LocalDate.parse(d.dataNascimento));
-                // Chamada simplificada sem CPF
-                ctx.status(201).json(usuarioBO.cadastrar(vo)); 
+                ctx.status(201).json(usuarioBO.cadastrar(vo));
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
 
-        // ── FEED DE POSTAGENS ─────────────────────────────────────────────
+        // ── FEED ──────────────────────────────────────────────────────────
         app.get("/api/posts", ctx -> {
             try {
-                // Aceita ?usuarioId=X para marcar vistos/não vistos
                 int uid = 0;
                 try { uid = Integer.parseInt(ctx.queryParam("usuarioId")); } catch (Exception ignored) {}
-                ctx.json(postDAO.listarTodos(uid));
+                boolean soSeguidos = "seguindo".equals(ctx.queryParam("filtro"));
+                ctx.json(soSeguidos ? postDAO.listarDosSeguidos(uid) : postDAO.listarTodos(uid));
             } catch (Exception e) { ctx.status(500).result(e.getMessage()); }
         });
 
         app.post("/api/posts", ctx -> {
             try {
                 DadosPost d = ctx.bodyAsClass(DadosPost.class);
-                PostVO post = new PostVO(0, d.texto, d.autor);
-                if ("COMUNIDADE".equalsIgnoreCase(d.destinoTipo)) {
-                    ComunidadeVO c = new ComunidadeVO(); c.setId(d.destinoId);
-                    post.setDestino(c); post.setDestinoTipo("COMUNIDADE");
-                }
-                ctx.status(201).json(usuarioBO.criarPostagem(d.autor, d.texto));
+                ctx.status(201).json(usuarioBO.criarPostagem(d.autor, d.texto, d.imagem));
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
 
-        // Marcar post como visto
         app.post("/api/posts/{id}/ver", ctx -> {
             try {
                 int postId = Integer.parseInt(ctx.pathParam("id"));
@@ -77,13 +67,11 @@ public class Main {
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
 
-        // ── INTERAÇÕES (curtir / responder) ───────────────────────────────
         app.post("/api/posts/{id}/curtir", ctx -> {
             try {
                 int postId = Integer.parseInt(ctx.pathParam("id"));
                 DadosInteracao d = ctx.bodyAsClass(DadosInteracao.class);
-                boolean curtiu = usuarioBO.processarCurtida(d.usuarioId, postId);
-                ctx.result(curtiu ? "curtiu" : "descurtiu");
+                ctx.result(usuarioBO.processarCurtida(d.usuarioId, postId) ? "curtiu" : "descurtiu");
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
 
@@ -92,12 +80,24 @@ public class Main {
                 int postId = Integer.parseInt(ctx.pathParam("id"));
                 DadosInteracao d = ctx.bodyAsClass(DadosInteracao.class);
                 usuarioBO.adicionarComentario(d.usuarioId, postId, d.texto);
-                ctx.status(201).result("Comentário gravado!");
+                ctx.status(201).result("ok");
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
 
-        // ── PERFIL ────────────────────────────────────────────────────────
-        // Perfil público de qualquer usuário
+        // ── USUÁRIOS / PERFIL ─────────────────────────────────────────────
+        app.get("/api/usuarios", ctx -> {
+            try { ctx.json(usuarioDAO.listarTodos()); }
+            catch (Exception e) { ctx.status(500).result(e.getMessage()); }
+        });
+
+        app.get("/api/usuarios/{id}", ctx -> {
+            try {
+                int id = Integer.parseInt(ctx.pathParam("id"));
+                UsuarioVO u = usuarioDAO.buscarPorId(id);
+                if (u == null) { ctx.status(404).result("Não encontrado."); return; }
+                ctx.json(Map.of("usuario", u, "posts", postDAO.listarPorUsuario(id)));
+            } catch (Exception e) { ctx.status(500).result(e.getMessage()); }
+        });
 
         app.get("/api/usuarios/{id}/estatisticas", ctx -> {
             try {
@@ -105,88 +105,169 @@ public class Main {
                 ctx.json(usuarioDAO.buscarEstatisticas(id));
             } catch (Exception e) { ctx.status(500).result(e.getMessage()); }
         });
-        
-        app.get("/api/usuarios/{id}", ctx -> {
+
+        // Verificar se o usuário logado segue o perfil visitado
+        app.get("/api/usuarios/{id}/sigo", ctx -> {
             try {
-                int id = Integer.parseInt(ctx.pathParam("id"));
-                UsuarioVO u = usuarioDAO.buscarPorId(id);
-                if (u == null) { ctx.status(404).result("Usuário não encontrado."); return; }
-                // Adiciona os posts do usuário no retorno
-                List<PostVO> posts = postDAO.listarPorUsuario(id);
-                ctx.json(Map.of("usuario", u, "posts", posts));
-            } catch (Exception e) { ctx.status(500).result(e.getMessage()); }
+                int seguidoId  = Integer.parseInt(ctx.pathParam("id"));
+                int seguidorId = Integer.parseInt(ctx.queryParam("usuarioId"));
+                SeguidorDAO sd = new SeguidorDAO();
+                ctx.json(Map.of("sigo", sd.jaSegue(seguidorId, seguidoId)));
+            } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
 
-        // Lista todos os usuários (aba de pessoas)
-        app.get("/api/usuarios", ctx -> {
-            try { ctx.json(usuarioDAO.listarTodos()); }
-            catch (Exception e) { ctx.status(500).result(e.getMessage()); }
-        });
-
-        // Seguir / deixar de seguir
         app.post("/api/usuarios/{id}/seguir", ctx -> {
             try {
                 int seguidoId = Integer.parseInt(ctx.pathParam("id"));
                 DadosInteracao d = ctx.bodyAsClass(DadosInteracao.class);
-                String resultado = usuarioBO.seguirOuDeixar(d.usuarioId, seguidoId);
-                ctx.result(resultado);
+                ctx.result(usuarioBO.seguirOuDeixar(d.usuarioId, seguidoId));
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
 
-        // Upload de foto de perfil (base64)
         app.post("/api/usuarios/{id}/foto", ctx -> {
             try {
                 int id = Integer.parseInt(ctx.pathParam("id"));
                 DadosFoto d = ctx.bodyAsClass(DadosFoto.class);
                 usuarioBO.atualizarFoto(id, d.base64);
-                ctx.result("Foto atualizada!");
+                ctx.result("ok");
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
 
-        // ── NOTIFICAÇÕES (Observer) ───────────────────────────────────────
-        app.get("/api/notificacoes/{usuarioId}", ctx -> {
-            try {
-                int uid = Integer.parseInt(ctx.pathParam("usuarioId"));
-                ctx.json(notifDAO.listarPorUsuario(uid));
-            } catch (Exception e) { ctx.status(500).result(e.getMessage()); }
-        });
-
-        app.get("/api/notificacoes/{usuarioId}/nao-lidas", ctx -> {
-            try {
-                int uid = Integer.parseInt(ctx.pathParam("usuarioId"));
-                ctx.json(Map.of("total", notifDAO.contarNaoLidas(uid)));
-            } catch (Exception e) { ctx.status(500).result(e.getMessage()); }
-        });
-
-        app.post("/api/notificacoes/{usuarioId}/ler", ctx -> {
-            try {
-                int uid = Integer.parseInt(ctx.pathParam("usuarioId"));
-                notifDAO.marcarTodasComoLidas(uid);
-                ctx.result("ok");
-            } catch (Exception e) { ctx.status(500).result(e.getMessage()); }
-        });
-
-        // ── COMUNIDADES ───────────────────────────────────────────────────
-        app.get("/api/comunidades", ctx -> {
-            try { ctx.json(comDAO.listarTodas()); }
+        // ── NOTIFICAÇÕES ──────────────────────────────────────────────────
+        app.get("/api/notificacoes/{uid}", ctx -> {
+            try { ctx.json(notifDAO.listarPorUsuario(Integer.parseInt(ctx.pathParam("uid")))); }
             catch (Exception e) { ctx.status(500).result(e.getMessage()); }
+        });
+
+        app.get("/api/notificacoes/{uid}/nao-lidas", ctx -> {
+            try { ctx.json(Map.of("total", notifDAO.contarNaoLidas(Integer.parseInt(ctx.pathParam("uid"))))); }
+            catch (Exception e) { ctx.status(500).result(e.getMessage()); }
+        });
+
+        app.post("/api/notificacoes/{uid}/ler", ctx -> {
+            try { notifDAO.marcarTodasComoLidas(Integer.parseInt(ctx.pathParam("uid"))); ctx.result("ok"); }
+            catch (Exception e) { ctx.status(500).result(e.getMessage()); }
+        });
+
+        // ── CHAT PRIVADO ──────────────────────────────────────────────────
+        app.get("/api/chat/contatos/{uid}", ctx -> {
+            try { ctx.json(msgDAO.listarContatos(Integer.parseInt(ctx.pathParam("uid")))); }
+            catch (Exception e) { ctx.status(500).result(e.getMessage()); }
+        });
+
+        app.get("/api/chat/{uidA}/{uidB}", ctx -> {
+            try {
+                int a = Integer.parseInt(ctx.pathParam("uidA"));
+                int b = Integer.parseInt(ctx.pathParam("uidB"));
+                msgDAO.marcarComoLidas(b, a); // marca mensagens de B para A como lidas
+                ctx.json(msgDAO.buscarConversa(a, b));
+            } catch (Exception e) { ctx.status(500).result(e.getMessage()); }
+        });
+
+        app.post("/api/chat", ctx -> {
+            try {
+                DadosMensagem d = ctx.bodyAsClass(DadosMensagem.class);
+                msgDAO.enviar(d.remetenteId, d.destinatarioId, d.conteudo);
+                ctx.status(201).result("ok");
+            } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
+        });
+
+        app.get("/api/chat/nao-lidas/{uid}", ctx -> {
+            try { ctx.json(Map.of("total", msgDAO.contarNaoLidas(Integer.parseInt(ctx.pathParam("uid"))))); }
+            catch (Exception e) { ctx.status(500).result(e.getMessage()); }
+        });
+
+        // ── GRUPOS (COMUNIDADES) ──────────────────────────────────────────
+        app.get("/api/comunidades", ctx -> {
+            try {
+                int uid = Integer.parseInt(ctx.queryParam("usuarioId"));
+                ctx.json(comDAO.listarDoUsuario(uid));
+            } catch (Exception e) { ctx.status(500).result(e.getMessage()); }
         });
 
         app.post("/api/comunidades", ctx -> {
             try {
                 DadosNovaComunidade d = ctx.bodyAsClass(DadosNovaComunidade.class);
                 if (d.nome == null || d.nome.trim().isEmpty())
-                    throw new Exception("Nome da comunidade é obrigatório.");
-                ctx.status(201).json(comDAO.salvar(new ComunidadeVO(0, d.nome, d.descricao)));
+                    throw new Exception("Nome do grupo é obrigatório.");
+                ComunidadeVO c = comDAO.salvar(new ComunidadeVO(0, d.nome, d.descricao), d.criadorId);
+                ctx.status(201).json(c);
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
+
+        app.get("/api/comunidades/{id}/membros", ctx -> {
+            try { ctx.json(comDAO.listarMembros(Integer.parseInt(ctx.pathParam("id")))); }
+            catch (Exception e) { ctx.status(500).result(e.getMessage()); }
+        });
+
+        // Convidar usuário para o grupo
+        app.post("/api/comunidades/{id}/convidar", ctx -> {
+            try {
+                int comunidadeId = Integer.parseInt(ctx.pathParam("id"));
+                DadosConvite d = ctx.bodyAsClass(DadosConvite.class);
+                // Só ADMIN pode convidar
+                if (!comDAO.ehMembro(comunidadeId, d.convidanteId))
+                    throw new Exception("Você não é membro deste grupo.");
+                int conviteId = comDAO.convidar(comunidadeId, d.convidanteId, d.convidadoId);
+                // Envia notificação para o convidado
+                UsuarioVO convidante = usuarioDAO.buscarPorId(d.convidanteId);
+                ComunidadeVO grupo = comDAO.buscarPorId(comunidadeId);
+                if (convidante != null && grupo != null)
+                    notifDAO.salvar(d.convidadoId, convidante.getNome() + " te convidou para o grupo \"" + grupo.getNome() + "\" 💬");
+                ctx.status(201).json(Map.of("conviteId", conviteId));
+            } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
+        });
+
+        // Responder convite
+        app.post("/api/convites/{id}/responder", ctx -> {
+            try {
+                int conviteId = Integer.parseInt(ctx.pathParam("id"));
+                DadosRespostaConvite d = ctx.bodyAsClass(DadosRespostaConvite.class);
+                comDAO.responderConvite(conviteId, d.usuarioId, d.aceitar);
+                ctx.result(d.aceitar ? "aceito" : "recusado");
+            } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
+        });
+
+        // Convites pendentes do usuário
+        app.get("/api/convites/pendentes/{uid}", ctx -> {
+            try { ctx.json(comDAO.listarConvitesPendentes(Integer.parseInt(ctx.pathParam("uid")))); }
+            catch (Exception e) { ctx.status(500).result(e.getMessage()); }
+        });
+
+        // Chat do grupo
+        app.get("/api/comunidades/{id}/mensagens", ctx -> {
+            try {
+                int comunidadeId = Integer.parseInt(ctx.pathParam("id"));
+                int uid = Integer.parseInt(ctx.queryParam("usuarioId"));
+                if (!comDAO.ehMembro(comunidadeId, uid))
+                    throw new Exception("Acesso negado: você não é membro deste grupo.");
+                ctx.json(msgGrupoDAO.listarPorGrupo(comunidadeId));
+            } catch (Exception e) { ctx.status(403).result(e.getMessage()); }
+        });
+
+        app.post("/api/comunidades/{id}/mensagens", ctx -> {
+            try {
+                int comunidadeId = Integer.parseInt(ctx.pathParam("id"));
+                DadosMensagemGrupo d = ctx.bodyAsClass(DadosMensagemGrupo.class);
+                if (!comDAO.ehMembro(comunidadeId, d.usuarioId))
+                    throw new Exception("Acesso negado: você não é membro deste grupo.");
+                msgGrupoDAO.enviar(comunidadeId, d.usuarioId, d.conteudo);
+                ctx.status(201).result("ok");
+            } catch (Exception e) { ctx.status(403).result(e.getMessage()); }
+        });
+
+        // ── DTOs ──────────────────────────────────────────────────────────
+        System.out.println("✅ Todas as rotas configuradas!");
     }
 
-    // ── DTOs ──────────────────────────────────────────────────────────────
     public static class DadosLogin          { public String email, senha; public DadosLogin() {} }
     public static class DadosCadastro       { public String nome, email, senha, dataNascimento; public DadosCadastro() {} }
     public static class DadosInteracao      { public int usuarioId; public String texto; public DadosInteracao() {} }
-    public static class DadosPost           { public String texto, destinoTipo; public int destinoId; public UsuarioVO autor; public DadosPost() {} }
-    public static class DadosNovaComunidade { public String nome, descricao; public DadosNovaComunidade() {} }
+    public static class DadosPost           { public String texto, imagem, destinoTipo; public int destinoId; public UsuarioVO autor; public DadosPost() {} }
+    public static class DadosNovaComunidade { public String nome, descricao; public int criadorId; public DadosNovaComunidade() {} }
     public static class DadosFoto           { public String base64; public DadosFoto() {} }
+    public static class DadosMensagem       { public int remetenteId, destinatarioId; public String conteudo; public DadosMensagem() {} }
+    public static class DadosMensagemGrupo  { public int usuarioId; public String conteudo; public DadosMensagemGrupo() {} }
+    public static class DadosConvite        { public int convidanteId, convidadoId; public DadosConvite() {} }
+    public static class DadosRespostaConvite{ public int usuarioId; public boolean aceitar; public DadosRespostaConvite() {} }
 }
