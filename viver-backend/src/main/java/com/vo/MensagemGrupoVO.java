@@ -24,4 +24,10 @@ public class MensagemGrupoVO {
     public UsuarioVO getAutor()    { return autor; }
     public String getConteudo()    { return conteudo; }
     public Date getDataCriacao()   { return dataCriacao; }
+
+    public void setId(int id) { this.id = id; }
+    public void setComunidadeId(int comunidadeId) { this.comunidadeId = comunidadeId; }
+    public void setAutor(UsuarioVO autor) { this.autor = autor; }
+    public void setConteudo(String conteudo) { this.conteudo = conteudo; }
+    public void setDataCriacao(Date dataCriacao) { this.dataCriacao = dataCriacao; }
 }
