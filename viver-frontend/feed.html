@@ -32,7 +32,6 @@
     </div>
   </header>
 
-  <!-- Filtro vistos / não vistos -->
   <div class="filtro-bar">
     <button class="btn-filtro ativo" id="btn-todos"     onclick="filtrar('todos')">Todos</button>
     <button class="btn-filtro"       id="btn-novos"     onclick="filtrar('novos')">🆕 Novos</button>
@@ -130,6 +129,11 @@ function renderCard(post, container) {
     ? `<img src="${post.autor.fotoPerfil}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;">`
     : `<div class="avatar">${post.autor.nome.charAt(0).toUpperCase()}</div>`;
 
+  // Imagem anexada ao post (AQUI ESTÁ A ALTERAÇÃO)
+  const imagemPostHtml = post.imagem 
+    ? `<img src="${post.imagem}" style="width:100%; border-radius:12px; margin-top:12px; border:2px solid var(--cor-borda); object-fit:cover;">` 
+    : '';
+
   // Respostas/comentários
   let respostasHtml = '';
   if (post.respostas && post.respostas.length > 0) {
@@ -162,7 +166,10 @@ function renderCard(post, container) {
       </div>
       <span style="font-size:0.9rem;color:gray;">${data}</span>
     </div>
-    <p style="font-size:1.3rem;line-height:1.4;font-weight:500;color:#111;margin-bottom:12px;">${post.conteudo}</p>
+    <p style="font-size:1.3rem;line-height:1.4;font-weight:500;color:#111;margin-bottom:0;">${post.conteudo}</p>
+    
+    ${imagemPostHtml}
+    
     ${respostasHtml}
     <div style="display:flex;gap:20px;border-top:1px solid #e9ecef;padding-top:10px;margin-top:10px;">
       <button id="btn-curtir-${post.id}" onclick="curtirPost(${post.id})"
