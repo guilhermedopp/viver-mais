@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VIVER+ - Chat</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="img/logo.png">
+  <style>
+    .filtro-bar { display:flex; gap:10px; margin-bottom:18px; }
+    .btn-filtro { flex:1; padding:10px; font-size:1.1rem; font-weight:700; border:3px solid var(--cor-borda);
+                  border-radius:99px; background:#fff; cursor:pointer; transition:.2s; }
+    .btn-filtro.ativo { background:var(--cor-primaria); color:#fff; border-color:var(--cor-primaria); }
+    .avatar { width:48px; height:48px; border-radius:50%; object-fit:cover;
+              background:var(--cor-primaria); color:#fff; display:flex; align-items:center;
+              justify-content:center; font-size:1.4rem; font-weight:700; flex-shrink:0; }
+    .item-lista { display:flex; align-items:center; gap:14px; padding:16px; background:#fff; 
+                  border:2px solid #e9ecef; border-radius:14px; margin-bottom:12px; cursor:pointer; }
+    
+    /* Balões de Chat */
+    .bolha-chat { max-width:80%; padding:12px 16px; border-radius:14px; font-size:1.2rem; margin-bottom:10px; line-height:1.4; }
+    .bolha-minha { background:var(--cor-primaria); color:#fff; border-bottom-right-radius:4px; align-self:flex-end; }
+    .bolha-outro { background:#e9ecef; color:#111; border-bottom-left-radius:4px; align-self:flex-start; }
+    .autor-grupo { font-size:0.85rem; color:var(--cor-texto-suave); margin-bottom:4px; font-weight:bold; }
+  </style>
+</head>
+<body>
+<main class="tela-acesso" style="max-width:650px; padding-bottom:90px; justify-content:flex-start; position:relative;">
+
+  <div id="tela-lista" style="width:100%;">
+    <header style="margin-bottom:20px; padding-top:20px;">
+      <h1 style="font-size:2rem; color:var(--cor-azul);">Mensagens</h1>
+      <p style="color:var(--cor-texto-suave);">Escolha com quem quer conversar</p>
+    </header>
+
+    <div class="filtro-bar">
+      <button class="btn-filtro ativo" id="btn-amigos" onclick="mudarAba('amigos')">👤 Amigos</button>
+      <button class="btn-filtro"       id="btn-grupos" onclick="mudarAba('grupos')">👥 Grupos</button>
+    </div>
+
+    <div id="lista-conteudo">
+      <p style="text-align:center; color:var(--cor-texto-suave);">A carregar...</p>
+    </div>
+  </div>
+
+  <div id="tela-conversa" style="display:none; width:100%; height:100%; flex-direction:column; background:var(--cor-fundo); position:absolute; top:0; left:0; z-index:100;">
+    
+    <header style="display:flex; align-items:center; gap:12px; padding:16px; background:#fff; border-bottom:2px solid var(--cor-borda);">
+      <button onclick="fecharConversa()" style="background:none;border:none;font-size:1.8rem;cursor:pointer;color:var(--cor-azul);">←</button>
+      <div id="conversa-avatar"></div>
+      <h2 id="conversa-nome" style="font-size:1.4rem; color:var(--cor-azul); margin:0;">Nome</h2>
+    </header>
+
+    <div id="area-mensagens" style="flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; height:calc(100vh - 220px);">
+    </div>
+
+    <div style="padding:16px; background:#fff; border-top:2px solid var(--cor-borda); display:flex; gap:10px;">
+      <input type="text" id="input-msg" placeholder="Escreva a sua mensagem..." 
+             style="flex:1; padding:14px; border:2px solid var(--cor-borda); border-radius:99px; font-size:1.2rem;">
+      <button onclick="enviarMensagem()" class="btn-primario" style="padding:0 24px; border:none; border-radius:99px; font-weight:bold; font-size:1.2rem; cursor:pointer;">Enviar</button>
+    </div>
+  </div>
+
+  <nav class="barra-navegacao" id="nav-bar">
+    <a href="feed.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>Início</span></a>
+    <a href="chat.html" class="item-nav ativo"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg><span>Chat</span></a>
+    <a href="comunidades.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><span>Grupos</span></a>
+    <a href="notificacoes.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><span>Avisos</span></a>
+    <a href="perfil.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span>Perfil</span></a>
+  </nav>
+
+</main>
+
+<script>
+const API_URL = 'http://localhost:8080/api';
+const usuario = JSON.parse(localStorage.getItem('usuarioLogado'));
+if (!usuario) window.location.href = 'index.html';
+
+let abaAtual = 'amigos';
+let chatAtivo = { tipo: null, id: null, nome: null }; // tipo: 'PRIVADO' ou 'GRUPO'
+let loopMensagens = null;
+
+// ── NAVEGAÇÃO DE ABAS ──────────────────────────────────────────────
+function mudarAba(aba) {
+  abaAtual = aba;
+  document.getElementById('btn-amigos').classList.toggle('ativo', aba === 'amigos');
+  document.getElementById('btn-grupos').classList.toggle('ativo', aba === 'grupos');
+  carregarLista();
+}
+
+// ── CARREGAR CONTATOS OU GRUPOS ────────────────────────────────────
+async function carregarLista() {
+  const container = document.getElementById('lista-conteudo');
+  container.innerHTML = '<p style="text-align:center; color:var(--cor-texto-suave);">A carregar...</p>';
+
+  try {
+    if (abaAtual === 'amigos') {
+      // Usa a rota para carregar todos os usuários (simulando os contatos para facilitar o teste)
+      const r = await fetch(`${API_URL}/usuarios`);
+      const usuarios = await r.json();
+      const contatos = usuarios.filter(u => u.id !== usuario.id);
+      
+      if (contatos.length === 0) {
+        container.innerHTML = '<p style="text-align:center;">Não encontrou amigos. Visite a página de Grupos!</p>';
+        return;
+      }
+
+      container.innerHTML = contatos.map(c => `
+        <div class="item-lista" onclick="abrirConversa('PRIVADO', ${c.id}, '${c.nome}')">
+          ${c.fotoPerfil ? `<img src="${c.fotoPerfil}" class="avatar">` : `<div class="avatar">${c.nome.charAt(0)}</div>`}
+          <div style="flex:1;">
+            <strong style="font-size:1.3rem; color:var(--cor-azul);">${c.nome}</strong>
+            <p style="color:var(--cor-texto-suave); margin-top:4px;">Tocar para conversar</p>
+          </div>
+        </div>
+      `).join('');
+    } else {
+      // Carrega os grupos onde o usuário está inserido
+      const r = await fetch(`${API_URL}/comunidades?usuarioId=${usuario.id}`);
+      const grupos = await r.json();
+
+      if (grupos.length === 0) {
+        container.innerHTML = '<p style="text-align:center;">Você não está em nenhum grupo. Vá à aba Grupos para entrar!</p>';
+        return;
+      }
+
+      container.innerHTML = grupos.map(g => `
+        <div class="item-lista" onclick="abrirConversa('GRUPO', ${g.id}, '${g.nome}')">
+          <div class="avatar" style="background:#0f5d82;">👥</div>
+          <div style="flex:1;">
+            <strong style="font-size:1.3rem; color:var(--cor-azul);">${g.nome}</strong>
+            <p style="color:var(--cor-texto-suave); margin-top:4px;">Chat do grupo</p>
+          </div>
+        </div>
+      `).join('');
+    }
+  } catch (e) {
+    container.innerHTML = '<p style="color:red; text-align:center;">Erro ao carregar a lista.</p>';
+  }
+}
+
+// ── ABRIR E FECHAR CONVERSA ────────────────────────────────────────
+function abrirConversa(tipo, id, nome) {
+  chatAtivo = { tipo, id, nome };
+  
+  // Esconde lista, mostra chat e oculta barra de navegação inferior
+  document.getElementById('tela-lista').style.display = 'none';
+  document.getElementById('nav-bar').style.display = 'none';
+  document.getElementById('tela-conversa').style.display = 'flex';
+  
+  document.getElementById('conversa-nome').textContent = nome;
+  document.getElementById('conversa-avatar').innerHTML = tipo === 'GRUPO' 
+    ? '<div class="avatar" style="width:40px;height:40px;font-size:1.2rem;background:#0f5d82;">👥</div>'
+    : `<div class="avatar" style="width:40px;height:40px;font-size:1.2rem;">${nome.charAt(0)}</div>`;
+  
+  document.getElementById('area-mensagens').innerHTML = '<p style="text-align:center;margin-top:20px;">A sincronizar chat...</p>';
+  
+  carregarMensagens();
+  // Inicia um pequeno "Long Polling" para atualizar mensagens a cada 3 segundos
+  loopMensagens = setInterval(carregarMensagens, 3000);
+}
+
+function fecharConversa() {
+  clearInterval(loopMensagens);
+  chatAtivo = { tipo: null, id: null, nome: null };
+  document.getElementById('tela-conversa').style.display = 'none';
+  document.getElementById('nav-bar').style.display = 'flex';
+  document.getElementById('tela-lista').style.display = 'block';
+  carregarLista(); // Atualiza a lista ao voltar
+}
+
+// ── LER MENSAGENS ──────────────────────────────────────────────────
+async function carregarMensagens() {
+  try {
+    let url = chatAtivo.tipo === 'PRIVADO' 
+      ? `${API_URL}/chat/${usuario.id}/${chatAtivo.id}`
+      : `${API_URL}/comunidades/${chatAtivo.id}/mensagens?usuarioId=${usuario.id}`;
+
+    const r = await fetch(url);
+    if (!r.ok) return;
+    const mensagens = await r.json();
+    
+    const area = document.getElementById('area-mensagens');
+    
+    if (mensagens.length === 0) {
+      if(area.innerHTML.includes('sincronizar')) {
+         area.innerHTML = '<p style="text-align:center; color:gray; margin-top:20px;">Envie a primeira mensagem!</p>';
+      }
+      return;
+    }
+
+    let html = '';
+    mensagens.forEach(m => {
+      // No chat privado o campo do remetente pode estar direto no 'remetenteId', no grupo pode estar populado com o autor.
+      // Vamos fazer uma lógica genérica que aguenta ambos:
+      const souEu = m.remetenteId === usuario.id || (m.autor && m.autor.id === usuario.id) || m.usuario_id === usuario.id;
+      const cssClasse = souEu ? 'bolha-minha' : 'bolha-outro';
+      const nomeGrupo = (!souEu && chatAtivo.tipo === 'GRUPO') ? `<div class="autor-grupo">${m.autor ? m.autor.nome : 'Membro'}</div>` : '';
+      
+      html += `
+        <div class="bolha-chat ${cssClasse}">
+          ${nomeGrupo}
+          ${m.conteudo}
+        </div>
+      `;
+    });
+
+    // Só atualiza se houver mensagens novas para não quebrar o scroll
+    if (area.innerHTML !== html) {
+      area.innerHTML = html;
+      area.scrollTop = area.scrollHeight; // Faz scroll para o fundo
+    }
+  } catch (e) { console.log("Erro no refresh do chat:", e); }
+}
+
+// ── ENVIAR MENSAGEM ────────────────────────────────────────────────
+async function enviarMensagem() {
+  const input = document.getElementById('input-msg');
+  const texto = input.value.trim();
+  if (!texto) return;
+
+  // Mostra a mensagem temporariamente antes do servidor confirmar (para feedback rápido)
+  const area = document.getElementById('area-mensagens');
+  if(area.innerHTML.includes('primeira mensagem')) area.innerHTML = '';
+  area.innerHTML += `<div class="bolha-chat bolha-minha" style="opacity:0.7;">${texto}</div>`;
+  area.scrollTop = area.scrollHeight;
+  input.value = '';
+
+  try {
+    let url, bodyData;
+    if (chatAtivo.tipo === 'PRIVADO') {
+      url = `${API_URL}/chat`;
+      bodyData = { remetenteId: usuario.id, destinatarioId: chatAtivo.id, conteudo: texto };
+    } else {
+      url = `${API_URL}/comunidades/${chatAtivo.id}/mensagens`;
+      bodyData = { usuarioId: usuario.id, conteudo: texto };
+    }
+
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(bodyData)
+    });
+    
+    // Força o recarregamento imediato
+    carregarMensagens();
+  } catch (e) { alert("Falha ao enviar mensagem. Verifique a ligação."); }
+}
+
+// Permite enviar mensagem carregando no 'Enter' do teclado do telemóvel
+document.getElementById('input-msg').addEventListener('keypress', function (e) {
+  if (e.key === 'Enter') enviarMensagem();
+});
+
+carregarLista();
+</script>
+<script src="js/pwa-setup.js"></script>
+</body>
+</html
