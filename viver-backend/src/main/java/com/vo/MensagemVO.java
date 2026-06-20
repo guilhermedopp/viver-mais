@@ -2,20 +2,28 @@ package com.vo;
 
 import java.util.Date;
 
-public class MensagemGrupoVO extends MensagemBase {
-    private int comunidadeId;
+public class MensagemVO extends MensagemBase {
+    private UsuarioVO remetente;
+    private UsuarioVO destinatario;
+    private boolean lida;
 
-    public MensagemGrupoVO() {}
+    public MensagemVO() {}
 
-    public MensagemGrupoVO(int id, int comunidadeId, UsuarioVO autor,
-                            String conteudo, Date dataCriacao) {
-        super(id, conteudo, autor, dataCriacao);
-        this.comunidadeId = comunidadeId;
+    public MensagemVO(int id, UsuarioVO remetente, UsuarioVO destinatario,
+                      String conteudo, boolean lida, Date dataCriacao) {
+        super(id, conteudo, remetente, dataCriacao);
+        this.remetente = remetente;
+        this.destinatario = destinatario;
+        this.lida = lida;
     }
 
     @Override
-    public String getTipo() { return "GRUPO"; }
+    public String getTipo() { return "PRIVADA"; }
 
-    public int getComunidadeId()           { return comunidadeId; }
-    public void setComunidadeId(int id)    { this.comunidadeId = id; }
+    public UsuarioVO getRemetente()            { return remetente; }
+    public UsuarioVO getDestinatario()         { return destinatario; }
+    public boolean isLida()                    { return lida; }
+    public void setRemetente(UsuarioVO r)      { this.remetente = r; }
+    public void setDestinatario(UsuarioVO d)   { this.destinatario = d; }
+    public void setLida(boolean l)             { this.lida = l; }
 }
