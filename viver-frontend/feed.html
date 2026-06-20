@@ -34,6 +34,7 @@
 
   <div class="filtro-bar">
     <button class="btn-filtro ativo" id="btn-todos"     onclick="filtrar('todos')">Todos</button>
+    <button class="btn-filtro"       id="btn-seguindo"  onclick="filtrar('seguindo')">👥 Seguindo</button>
     <button class="btn-filtro"       id="btn-novos"     onclick="filtrar('novos')">🆕 Novos</button>
     <button class="btn-filtro"       id="btn-ja-vistos" onclick="filtrar('vistos')">✅ Já vistos</button>
   </div>
@@ -94,10 +95,16 @@ async function carregarBadgeNotif() {
 // ── Filtro ────────────────────────────────────────────────────────
 function filtrar(tipo) {
   filtroAtual = tipo;
-  ['todos','novos','ja-vistos'].forEach(id =>
-    document.getElementById('btn-' + id).classList.toggle('ativo', id === tipo.replace('vistos','ja-vistos'))
-  );
-  renderizarPosts();
+  ['todos','seguindo','novos','ja-vistos'].forEach(id => {
+    const btn = document.getElementById('btn-' + id);
+    if(btn) btn.classList.toggle('ativo', id === (tipo === 'vistos' ? 'ja-vistos' : tipo));
+  });
+  
+  if (tipo === 'seguindo' || tipo === 'todos') {
+    carregarFeed(); // Faz requisição nova ao backend
+  } else {
+    renderizarPosts(); // Filtra localmente os novos/vistos
+  }
 }
 
 function renderizarPosts() {
@@ -110,6 +117,7 @@ function renderizarPosts() {
     container.innerHTML = `<p style="font-size:1.2rem; color:var(--cor-texto-suave); text-align:center; margin-top:20px;">
       ${filtroAtual === 'novos' ? 'Nenhum momento novo! Você está em dia. ✅' :
         filtroAtual === 'vistos' ? 'Ainda não viu nenhum momento.' :
+        filtroAtual === 'seguindo' ? 'As pessoas que segue ainda não partilharam momentos.' :
         'Ainda não há partilhas. Seja o primeiro!'}
     </p>`;
     return;
@@ -129,7 +137,7 @@ function renderCard(post, container) {
     ? `<img src="${post.autor.fotoPerfil}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;">`
     : `<div class="avatar">${post.autor.nome.charAt(0).toUpperCase()}</div>`;
 
-  // Imagem anexada ao post (AQUI ESTÁ A ALTERAÇÃO)
+  // Imagem anexada ao post
   const imagemPostHtml = post.imagem 
     ? `<img src="${post.imagem}" style="width:100%; border-radius:12px; margin-top:12px; border:2px solid var(--cor-borda); object-fit:cover;">` 
     : '';
@@ -259,7 +267,10 @@ async function marcarVistos(posts) {
 // ── Carregar feed ─────────────────────────────────────────────────
 async function carregarFeed() {
   try {
-    const r = await fetch(`${API_URL}/posts?usuarioId=${usuario.id}`);
+    let url = `${API_URL}/posts?usuarioId=${usuario.id}`;
+    if (filtroAtual === 'seguindo') url += '&filtro=seguindo';
+    
+    const r = await fetch(url);
     if (r.ok) {
       todosPosts = await r.json();
       renderizarPosts();
