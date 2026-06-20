@@ -2,6 +2,7 @@ package com.vo;
 
 import java.sql.Timestamp;
 
+// Classe abstrata: define o contrato comum para UsuarioVO e ComunidadeVO
 public abstract class Perfil {
     protected int id;
     protected String nome;
@@ -14,13 +15,12 @@ public abstract class Perfil {
         this.nome = nome;
     }
 
-    // Getters e Setters
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public abstract String getTipo();
 
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
-
-    public Timestamp getDataCriacao() { return dataCriacao; }
-    public void setDataCriacao(Timestamp dataCriacao) { this.dataCriacao = dataCriacao; }
+    public int getId()                           { return id; }
+    public void setId(int id)                    { this.id = id; }
+    public String getNome()                      { return nome; }
+    public void setNome(String nome)             { this.nome = nome; }
+    public Timestamp getDataCriacao()            { return dataCriacao; }
+    public void setDataCriacao(Timestamp ts)     { this.dataCriacao = ts; }
 }
