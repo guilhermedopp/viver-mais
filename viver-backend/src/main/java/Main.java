@@ -17,13 +17,13 @@ public class Main {
 
         System.out.println("🔥 VIVER+ online em: http://localhost:8080");
 
-        UsuarioBO       usuarioBO    = new UsuarioBO();
-        PostDAO         postDAO      = new PostDAO();
-        UsuarioDAO      usuarioDAO   = new UsuarioDAO();
-        ComunidadeDAO   comDAO       = new ComunidadeDAO();
-        NotificacaoDAO  notifDAO     = new NotificacaoDAO();
-        MensagemDAO     msgDAO       = new MensagemDAO();
-        MensagemGrupoDAO msgGrupoDAO = new MensagemGrupoDAO();
+        UsuarioBO        usuarioBO    = new UsuarioBO();
+        PostDAO          postDAO      = new PostDAO();
+        UsuarioDAO       usuarioDAO   = new UsuarioDAO();
+        ComunidadeDAO    comDAO       = new ComunidadeDAO();
+        NotificacaoDAO   notifDAO     = new NotificacaoDAO();
+        MensagemDAO      msgDAO       = new MensagemDAO();
+        MensagemGrupoDAO msgGrupoDAO  = new MensagemGrupoDAO();
 
         // ── AUTH ──────────────────────────────────────────────────────────
         app.post("/api/login", ctx -> {
@@ -90,12 +90,29 @@ public class Main {
             catch (Exception e) { ctx.status(500).result(e.getMessage()); }
         });
 
+        // ROTA NOVA: buscar usuário por e-mail (usado pelo convite de grupo)
+        // ATENÇÃO: esta rota deve vir ANTES de /api/usuarios/{id}
+        app.get("/api/usuarios/buscar", ctx -> {
+            try {
+                String email = ctx.queryParam("email");
+                if (email == null || email.isEmpty()) {
+                    ctx.status(400).result("E-mail não informado."); return;
+                }
+                UsuarioVO u = usuarioDAO.buscarPorEmail(email);
+                if (u == null) { ctx.status(404).result("Nenhum usuário encontrado com esse e-mail."); return; }
+                // Retorna apenas id e nome por segurança
+                ctx.json(Map.of("id", u.getId(), "nome", u.getNome()));
+            } catch (Exception e) { ctx.status(500).result(e.getMessage()); }
+        });
+
         app.get("/api/usuarios/{id}", ctx -> {
             try {
                 int id = Integer.parseInt(ctx.pathParam("id"));
                 UsuarioVO u = usuarioDAO.buscarPorId(id);
                 if (u == null) { ctx.status(404).result("Não encontrado."); return; }
-                ctx.json(Map.of("usuario", u, "posts", postDAO.listarPorUsuario(id)));
+                List<PostVO> posts = postDAO.listarPorUsuario(id);
+                EstatisticasPerfilVO stats = usuarioDAO.buscarEstatisticas(id);
+                ctx.json(Map.of("usuario", u, "posts", posts, "estatisticas", stats));
             } catch (Exception e) { ctx.status(500).result(e.getMessage()); }
         });
 
@@ -106,7 +123,6 @@ public class Main {
             } catch (Exception e) { ctx.status(500).result(e.getMessage()); }
         });
 
-        // Verificar se o usuário logado segue o perfil visitado
         app.get("/api/usuarios/{id}/sigo", ctx -> {
             try {
                 int seguidoId  = Integer.parseInt(ctx.pathParam("id"));
@@ -159,7 +175,7 @@ public class Main {
             try {
                 int a = Integer.parseInt(ctx.pathParam("uidA"));
                 int b = Integer.parseInt(ctx.pathParam("uidB"));
-                msgDAO.marcarComoLidas(b, a); // marca mensagens de B para A como lidas
+                msgDAO.marcarComoLidas(b, a);
                 ctx.json(msgDAO.buscarConversa(a, b));
             } catch (Exception e) { ctx.status(500).result(e.getMessage()); }
         });
@@ -177,7 +193,7 @@ public class Main {
             catch (Exception e) { ctx.status(500).result(e.getMessage()); }
         });
 
-        // ── GRUPOS (COMUNIDADES) ──────────────────────────────────────────
+        // ── GRUPOS ────────────────────────────────────────────────────────
         app.get("/api/comunidades", ctx -> {
             try {
                 int uid = Integer.parseInt(ctx.queryParam("usuarioId"));
@@ -190,8 +206,7 @@ public class Main {
                 DadosNovaComunidade d = ctx.bodyAsClass(DadosNovaComunidade.class);
                 if (d.nome == null || d.nome.trim().isEmpty())
                     throw new Exception("Nome do grupo é obrigatório.");
-                ComunidadeVO c = comDAO.salvar(new ComunidadeVO(0, d.nome, d.descricao), d.criadorId);
-                ctx.status(201).json(c);
+                ctx.status(201).json(comDAO.salvar(new ComunidadeVO(0, d.nome, d.descricao), d.criadorId));
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
 
@@ -200,25 +215,22 @@ public class Main {
             catch (Exception e) { ctx.status(500).result(e.getMessage()); }
         });
 
-        // Convidar usuário para o grupo
         app.post("/api/comunidades/{id}/convidar", ctx -> {
             try {
                 int comunidadeId = Integer.parseInt(ctx.pathParam("id"));
                 DadosConvite d = ctx.bodyAsClass(DadosConvite.class);
-                // Só ADMIN pode convidar
                 if (!comDAO.ehMembro(comunidadeId, d.convidanteId))
                     throw new Exception("Você não é membro deste grupo.");
                 int conviteId = comDAO.convidar(comunidadeId, d.convidanteId, d.convidadoId);
-                // Envia notificação para o convidado
                 UsuarioVO convidante = usuarioDAO.buscarPorId(d.convidanteId);
-                ComunidadeVO grupo = comDAO.buscarPorId(comunidadeId);
+                ComunidadeVO grupo   = comDAO.buscarPorId(comunidadeId);
                 if (convidante != null && grupo != null)
-                    notifDAO.salvar(d.convidadoId, convidante.getNome() + " te convidou para o grupo \"" + grupo.getNome() + "\" 💬");
+                    notifDAO.salvar(d.convidadoId,
+                        convidante.getNome() + " te convidou para o grupo \"" + grupo.getNome() + "\" 💬");
                 ctx.status(201).json(Map.of("conviteId", conviteId));
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
 
-        // Responder convite
         app.post("/api/convites/{id}/responder", ctx -> {
             try {
                 int conviteId = Integer.parseInt(ctx.pathParam("id"));
@@ -228,13 +240,11 @@ public class Main {
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
 
-        // Convites pendentes do usuário
         app.get("/api/convites/pendentes/{uid}", ctx -> {
             try { ctx.json(comDAO.listarConvitesPendentes(Integer.parseInt(ctx.pathParam("uid")))); }
             catch (Exception e) { ctx.status(500).result(e.getMessage()); }
         });
 
-        // Chat do grupo
         app.get("/api/comunidades/{id}/mensagens", ctx -> {
             try {
                 int comunidadeId = Integer.parseInt(ctx.pathParam("id"));
@@ -256,18 +266,18 @@ public class Main {
             } catch (Exception e) { ctx.status(403).result(e.getMessage()); }
         });
 
-        // ── DTOs ──────────────────────────────────────────────────────────
         System.out.println("✅ Todas as rotas configuradas!");
     }
 
-    public static class DadosLogin          { public String email, senha; public DadosLogin() {} }
-    public static class DadosCadastro       { public String nome, email, senha, dataNascimento; public DadosCadastro() {} }
-    public static class DadosInteracao      { public int usuarioId; public String texto; public DadosInteracao() {} }
-    public static class DadosPost           { public String texto, imagem, destinoTipo; public int destinoId; public UsuarioVO autor; public DadosPost() {} }
-    public static class DadosNovaComunidade { public String nome, descricao; public int criadorId; public DadosNovaComunidade() {} }
-    public static class DadosFoto           { public String base64; public DadosFoto() {} }
-    public static class DadosMensagem       { public int remetenteId, destinatarioId; public String conteudo; public DadosMensagem() {} }
-    public static class DadosMensagemGrupo  { public int usuarioId; public String conteudo; public DadosMensagemGrupo() {} }
-    public static class DadosConvite        { public int convidanteId, convidadoId; public DadosConvite() {} }
-    public static class DadosRespostaConvite{ public int usuarioId; public boolean aceitar; public DadosRespostaConvite() {} }
+    // ── DTOs ──────────────────────────────────────────────────────────────
+    public static class DadosLogin           { public String email, senha;                                               public DadosLogin() {} }
+    public static class DadosCadastro        { public String nome, email, senha, dataNascimento;                         public DadosCadastro() {} }
+    public static class DadosInteracao       { public int usuarioId; public String texto;                                public DadosInteracao() {} }
+    public static class DadosPost            { public String texto, imagem, destinoTipo; public int destinoId; public UsuarioVO autor; public DadosPost() {} }
+    public static class DadosNovaComunidade  { public String nome, descricao; public int criadorId;                     public DadosNovaComunidade() {} }
+    public static class DadosFoto            { public String base64;                                                     public DadosFoto() {} }
+    public static class DadosMensagem        { public int remetenteId, destinatarioId; public String conteudo;           public DadosMensagem() {} }
+    public static class DadosMensagemGrupo   { public int usuarioId; public String conteudo;                            public DadosMensagemGrupo() {} }
+    public static class DadosConvite         { public int convidanteId, convidadoId;                                    public DadosConvite() {} }
+    public static class DadosRespostaConvite { public int usuarioId; public boolean aceitar;                             public DadosRespostaConvite() {} }
 }
