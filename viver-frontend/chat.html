@@ -252,8 +252,18 @@ document.getElementById('input-msg').addEventListener('keypress', function (e) {
   if (e.key === 'Enter') enviarMensagem();
 });
 
+// Força o scroll inteligente quando o teclado do telemóvel abre (Visual Viewport API)
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', () => {
+    const area = document.getElementById('area-mensagens');
+    if (area && chatAtivo.id) {
+      setTimeout(() => { area.scrollTop = area.scrollHeight; }, 100);
+    }
+  });
+}
+
 carregarLista();
 </script>
 <script src="js/pwa-setup.js"></script>
 </body>
-</html
+</html>
