@@ -32,8 +32,25 @@ body {
     justify-content: center;
     align-items: center;
     padding: 24px;
+    padding-bottom: 90px;
 }
 
+/* ───────────────────────────────────────────────
+   MELHORIAS DE PWA E ACESSIBILIDADE MOBILE
+─────────────────────────────────────────────── */
+/* Desativa delay de 300ms e evita zoom de duplo toque em elementos interativos */
+a, button, input[type="button"], input[type="submit"] {
+    touch-action: manipulation;
+}
+
+/* Impede o zoom automático (irritante) do iOS Safari ao focar num input */
+input, textarea, select {
+    font-size: 16px !important;
+}
+
+/* ───────────────────────────────────────────────
+   ESTRUTURA BASE (Login, Cadastros, etc.)
+─────────────────────────────────────────────── */
 .tela-acesso,
 .container-login {
     width: 100%;
@@ -157,7 +174,6 @@ body {
     color: #7f858a;
 }
 
-/* Botão "mostrar/ocultar senha" dentro do campo-com-icone */
 .btn-olho {
     flex: 0 0 auto;
     background: none;
@@ -289,7 +305,6 @@ body {
     font-weight: bold;
 }
 
-/* Badge numérico de notificações não lidas, sobre o ícone "Avisos" */
 .nav-item-wrap {
     position: relative;
 }
@@ -305,11 +320,6 @@ body {
     padding: 1px 6px;
     border-radius: 99px;
     line-height: 1.3;
-}
-
-/* Ajuste para o body não ficar escondido atrás da barra */
-body {
-    padding-bottom: 90px;
 }
 
 /* ───────────────────────────────────────────────
@@ -446,10 +456,14 @@ body {
     border-color: var(--cor-primaria);
 }
 
+/* ───────────────────────────────────────────────
+   MEDIA QUERIES (Mobile View)
+─────────────────────────────────────────────── */
 @media (max-width: 560px) {
     body {
         align-items: flex-start;
         padding: 14px;
+        padding-bottom: 90px;
     }
 
     .tela-acesso,
@@ -493,11 +507,6 @@ body {
     .campo-com-icone svg {
         width: 30px;
         height: 30px;
-    }
-
-    .campo-com-icone input,
-    .grupo-input input {
-        font-size: 1.15rem;
     }
 
     .grupo-input label {
