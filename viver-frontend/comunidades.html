@@ -150,15 +150,30 @@ async function criarGrupo() {
 }
 
 function abrirChat(grupoId) {
-  // Redireciona para o chat e instrui a aba Grupos
   window.location.href = `chat.html`; 
-  // Nota: o chat atual deteta os grupos e abre as conversas
 }
 
 async function convidarAlguem(grupoId, nomeGrupo) {
-  const emailOuId = prompt(`Convide um amigo para o grupo "${nomeGrupo}".\nDigite o ID dele (ex: 2):`);
-  if (!emailOuId) return;
-  const convidadoId = parseInt(emailOuId);
+  const entrada = prompt(`Convide um amigo para o grupo "${nomeGrupo}".\nDigite o E-MAIL ou o ID dele:`);
+  if (!entrada) return;
+  
+  let convidadoId;
+
+  // Se tiver '@', assumimos que é e-mail. Vamos buscar na API.
+  if (entrada.includes('@')) {
+    try {
+      const r = await fetch(`${API_URL}/usuarios/buscar?email=${encodeURIComponent(entrada.trim())}`);
+      if (!r.ok) { alert("Nenhum utilizador encontrado com este e-mail."); return; }
+      const user = await r.json();
+      convidadoId = user.id;
+    } catch (e) {
+      alert("Erro ao procurar utilizador."); return;
+    }
+  } else {
+    // Se não tiver '@', assumimos que digitou o ID numérico diretamente
+    convidadoId = parseInt(entrada);
+    if (isNaN(convidadoId)) { alert("Por favor, digite um e-mail ou um ID válido."); return; }
+  }
   
   try {
     const r = await fetch(`${API_URL}/comunidades/${grupoId}/convidar`, {
@@ -171,7 +186,7 @@ async function convidarAlguem(grupoId, nomeGrupo) {
     } else {
       alert(await r.text());
     }
-  } catch (e) { alert("Erro ao enviar convite."); }
+  } catch (e) { alert("Erro ao enviar convite. Verifique o servidor."); }
 }
 
 carregarConvites();
