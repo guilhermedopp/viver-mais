@@ -48,33 +48,33 @@ async function carregarPerfil() {
     const r = await fetch(`${API_URL}/usuarios/${perfilId}`);
     if (!r.ok) { alert('Usuário não encontrado.'); history.back(); return; }
 
-    const { usuario, posts } = await r.json();
+    const { usuario, posts, estatisticas } = await r.json();
     const sigo = await verificarSeguimento();
 
     const avatarHtml = usuario.fotoPerfil
       ? `<img src="${usuario.fotoPerfil}" style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:4px solid var(--cor-primaria);">`
-      : `<div style="width:90px;height:90px;border-radius:50%;background:var(--cor-primaria);color:#fff;
-                     display:flex;align-items:center;justify-content:center;font-size:2.5rem;
-                     font-weight:700;border:4px solid var(--cor-primaria-escura);">
-           ${usuario.nome.charAt(0).toUpperCase()}
-         </div>`;
+      : `<div style="width:90px;height:90px;border-radius:50%;background:var(--cor-primaria);color:#fff; display:flex;align-items:center;justify-content:center;font-size:2.5rem;font-weight:700;border:4px solid var(--cor-primaria-escura);">${usuario.nome.charAt(0).toUpperCase()}</div>`;
 
     document.getElementById('container-perfil').innerHTML = `
       ${avatarHtml}
       <h2 style="font-size:1.8rem; color:var(--cor-azul); margin:12px 0 4px;">${usuario.nome}</h2>
       <p style="color:var(--cor-texto-suave); font-size:1.1rem; margin-bottom:16px;">${usuario.email}</p>
       
+      <div style="display:flex; gap:25px; justify-content:center; margin-bottom:20px;">
+          <div style="text-align:center;"><strong style="display:block; font-size:1.3rem;">${estatisticas.totalPosts}</strong> posts</div>
+          <div style="text-align:center;"><strong style="display:block; font-size:1.3rem;">${estatisticas.totalSeguidores}</strong> seguidores</div>
+          <div style="text-align:center;"><strong style="display:block; font-size:1.3rem;">${estatisticas.totalSeguindo}</strong> seguindo</div>
+      </div>
+
       <div style="display:flex; gap:10px; justify-content:center;">
         <button id="btn-seguir" onclick="toggleSeguir()"
           class="${sigo ? 'btn-secundario' : 'btn-primario'}"
-          style="padding:10px 24px; border-radius:99px; border:none; font-size:1.1rem;
-                 font-weight:700; cursor:pointer; min-height:auto;">
+          style="padding:10px 24px; border-radius:99px; border:none; font-size:1.1rem; font-weight:700; cursor:pointer; min-height:auto;">
           ${sigo ? '✅ Seguindo' : '➕ Seguir'}
         </button>
         <button onclick="irParaChat(${usuario.id}, '${usuario.nome}')"
           class="btn-secundario"
-          style="padding:10px 24px; border-radius:99px; border:none; font-size:1.1rem;
-                 font-weight:700; cursor:pointer; min-height:auto; background:#e9ecef;">
+          style="padding:10px 24px; border-radius:99px; border:none; font-size:1.1rem; font-weight:700; cursor:pointer; min-height:auto; background:#e9ecef;">
           💬 Mensagem
         </button>
       </div>
@@ -90,7 +90,11 @@ async function carregarPerfil() {
       const data = new Date(post.data).toLocaleDateString('pt-PT', { day:'2-digit', month:'short' });
       const card = document.createElement('article');
       card.style.cssText = 'background:#fff;border:2px solid #e9ecef;border-radius:12px;padding:16px;margin-bottom:14px;text-align:left;';
-      card.innerHTML = `<p style="font-size:0.9rem;color:gray;margin-bottom:6px;">${data}</p><p style="font-size:1.2rem;font-weight:500;color:#111;">${post.conteudo}</p>`;
+      
+      // Inclui a imagem se o post tiver
+      const imagemHtml = post.imagem ? `<img src="${post.imagem}" style="width:100%; border-radius:12px; margin-top:10px; object-fit:cover; border:2px solid var(--cor-borda);">` : '';
+      
+      card.innerHTML = `<p style="font-size:0.9rem;color:gray;margin-bottom:6px;">${data}</p><p style="font-size:1.2rem;font-weight:500;color:#111;">${post.conteudo}</p>${imagemHtml}`;
       container.appendChild(card);
     });
   } catch (err) {
@@ -102,7 +106,16 @@ function irParaChat(id, nome) {
   window.location.href = 'chat.html';
 }
 
-async function verificarSeguimento() { return false; }
+async function verificarSeguimento() {
+  try {
+    const r = await fetch(`${API_URL}/usuarios/${perfilId}/sigo?usuarioId=${eu.id}`);
+    if (r.ok) {
+      const json = await r.json();
+      return json.sigo;
+    }
+  } catch (e) {}
+  return false; 
+}
 
 async function toggleSeguir() {
   const btn = document.getElementById('btn-seguir');
