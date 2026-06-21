@@ -25,47 +25,62 @@ if (formLogin) {
     });
 }
 
-// ── CADASTRO (Simplificado - Sem CPF) ──────────────────────────────────
+// ── CADASTRO (Agora com Nickname!) ──────────────────────────────────
 const formCadastro = document.getElementById('form-cadastro');
 if (formCadastro) {
     formCadastro.addEventListener('submit', async (e) => {
         e.preventDefault();
         const nome           = document.getElementById('nome').value.trim();
+        const nickname       = document.getElementById('nickname').value.trim().replace('@', ''); // Limpa o @
         const email          = document.getElementById('email').value.trim();
         const dataNascimento = document.getElementById('dataNascimento').value;
         const senha          = document.getElementById('senha').value;
-        const confirmar      = document.getElementById('confirmarSenha').value;
-        const msg            = document.getElementById('mensagem-cadastro');
+        const confirmar      = document.getElementById('confirmaSenha').value;
+        const msg            = document.getElementById('mensagem-cadastro') || { textContent: '', className: '' };
 
-        // Validações no frontend
         if (senha !== confirmar) {
-            msg.textContent = 'As senhas não coincidem. Verifique e tente novamente.';
+            msg.textContent = 'As senhas não coincidem.';
             msg.className = 'mensagem mensagem-erro'; return;
         }
-
-        msg.textContent = 'A validar dados...';
-        msg.className = 'mensagem';
 
         try {
             const resp = await fetch(`${API_URL}/cadastro`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nome, email, senha, dataNascimento }) // CPF removido
+                // Adicionamos o nickname aqui para bater com o backend
+                body: JSON.stringify({ nome, nickname, email, senha, dataNascimento })
             });
             
             if (resp.ok) {
-                const usuario = await resp.json();
-                msg.textContent = 'Conta criada com sucesso, ' + usuario.nome + '!';
-                msg.className = 'mensagem mensagem-sucesso';
+                alert('Conta criada com sucesso!');
                 localStorage.setItem('emailRecenteCadastro', email);
-                setTimeout(() => window.location.href = 'index.html', 1500);
+                window.location.href = 'index.html';
             } else {
-                msg.textContent = await resp.text();
-                msg.className = 'mensagem mensagem-erro';
+                alert('Erro: ' + await resp.text());
             }
         } catch (err) {
-            msg.textContent = 'Não foi possível ligar ao servidor.';
-            msg.className = 'mensagem mensagem-erro';
+            alert('Não foi possível ligar ao servidor.');
         }
     });
 }
+
+// ── FUNÇÕES DE PERFIL (Para usar nas telas de edição) ────────────────
+const api = {
+    async atualizarNickname(usuarioId, novoNickname) {
+        const res = await fetch(`${API_URL}/usuarios/${usuarioId}/nickname`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ nickname: novoNickname.replace('@', '') })
+        });
+        return res.ok;
+    },
+
+    async atualizarFoto(usuarioId, base64) {
+        const res = await fetch(`${API_URL}/usuarios/${usuarioId}/foto`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ base64: base64 })
+        });
+        return res.ok;
+    }
+};
