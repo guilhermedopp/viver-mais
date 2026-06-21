@@ -67,7 +67,7 @@ public class Main {
                     while ((line = br.readLine()) != null) sb.append(line);
                 }
                 String json = sb.toString();
-                // Extrai campos do JSON da resposta do Google (parsing simples)
+                // Extrai campos do JSON da resposta do Google (parsing com Regex para ignorar espaços)
                 String googleId  = extrairCampo(json, "sub");
                 String email     = extrairCampo(json, "email");
                 String nome      = extrairCampo(json, "name");
@@ -334,28 +334,24 @@ public class Main {
         System.out.println("✅ Todas as rotas configuradas!");
     }
 
-    // Extrai campo de um JSON simples (sem biblioteca)
+    // Extrai campo de um JSON simples (ignorando espaços com Regex)
     private static String extrairCampo(String json, String campo) {
-        String chave = "\"" + campo + "\":\"";
-        int inicio = json.indexOf(chave);
-        if (inicio == -1) return "";
-        inicio += chave.length();
-        int fim = json.indexOf("\"", inicio);
-        return fim == -1 ? "" : json.substring(inicio, fim);
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("\"" + campo + "\"\\s*:\\s*\"([^\"]+)\"").matcher(json);
+        return m.find() ? m.group(1) : "";
     }
 
     // ── DTOs ──────────────────────────────────────────────────────────────
-    public static class DadosLogin           { public String email, senha;                                                                   public DadosLogin() {} }
-    public static class DadosCadastro        { public String nome, nickname, email, senha, dataNascimento;                                    public DadosCadastro() {} }
-    public static class DadosGoogle          { public String credential;                                                                     public DadosGoogle() {} }
-    public static class DadosInteracao       { public int usuarioId; public String texto;                                                    public DadosInteracao() {} }
+    public static class DadosLogin           { public String email, senha;                                                                      public DadosLogin() {} }
+    public static class DadosCadastro        { public String nome, nickname, email, senha, dataNascimento;                                      public DadosCadastro() {} }
+    public static class DadosGoogle          { public String credential;                                                                        public DadosGoogle() {} }
+    public static class DadosInteracao       { public int usuarioId; public String texto;                                                       public DadosInteracao() {} }
     public static class DadosPost            { public String texto, imagem, destinoTipo; public int destinoId; public UsuarioVO autor;        public DadosPost() {} }
-    public static class DadosNovaComunidade  { public String nome, descricao; public int criadorId;                                         public DadosNovaComunidade() {} }
-    public static class DadosEditarGrupo     { public int usuarioId; public String nome, descricao, fotoGrupo;                               public DadosEditarGrupo() {} }
-    public static class DadosFoto            { public String base64;                                                                         public DadosFoto() {} }
-    public static class DadosMensagem        { public int remetenteId, destinatarioId; public String conteudo;                               public DadosMensagem() {} }
-    public static class DadosMensagemGrupo   { public int usuarioId; public String conteudo;                                                public DadosMensagemGrupo() {} }
-    public static class DadosConvite         { public int convidanteId, convidadoId;                                                        public DadosConvite() {} }
-    public static class DadosRespostaConvite { public int usuarioId; public boolean aceitar;                                                 public DadosRespostaConvite() {} }
-    public static class DadosNickname        { public String nickname;                                                                       public DadosNickname() {} }
+    public static class DadosNovaComunidade  { public String nome, descricao; public int criadorId;                                             public DadosNovaComunidade() {} }
+    public static class DadosEditarGrupo     { public int usuarioId; public String nome, descricao, fotoGrupo;                                  public DadosEditarGrupo() {} }
+    public static class DadosFoto            { public String base64;                                                                            public DadosFoto() {} }
+    public static class DadosMensagem        { public int remetenteId, destinatarioId; public String conteudo;                                  public DadosMensagem() {} }
+    public static class DadosMensagemGrupo   { public int usuarioId; public String conteudo;                                                    public DadosMensagemGrupo() {} }
+    public static class DadosConvite         { public int convidanteId, convidadoId;                                                            public DadosConvite() {} }
+    public static class DadosRespostaConvite { public int usuarioId; public boolean aceitar;                                                    public DadosRespostaConvite() {} }
+    public static class DadosNickname        { public String nickname;                                                                          public DadosNickname() {} }
 }
