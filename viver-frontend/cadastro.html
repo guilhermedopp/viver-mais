@@ -5,7 +5,6 @@
     <title>VIVER+ - Criar Conta</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Ajustes específicos para embelezar o formulário */
         .area-formulario { max-width: 400px; margin: auto; padding: 20px; }
         .grupo-input { margin-bottom: 15px; }
         .grupo-input label { display: block; font-weight: bold; margin-bottom: 5px; color: #333; }
@@ -18,6 +17,7 @@
             border-radius: 50px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px;
         }
         #status-nick { font-size: 0.85rem; display: block; margin-top: 5px; }
+        .toggle-senha { font-size: 0.9rem; color: #28a745; cursor: pointer; margin-top: 5px; display: inline-block; }
     </style>
 </head>
 <body>
@@ -55,6 +55,12 @@
                     <input type="password" id="senha" placeholder="••••••" required>
                 </div>
 
+                <div class="grupo-input">
+                    <label>Confirmar Senha</label>
+                    <input type="password" id="confirmaSenha" placeholder="••••••" required>
+                    <span class="toggle-senha" onclick="toggleSenha()">👁️ Mostrar senhas</span>
+                </div>
+
                 <button type="submit" class="btn-primario">CRIAR CONTA</button>
             </form>
             <div class="area-links" style="text-align: center; margin-top: 15px;">
@@ -64,7 +70,15 @@
     </main>
 
     <script>
-        // Lógica de verificação continua a mesma
+        function toggleSenha() {
+            const senha = document.getElementById('senha');
+            const confirma = document.getElementById('confirmaSenha');
+            const type = senha.type === 'password' ? 'text' : 'password';
+            senha.type = type;
+            confirma.type = type;
+        }
+
+        // Validação de nickname (mantida)
         const inputNick = document.getElementById('nickname');
         const statusNick = document.getElementById('status-nick');
         let timer;
@@ -82,18 +96,29 @@
 
         document.getElementById('form-cadastro').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            const senha = document.getElementById('senha').value;
+            const confirma = document.getElementById('confirmaSenha').value;
+
+            if (senha !== confirma) {
+                alert('As senhas não coincidem!');
+                return;
+            }
+
             const payload = {
                 nome: document.getElementById('nome').value,
                 nickname: document.getElementById('nickname').value.replace('@', ''),
                 email: document.getElementById('email').value,
                 dataNascimento: document.getElementById('dataNascimento').value,
-                senha: document.getElementById('senha').value
+                senha: senha
             };
+
             const res = await fetch('http://localhost:8080/api/cadastro', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(payload)
             });
+
             if (res.ok) {
                 localStorage.setItem('emailRecenteCadastro', payload.email);
                 alert('Conta criada com sucesso!');
