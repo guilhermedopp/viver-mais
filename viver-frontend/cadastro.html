@@ -4,11 +4,26 @@
     <meta charset="UTF-8">
     <title>VIVER+ - Criar Conta</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Ajustes específicos para embelezar o formulário */
+        .area-formulario { max-width: 400px; margin: auto; padding: 20px; }
+        .grupo-input { margin-bottom: 15px; }
+        .grupo-input label { display: block; font-weight: bold; margin-bottom: 5px; color: #333; }
+        .grupo-input input { 
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;
+            font-size: 1rem;
+        }
+        .btn-primario { 
+            width: 100%; padding: 15px; background: #28a745; color: white; border: none; 
+            border-radius: 50px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px;
+        }
+        #status-nick { font-size: 0.85rem; display: block; margin-top: 5px; }
+    </style>
 </head>
 <body>
     <main class="tela-acesso">
-        <header class="marca">
-            <h1>VIVER+</h1>
+        <header class="marca" style="text-align: center; margin-bottom: 20px;">
+            <h1 style="color: #28a745; font-size: 2.5rem;">VIVER+</h1>
             <p>Junte-se à nossa comunidade!</p>
         </header>
 
@@ -16,18 +31,18 @@
             <form id="form-cadastro">
                 <div class="grupo-input">
                     <label>Nome Completo</label>
-                    <input type="text" id="nome" required>
+                    <input type="text" id="nome" placeholder="Seu nome" required>
                 </div>
 
                 <div class="grupo-input">
                     <label>Escolha seu @nickname</label>
                     <input type="text" id="nickname" placeholder="ex: maria_silva" required>
-                    <small id="status-nick" style="color: var(--cor-azul);"></small>
+                    <small id="status-nick"></small>
                 </div>
 
                 <div class="grupo-input">
                     <label>E-mail</label>
-                    <input type="email" id="email" required>
+                    <input type="email" id="email" placeholder="seu@email.com" required>
                 </div>
 
                 <div class="grupo-input">
@@ -37,31 +52,26 @@
 
                 <div class="grupo-input">
                     <label>Senha</label>
-                    <input type="password" id="senha" required>
+                    <input type="password" id="senha" placeholder="••••••" required>
                 </div>
 
-                <button type="submit" class="btn-primario btn-grande">CRIAR CONTA</button>
+                <button type="submit" class="btn-primario">CRIAR CONTA</button>
             </form>
-            <div class="area-links">
-                <p>Já tem conta?</p> <a href="index.html">Entrar</a>
+            <div class="area-links" style="text-align: center; margin-top: 15px;">
+                <p>Já tem conta? <a href="index.html" style="color: #28a745; font-weight: bold;">Entrar</a></p>
             </div>
         </section>
     </main>
 
     <script>
+        // Lógica de verificação continua a mesma
         const inputNick = document.getElementById('nickname');
         const statusNick = document.getElementById('status-nick');
-
-        // Validação em tempo real (debounce)
         let timer;
         inputNick.addEventListener('input', () => {
             clearTimeout(timer);
             const nick = inputNick.value.replace('@', '');
-            if (nick.length < 3) {
-                statusNick.innerText = "Mínimo 3 caracteres";
-                return;
-            }
-            
+            if (nick.length < 3) { statusNick.innerText = ""; return; }
             timer = setTimeout(async () => {
                 const res = await fetch(`http://localhost:8080/api/usuarios/nickname/${nick}/disponivel`);
                 const data = await res.json();
@@ -79,13 +89,11 @@
                 dataNascimento: document.getElementById('dataNascimento').value,
                 senha: document.getElementById('senha').value
             };
-
             const res = await fetch('http://localhost:8080/api/cadastro', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(payload)
             });
-
             if (res.ok) {
                 localStorage.setItem('emailRecenteCadastro', payload.email);
                 alert('Conta criada com sucesso!');
