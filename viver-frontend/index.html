@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="img/logo.png">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
     <main class="tela-acesso">
@@ -45,6 +46,29 @@
                 <button type="submit" class="btn-primario btn-grande">ENTRAR NA MINHA CONTA</button>
             </form>
 
+            <div style="display: flex; align-items: center; margin: 24px 0;">
+                <hr style="flex: 1; border: 1px solid #e9ecef;">
+                <span style="margin: 0 15px; color: var(--cor-texto-suave); font-weight: bold; font-size: 1.1rem;">OU</span>
+                <hr style="flex: 1; border: 1px solid #e9ecef;">
+            </div>
+
+            <div id="g_id_onload"
+                 data-client_id="1095979412262-me3kh924htbgh5fmt434hqpkhjsv715s.apps.googleusercontent.com"
+                 data-context="signin"
+                 data-ux_mode="popup"
+                 data-callback="handleCredentialResponse"
+                 data-auto_prompt="false">
+            </div>
+            <div class="g_id_signin"
+                 data-type="standard"
+                 data-shape="pill"
+                 data-theme="outline"
+                 data-text="signin_with"
+                 data-size="large"
+                 data-logo_alignment="left"
+                 style="display: flex; justify-content: center; margin-bottom: 24px;">
+            </div>
+
             <div class="area-links">
                 <p>Ainda não tem conta?</p> <a href="cadastro.html">Criar conta</a>
             </div>
@@ -64,10 +88,32 @@
             const emailSalvo = localStorage.getItem('emailRecenteCadastro');
             if (emailSalvo) {
                 document.getElementById('email').value = emailSalvo;
-                document.getElementById('senha').focus(); // Foca logo na senha para facilitar
-                localStorage.removeItem('emailRecenteCadastro'); // Limpa para a próxima vez
+                document.getElementById('senha').focus();
+                localStorage.removeItem('emailRecenteCadastro');
             }
         });
+
+        // Função de Callback chamada pela Google após o login com sucesso
+        async function handleCredentialResponse(response) {
+            try {
+                // Envia o token da Google para o nosso servidor Javalin validar e fazer o login/cadastro
+                const res = await fetch('http://localhost:8080/api/auth/google', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ credential: response.credential })
+                });
+
+                if (res.ok) {
+                    const usuario = await res.json();
+                    localStorage.setItem('usuarioLogado', JSON.stringify(usuario));
+                    window.location.href = 'feed.html';
+                } else {
+                    alert('Erro ao entrar com Google: ' + await res.text());
+                }
+            } catch (error) {
+                alert('Não foi possível conectar ao servidor VIVER+.');
+            }
+        }
     </script>
 </body>
 </html>
