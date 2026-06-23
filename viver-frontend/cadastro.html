@@ -16,7 +16,12 @@
             width: 100%; padding: 15px; background: #28a745; color: white; border: none; 
             border-radius: 50px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px;
         }
-        #status-nick { font-size: 0.85rem; display: block; margin-top: 5px; }
+        /* Estilo para quando o botão estiver desativado por e-mail falso */
+        .btn-primario:disabled {
+            background: #a5d6a7;
+            cursor: not-allowed;
+        }
+        #status-nick, #status-email { font-size: 0.85rem; display: block; margin-top: 5px; }
         .toggle-senha { font-size: 0.9rem; color: #28a745; cursor: pointer; margin-top: 5px; display: inline-block; }
     </style>
 </head>
@@ -43,6 +48,7 @@
                 <div class="grupo-input">
                     <label>E-mail</label>
                     <input type="email" id="email" placeholder="seu@email.com" required>
+                    <small id="status-email"></small>
                 </div>
 
                 <div class="grupo-input">
@@ -61,7 +67,7 @@
                     <span class="toggle-senha" onclick="toggleSenha()">👁️ Mostrar senhas</span>
                 </div>
 
-                <button type="submit" class="btn-primario">CRIAR CONTA</button>
+                <button type="submit" class="btn-primario" id="btn-submit">CRIAR CONTA</button>
             </form>
             <div class="area-links" style="text-align: center; margin-top: 15px;">
                 <p>Já tem conta? <a href="index.html" style="color: #28a745; font-weight: bold;">Entrar</a></p>
@@ -78,15 +84,15 @@
             confirma.type = type;
         }
 
-        // Validação de nickname (mantida)
+        // Validação de nickname
         const inputNick = document.getElementById('nickname');
         const statusNick = document.getElementById('status-nick');
-        let timer;
+        let timerNick;
         inputNick.addEventListener('input', () => {
-            clearTimeout(timer);
+            clearTimeout(timerNick);
             const nick = inputNick.value.replace('@', '');
             if (nick.length < 3) { statusNick.innerText = ""; return; }
-            timer = setTimeout(async () => {
+            timerNick = setTimeout(async () => {
                 const res = await fetch(`http://localhost:8080/api/usuarios/nickname/${nick}/disponivel`);
                 const data = await res.json();
                 statusNick.innerText = data.disponivel ? "✅ Disponível" : "❌ Já em uso";
@@ -94,6 +100,67 @@
             }, 500);
         });
 
+        // Validação de E-mail no Mundo Real
+        const inputEmail = document.getElementById('email');
+        const statusEmail = document.getElementById('status-email');
+        const btnSubmit = document.getElementById('btn-submit');
+        let timerEmail;
+
+        inputEmail.addEventListener('input', () => {
+            clearTimeout(timerEmail);
+            const email = inputEmail.value.trim();
+            
+            if (!email.includes('@') || !email.includes('.')) { 
+                statusEmail.innerText = ""; 
+                btnSubmit.disabled = false;
+                return; 
+            }
+
+            statusEmail.innerText = "A verificar e-mail na internet...";
+            statusEmail.style.color = "var(--cor-texto-suave)";
+            btnSubmit.disabled = true; // Desativa o botão enquanto verifica
+
+            timerEmail = setTimeout(async () => {
+                try {
+                    // 1. Verifica se já está registado na nossa Base de Dados
+                    const resDB = await fetch(`http://localhost:8080/api/usuarios/buscar?email=${encodeURIComponent(email)}`);
+                    if (resDB.ok) {
+                        statusEmail.innerText = "❌ Este e-mail já tem conta no VIVER+";
+                        statusEmail.style.color = "red";
+                        return; // O botão continua desativado
+                    }
+
+                    // 2. Verifica se o e-mail existe no MUNDO REAL usando API Externa
+                    // ATENÇÃO: Substitua a string abaixo pela sua API KEY do abstractapi.com
+                    const API_KEY = "26522ba265584d59b8fe1046455f8fc2"; 
+                    const urlMundo = `https://emailvalidation.abstractapi.com/v1/?api_key=${API_KEY}&email=${encodeURIComponent(email)}`;
+                    
+                    const resMundo = await fetch(urlMundo);
+                    const dataMundo = await resMundo.json();
+                    
+                    if (dataMundo.deliverability === "DELIVERABLE") {
+                        statusEmail.innerText = "✅ E-mail válido e verdadeiro!";
+                        statusEmail.style.color = "green";
+                        btnSubmit.disabled = false; // Liberta o botão para registo
+                    } else if (dataMundo.deliverability === "UNDELIVERABLE") {
+                        statusEmail.innerText = "❌ Este e-mail não existe no mundo real.";
+                        statusEmail.style.color = "red"; 
+                        // Botão continua desativado
+                    } else {
+                        statusEmail.innerText = "⚠️ E-mail com formato válido, mas não foi possível garantir se existe.";
+                        statusEmail.style.color = "orange";
+                        btnSubmit.disabled = false; // Liberta o botão para não prender o utilizador
+                    }
+
+                } catch (e) {
+                    console.error("Erro na verificação externa:", e);
+                    statusEmail.innerText = "";
+                    btnSubmit.disabled = false; // Em caso de erro de rede, liberta para o utilizador tentar
+                }
+            }, 1200);
+        });
+
+        // Envio do formulário
         document.getElementById('form-cadastro').addEventListener('submit', async (e) => {
             e.preventDefault();
             

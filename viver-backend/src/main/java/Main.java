@@ -3,12 +3,19 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 
 import com.bo.UsuarioBO;
-import com.dao.*;
-import com.vo.*;
+import com.dao.ComunidadeDAO;
+import com.dao.MensagemDAO;
+import com.dao.MensagemGrupoDAO;
+import com.dao.NotificacaoDAO;
+import com.dao.PostDAO;
+import com.dao.SeguidorDAO;
+import com.dao.UsuarioDAO;
+import com.vo.ComunidadeVO;
+import com.vo.UsuarioVO;
+
 import io.javalin.Javalin;
 
 public class Main {
@@ -208,6 +215,8 @@ public class Main {
                 ctx.result("ok");
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
+
+        
 
         // ── NOTIFICAÇÕES ──────────────────────────────────────────────────
         app.get("/api/notificacoes/{uid}", ctx -> {
