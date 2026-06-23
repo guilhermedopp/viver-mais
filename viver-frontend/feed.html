@@ -17,6 +17,29 @@
     .badge-notif { background:red; color:#fff; border-radius:99px; font-size:0.7rem;
                    padding:1px 5px; position:absolute; top:-4px; right:-6px; font-weight:700; }
     .nav-item-wrap { position:relative; }
+    
+    /* --- CSS DO BOTÃO BATE PAPO --- */
+    .btn-bate-papo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background-color: #28a745;
+      color: #ffffff;
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: 50px;
+      font-weight: bold;
+      font-size: 0.9rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+    .btn-bate-papo:hover {
+      background-color: #218838;
+      transform: translateY(-2px);
+    }
+    .btn-bate-papo svg {
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -30,6 +53,14 @@
         <p id="saudacao" style="margin:0; color:var(--cor-texto-suave);">Olá...</p>
       </div>
     </div>
+    
+    <!-- NOVO BOTÃO BATE PAPO -->
+    <a href="chat.html" class="btn-bate-papo">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      </svg>
+      Bate Papo
+    </a>
   </header>
 
   <div class="filtro-bar">
