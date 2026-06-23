@@ -10,6 +10,7 @@ import com.dao.SeguidorDAO;
 import com.dao.UsuarioDAO;
 import com.observer.Seguidor;
 import com.vo.PostVO;
+import com.vo.Reacao; // IMPORTANTE: Importa a nossa nova classe de Polimorfismo
 import com.vo.UsuarioVO;
 
 public class UsuarioBO {
@@ -107,19 +108,26 @@ public class UsuarioBO {
         return criarPostagem(autor, texto, null);
     }
 
-    // ── Curtida ───────────────────────────────────────────────────────────
-    public boolean processarCurtida(int usuarioId, int postId) throws Exception {
-        boolean curtiu = postDao.alternarCurtida(usuarioId, postId);
+    // ── Reações (Substitui a antiga Curtida para usar Polimorfismo) ───────
+    public boolean processarReacao(int usuarioId, int postId, String tipo) throws Exception {
+        // Envia o tipo para o DAO (que agora aceita 3 parâmetros)
+        boolean curtiu = postDao.alternarCurtida(usuarioId, postId, tipo); 
+        
         if (curtiu) {
             try {
                 UsuarioVO quemCurtiu = dao.buscarPorId(usuarioId);
                 PostVO post = postDao.buscarPorId(postId);
                 if (post != null && post.getAutor() != null && quemCurtiu != null
                         && post.getAutor().getId() != usuarioId) {
-                    notifDao.salvar(post.getAutor().getId(), quemCurtiu.getNome() + " curtiu o seu momento! ❤️");
+                    
+                    // APLICAÇÃO PRÁTICA DO POLIMORFISMO E FACTORY
+                    Reacao reacao = Reacao.criar(tipo); 
+                    String aviso = quemCurtiu.getNome() + " reagiu com " + reacao.getNome() + " " + reacao.getEmoji() + " ao seu post!";
+                    
+                    notifDao.salvar(post.getAutor().getId(), aviso);
                 }
             } catch (Exception e) {
-                System.err.println("[BO] Erro ao notificar curtida: " + e.getMessage());
+                System.err.println("[BO] Erro ao notificar reação: " + e.getMessage());
             }
         }
         return curtiu;

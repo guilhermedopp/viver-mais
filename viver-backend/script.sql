@@ -14,6 +14,9 @@ CREATE TABLE usuarios (
     foto_perfil      MEDIUMTEXT    DEFAULT NULL
 );
 
+-- NOTA DE SEGURANÇA: Como implementámos o BCrypt e regras rígidas de senha, 
+-- o login com a senha '1234' destes utilizadores testes não irá funcionar.
+-- Utilize a página de Registo da aplicação para criar novas contas de teste válidas!
 INSERT INTO usuarios (nome, nickname, email, senha, data_nascimento)
 VALUES
   ('Dona Maria', 'donamaria', 'maria@viver.com', '1234', '1950-05-20'),
@@ -33,9 +36,11 @@ CREATE TABLE postagens (
 INSERT INTO postagens (conteudo, usuario_id)
 VALUES ('Que bom estar aqui no VIVER+! 🌱', 1);
 
+-- Tabela atualizada para suportar Múltiplas Reações (Polimorfismo)
 CREATE TABLE curtidas (
     usuario_id INT NOT NULL,
     post_id    INT NOT NULL,
+    tipo       VARCHAR(20) DEFAULT 'curtida', -- NOVO CAMPO: curtida, abraco, parabens
     PRIMARY KEY (usuario_id, post_id),
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (post_id)    REFERENCES postagens(id) ON DELETE CASCADE
