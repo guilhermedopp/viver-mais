@@ -14,53 +14,49 @@
     .avatar { width:42px; height:42px; border-radius:50%; object-fit:cover;
               background:var(--cor-primaria); color:#fff; display:flex; align-items:center;
               justify-content:center; font-size:1.3rem; font-weight:700; flex-shrink:0; }
-    .badge-notif { background:red; color:#fff; border-radius:99px; font-size:0.7rem;
-                   padding:1px 5px; position:absolute; top:-4px; right:-6px; font-weight:700; }
+    .badge-notif { background:red; color:#fff; border-radius:99px; font-size:0.75rem;
+                   padding:2px 6px; position:absolute; top:-4px; right:-6px; font-weight:700; }
     .nav-item-wrap { position:relative; }
     
-    /* --- CSS DO BOTÃO BATE PAPO --- */
-    .btn-bate-papo {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background-color: #28a745;
-      color: #ffffff;
-      text-decoration: none;
-      padding: 10px 18px;
-      border-radius: 50px;
-      font-weight: bold;
-      font-size: 0.9rem;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      transition: all 0.3s ease;
+    /* --- CSS DOS BOTÕES DE TOPO --- */
+    .acoes-topo { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+    .btn-topo {
+      display: inline-flex; align-items: center; gap: 8px; color: #ffffff; text-decoration: none;
+      padding: 8px 16px; border-radius: 50px; font-weight: bold; font-size: 0.9rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: all 0.3s ease; border: none; cursor: pointer;
     }
-    .btn-bate-papo:hover {
-      background-color: #218838;
-      transform: translateY(-2px);
-    }
-    .btn-bate-papo svg {
-      color: white;
-    }
+    .btn-bate-papo { background-color: #28a745; }
+    .btn-bate-papo:hover { background-color: #218838; transform: translateY(-2px); }
+    .btn-acessibilidade { background-color: var(--cor-azul); }
+    .btn-acessibilidade:hover { filter: brightness(0.9); transform: translateY(-2px); }
+    
+    /* Efeito ao passar o rato nas reações */
+    .btn-reacao { background:none; border:none; cursor:pointer; font-size:1.4rem; transition:transform 0.2s; }
+    .btn-reacao:hover { transform: scale(1.3); }
   </style>
 </head>
 <body>
-<main class="tela-acesso" style="max-width:650px; padding-bottom:90px; justify-content:flex-start;">
+<main class="tela-acesso" style="max-width:650px; padding-bottom:90px; justify-content:flex-start; background: transparent; box-shadow: none;">
 
   <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding-top:20px;">
     <div style="display:flex; align-items:center; gap:12px;">
       <img src="img/logo.png" style="height:50px; object-fit:contain;">
       <div>
-        <h1 style="font-size:1.8rem; margin:0;">VIVER+</h1>
-        <p id="saudacao" style="margin:0; color:var(--cor-texto-suave);">Olá...</p>
+        <h1 style="font-size:1.8rem; margin:0; color: var(--cor-primaria);">VIVER+</h1>
+        <p id="saudacao" style="margin:0; color:var(--cor-texto-suave); font-weight: 600;">Olá...</p>
       </div>
     </div>
     
-    <!-- NOVO BOTÃO BATE PAPO -->
-    <a href="chat.html" class="btn-bate-papo">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-      </svg>
-      Bate Papo
-    </a>
+    <div class="acoes-topo">
+      <a href="chat.html" class="btn-topo btn-bate-papo">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg> Bate Papo
+      </a>
+      <button onclick="alternarAcessibilidade()" class="btn-topo btn-acessibilidade">
+        🔍 Letra Maior
+      </button>
+    </div>
   </header>
 
   <div class="filtro-bar">
@@ -72,7 +68,7 @@
 
   <section style="width:100%;">
     <div id="container-posts">
-      <p style="font-size:1.2rem; color:var(--cor-texto-suave);">A carregar os momentos...</p>
+      <p style="font-size:1.2rem; color:var(--cor-texto-suave); text-align: center;">A carregar os momentos...</p>
     </div>
   </section>
 
@@ -101,8 +97,9 @@
   </nav>
 </main>
 
+<script src="js/api.js"></script>
+
 <script>
-const API_URL = 'http://localhost:8080/api';
 const usuario = JSON.parse(localStorage.getItem('usuarioLogado'));
 if (!usuario) window.location.href = 'index.html';
 else document.getElementById('saudacao').textContent = `Olá, ${usuario.nome}! 👋`;
@@ -117,7 +114,7 @@ async function carregarBadgeNotif() {
     if (r.ok) {
       const { total } = await r.json();
       const badge = document.getElementById('badge-notif');
-      if (total > 0) { badge.textContent = total; badge.style.display = 'inline'; }
+      if (total > 0) { badge.textContent = total; badge.style.display = 'flex'; }
       else badge.style.display = 'none';
     }
   } catch (_) {}
@@ -145,12 +142,13 @@ function renderizarPosts() {
   if (filtroAtual === 'vistos')  posts = todosPosts.filter(p => p.visto);
 
   if (posts.length === 0) {
-    container.innerHTML = `<p style="font-size:1.2rem; color:var(--cor-texto-suave); text-align:center; margin-top:20px;">
+    container.innerHTML = `<div style="background:#fff; padding:30px; border-radius:16px; text-align:center; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+      <p style="font-size:1.2rem; color:var(--cor-texto-suave);">
       ${filtroAtual === 'novos' ? 'Nenhum momento novo! Você está em dia. ✅' :
         filtroAtual === 'vistos' ? 'Ainda não viu nenhum momento.' :
         filtroAtual === 'seguindo' ? 'As pessoas que segue ainda não partilharam momentos.' :
         'Ainda não há partilhas. Seja o primeiro!'}
-    </p>`;
+      </p></div>`;
     return;
   }
 
@@ -160,8 +158,6 @@ function renderizarPosts() {
 
 function renderCard(post, container) {
   const data = new Date(post.data).toLocaleDateString('pt-PT', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
-  const coracao = post.curtidoPeloUsuario ? '❤️' : '🤍';
-  const corBtn  = post.curtidoPeloUsuario ? '#e03131' : 'var(--cor-texto-suave)';
 
   // Avatar do autor
   const fotoSrc = post.autor.fotoPerfil
@@ -170,61 +166,73 @@ function renderCard(post, container) {
 
   // Imagem anexada ao post
   const imagemPostHtml = post.imagem 
-    ? `<img src="${post.imagem}" style="width:100%; border-radius:12px; margin-top:12px; border:2px solid var(--cor-borda); object-fit:cover;">` 
+    ? `<img src="${post.imagem}" style="width:100%; border-radius:12px; margin-top:12px; object-fit:cover;">` 
     : '';
 
-  // Respostas/comentários
+  // Respostas/comentários com link no nome
   let respostasHtml = '';
   if (post.respostas && post.respostas.length > 0) {
     respostasHtml = `<div style="margin-top:10px; padding-top:10px; border-top:1px solid #f0f0f0;">`;
     post.respostas.forEach(r => {
-      respostasHtml += `<div style="display:flex;gap:8px;margin-bottom:6px;align-items:flex-start;">
-        <div class="avatar" style="width:30px;height:30px;font-size:0.9rem;">${r.autor.nome.charAt(0)}</div>
-        <div style="background:#f7fbfd;border-radius:8px;padding:6px 10px;flex:1;">
-          <strong style="font-size:0.95rem;color:var(--cor-azul);">${r.autor.nome}</strong>
-          <p style="font-size:1rem;margin:2px 0;">${r.conteudo}</p>
+      respostasHtml += `
+      <div style="display:flex; gap:10px; margin-top:12px; align-items:flex-start;">
+        <a href="perfil-publico.html?id=${r.autor.id}" style="text-decoration:none;">
+            <div class="avatar" style="width:32px; height:32px; font-size:0.9rem;">
+                ${r.autor.fotoPerfil ? `<img src="${r.autor.fotoPerfil}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : r.autor.nome.charAt(0)}
+            </div>
+        </a>
+        <div style="background: #f8f9fa; border-radius: 12px; padding: 8px 12px; flex: 1;">
+            <a href="perfil-publico.html?id=${r.autor.id}" style="font-size:0.95rem; font-weight:bold; color:var(--cor-azul); text-decoration:none;">${r.autor.nome}</a>
+            <p style="font-size:1rem; margin-top:2px; color:var(--cor-texto);">${r.conteudo}</p>
         </div>
       </div>`;
     });
     respostasHtml += `</div>`;
   }
 
+  const numReacoes = post.curtidas ? post.curtidas.length : (post.totalCurtidas || 0);
+
   const card = document.createElement('article');
   card.id = `post-${post.id}`;
-  card.style.cssText = 'background:#fff;border:3px solid #e9ecef;border-radius:14px;padding:18px;margin-bottom:18px;';
+  card.style.cssText = 'background:#fff; border-radius:16px; padding:20px; margin-bottom:20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: border 0.3s; border: 2px solid transparent;';
   if (!post.visto) card.style.borderColor = 'var(--cor-primaria)';
 
   card.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
-      <div style="display:flex;gap:10px;align-items:center;">
+      <div style="display:flex;gap:12px;align-items:center;">
         <a href="perfil-publico.html?id=${post.autor.id}" style="text-decoration:none;">${fotoSrc}</a>
         <div>
-          <a href="perfil-publico.html?id=${post.autor.id}" style="font-size:1.2rem;font-weight:700;color:var(--cor-azul);text-decoration:none;">${post.autor.nome}</a>
-          ${!post.visto ? '<span style="font-size:0.8rem;background:var(--cor-primaria);color:#fff;padding:1px 7px;border-radius:99px;margin-left:6px;">Novo</span>' : ''}
+          <a href="perfil-publico.html?id=${post.autor.id}" style="font-size:1.15rem;font-weight:700;color:var(--cor-texto);text-decoration:none;">${post.autor.nome}</a>
+          ${!post.visto ? '<span style="font-size:0.75rem;background:var(--cor-primaria);color:#fff;padding:2px 8px;border-radius:99px;margin-left:6px;">Novo</span>' : ''}
+          <p style="font-size:0.85rem;color:var(--cor-texto-suave);margin:0;">${data}</p>
         </div>
       </div>
-      <span style="font-size:0.9rem;color:gray;">${data}</span>
     </div>
-    <p style="font-size:1.3rem;line-height:1.4;font-weight:500;color:#111;margin-bottom:0;">${post.conteudo}</p>
     
+    <p style="font-size:1.2rem;line-height:1.5;color:var(--cor-texto);margin-top:12px;">${post.conteudo}</p>
     ${imagemPostHtml}
     
-    ${respostasHtml}
-    <div style="display:flex;gap:20px;border-top:1px solid #e9ecef;padding-top:10px;margin-top:10px;">
-      <button id="btn-curtir-${post.id}" onclick="curtirPost(${post.id})"
-        style="background:none;border:none;font-size:1.2rem;font-weight:700;cursor:pointer;color:${corBtn};display:flex;align-items:center;gap:5px;">
-        ${coracao} <span id="n-curtidas-${post.id}">${post.totalCurtidas}</span>
-      </button>
-      <button onclick="abrirResposta(${post.id})"
-        style="background:none;border:none;font-size:1.2rem;font-weight:700;cursor:pointer;color:var(--cor-texto-suave);">
-        💬 ${post.respostas ? post.respostas.length : 0}
-      </button>
+    <div style="display:flex; gap:15px; border-top:1px solid var(--cor-borda); padding-top:14px; margin-top:15px; align-items:center;">
+        <div style="display:flex; gap:10px; background:var(--cor-fundo); padding:6px 14px; border-radius:30px;">
+            <button class="btn-reacao" onclick="reagirPost(${post.id}, 'curtida')" title="Curtir">❤️</button>
+            <button class="btn-reacao" onclick="reagirPost(${post.id}, 'abraco')" title="Abraço">🫂</button>
+            <button class="btn-reacao" onclick="reagirPost(${post.id}, 'parabens')" title="Parabéns">👏</button>
+        </div>
+        <span style="color:var(--cor-texto-suave); font-size:1rem; font-weight:bold;">
+            ${numReacoes}
+        </span>
+        <button onclick="abrirResposta(${post.id})" style="background:none;border:none;font-size:1.05rem;font-weight:700;cursor:pointer;color:var(--cor-texto-suave);margin-left:auto;">
+            💬 Comentar (${post.respostas ? post.respostas.length : 0})
+        </button>
     </div>
-    <div id="area-resp-${post.id}" style="display:none;margin-top:12px;">
-      <textarea id="txt-resp-${post.id}" placeholder="Deixe uma palavra de carinho..."
-        style="width:100%;min-height:60px;padding:10px;border:2px solid var(--cor-borda);border-radius:8px;font-size:1.1rem;resize:none;"></textarea>
+
+    ${respostasHtml}
+    
+    <div id="area-resp-${post.id}" style="display:none;margin-top:15px;">
+      <textarea id="txt-resp-${post.id}" placeholder="Escreva uma palavra de carinho..."
+        style="width:100%;min-height:60px;padding:12px;border:2px solid var(--cor-borda);border-radius:12px;font-size:1.05rem;resize:none;"></textarea>
       <button onclick="enviarResposta(${post.id})" class="btn-primario"
-        style="width:100%;margin-top:6px;min-height:44px;padding:8px;font-size:1.1rem;border:none;border-radius:8px;cursor:pointer;">
+        style="width:100%;margin-top:8px;padding:10px;font-size:1.1rem;border:none;border-radius:12px;cursor:pointer;">
         Publicar Comentário
       </button>
     </div>
@@ -232,28 +240,18 @@ function renderCard(post, container) {
   container.appendChild(card);
 }
 
-// ── Curtir (chamada real à API) ───────────────────────────────────
-async function curtirPost(postId) {
+// ── Reagir (Substitui o Curtir Simples) ───────────────────────────
+async function reagirPost(postId, tipo) {
   try {
-    const r = await fetch(`${API_URL}/posts/${postId}/curtir`, {
+    const r = await fetch(`${API_URL}/posts/${postId}/reagir`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ usuarioId: usuario.id })
+      body: JSON.stringify({ usuarioId: usuario.id, tipo: tipo })
     });
     if (r.ok) {
-      const resultado = await r.text();
-      const btn = document.getElementById(`btn-curtir-${postId}`);
-      const nEl = document.getElementById(`n-curtidas-${postId}`);
-      let n = parseInt(nEl.textContent);
-      if (resultado === 'curtiu') {
-        btn.innerHTML = `❤️ <span id="n-curtidas-${postId}">${n + 1}</span>`;
-        btn.style.color = '#e03131';
-      } else {
-        btn.innerHTML = `🤍 <span id="n-curtidas-${postId}">${Math.max(0, n - 1)}</span>`;
-        btn.style.color = 'var(--cor-texto-suave)';
-      }
+        carregarFeed(); // Recarrega para atualizar os números de reações
     }
-  } catch (_) { alert('Erro ao processar curtida.'); }
+  } catch (_) { alert('Erro ao processar reação.'); }
 }
 
 function abrirResposta(postId) {
@@ -261,7 +259,7 @@ function abrirResposta(postId) {
   area.style.display = area.style.display === 'none' ? 'block' : 'none';
 }
 
-// ── Responder (chamada real à API) ────────────────────────────────
+// ── Responder ─────────────────────────────────────────────────────
 async function enviarResposta(postId) {
   const txt = document.getElementById(`txt-resp-${postId}`).value.trim();
   if (!txt) { alert('Escreva algo antes de comentar.'); return; }
@@ -272,8 +270,6 @@ async function enviarResposta(postId) {
       body: JSON.stringify({ usuarioId: usuario.id, texto: txt })
     });
     if (r.ok) {
-      document.getElementById(`txt-resp-${postId}`).value = '';
-      abrirResposta(postId);
       carregarFeed(); // Recarrega para mostrar o novo comentário
     } else {
       alert(await r.text());
@@ -308,11 +304,26 @@ async function carregarFeed() {
       // Marca os posts visíveis como vistos após 2 segundos
       setTimeout(() => marcarVistos(todosPosts.filter(p => !p.visto)), 2000);
     }
-  } catch (_) { document.getElementById('container-posts').innerHTML = '<p>Erro ao carregar.</p>'; }
+  } catch (_) { document.getElementById('container-posts').innerHTML = '<p>Erro ao carregar o feed.</p>'; }
 }
 
+// Inicialização
 carregarFeed();
 carregarBadgeNotif();
+
+// ── WEBSOCKETS (Observer de Notificações ao Vivo) ─────────────────
+try {
+    const ws = new WebSocket(`ws://localhost:8080/ws/notificacoes/${usuario.id}`);
+    ws.onmessage = (event) => {
+        if (event.data === "NOVA_NOTIFICACAO") {
+            const badge = document.getElementById('badge-notif');
+            if (badge) {
+                badge.style.display = 'inline-flex';
+                badge.textContent = parseInt(badge.textContent || 0) + 1;
+            }
+        }
+    };
+} catch(e) { console.log("WebSocket offline."); }
 </script>
 <script src="js/pwa-setup.js"></script>
 </body>

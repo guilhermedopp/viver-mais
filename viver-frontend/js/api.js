@@ -1,5 +1,38 @@
 const API_URL = 'http://localhost:8080/api';
 
+// ── SISTEMA DE SEGURANÇA (JWT Interceptor) ────────────────────────────
+// Intercepta todos os pedidos para adicionar o Token de Segurança (JWT)
+const originalFetch = window.fetch;
+window.fetch = async function(resource, config = {}) {
+    if (typeof resource === 'string' && resource.includes('/api/') && 
+        !resource.includes('/login') && !resource.includes('/cadastro') && 
+        !resource.includes('/auth/google') && !resource.includes('/disponivel')) {
+        
+        config.headers = config.headers || {};
+        const token = localStorage.getItem('jwtToken');
+        if (token) config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return originalFetch(resource, config);
+};
+
+// ── SISTEMA DE ACESSIBILIDADE (Fonte Grande) ──────────────────────────
+function aplicarAcessibilidade() {
+    if(localStorage.getItem('fonte-grande') === 'true') {
+        document.body.classList.add('fonte-grande');
+    } else {
+        document.body.classList.remove('fonte-grande');
+    }
+}
+
+window.alternarAcessibilidade = function() {
+    const estadoAtual = localStorage.getItem('fonte-grande') === 'true';
+    localStorage.setItem('fonte-grande', !estadoAtual);
+    aplicarAcessibilidade();
+};
+
+// Aplica o tamanho de fonte correto assim que qualquer página abre
+document.addEventListener('DOMContentLoaded', aplicarAcessibilidade);
+
 // ── LOGIN ─────────────────────────────────────────────────────────────
 const formLogin = document.getElementById('form-login');
 if (formLogin) {
@@ -14,7 +47,10 @@ if (formLogin) {
                 body: JSON.stringify({ email, senha })
             });
             if (resp.ok) {
-                localStorage.setItem('usuarioLogado', JSON.stringify(await resp.json()));
+                const data = await resp.json();
+                // Agora o backend devolve o token separado do objeto do utilizador
+                localStorage.setItem('jwtToken', data.token); 
+                localStorage.setItem('usuarioLogado', JSON.stringify(data.usuario));
                 window.location.href = 'feed.html';
             } else {
                 alert('Aviso: ' + await resp.text());
@@ -25,7 +61,7 @@ if (formLogin) {
     });
 }
 
-// ── CADASTRO (Agora com Nickname!) ──────────────────────────────────
+// ── CADASTRO (Com Nickname) ───────────────────────────────────────────
 const formCadastro = document.getElementById('form-cadastro');
 if (formCadastro) {
     formCadastro.addEventListener('submit', async (e) => {
@@ -39,15 +75,19 @@ if (formCadastro) {
         const msg            = document.getElementById('mensagem-cadastro') || { textContent: '', className: '' };
 
         if (senha !== confirmar) {
-            msg.textContent = 'As senhas não coincidem.';
-            msg.className = 'mensagem mensagem-erro'; return;
+            if(msg.className !== undefined) {
+                msg.textContent = 'As senhas não coincidem.';
+                msg.className = 'mensagem mensagem-erro'; 
+            } else {
+                alert('As senhas não coincidem.');
+            }
+            return;
         }
 
         try {
             const resp = await fetch(`${API_URL}/cadastro`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                // Adicionamos o nickname aqui para bater com o backend
                 body: JSON.stringify({ nome, nickname, email, senha, dataNascimento })
             });
             
@@ -64,7 +104,7 @@ if (formCadastro) {
     });
 }
 
-// ── FUNÇÕES DE PERFIL (Para usar nas telas de edição) ────────────────
+// ── FUNÇÕES DE PERFIL (Para usar nas telas de edição) ─────────────────
 const api = {
     async atualizarNickname(usuarioId, novoNickname) {
         const res = await fetch(`${API_URL}/usuarios/${usuarioId}/nickname`, {

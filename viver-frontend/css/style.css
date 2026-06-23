@@ -531,4 +531,17 @@ input, textarea, select {
         font-size: 0.95rem;
         padding: 8px 4px;
     }
+    /* ── MODO DE ACESSIBILIDADE (Fonte Extra-Grande) ── */
+body.fonte-grande {
+    font-size: 24px !important;
+}
+body.fonte-grande h2 { font-size: 2rem !important; }
+body.fonte-grande p, 
+body.fonte-grande input, 
+body.fonte-grande button {
+    font-size: 1.3rem !important;
+}
+body.fonte-grande .card-post {
+    padding: 28px !important;
+}
 }
