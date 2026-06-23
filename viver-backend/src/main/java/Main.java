@@ -4,29 +4,28 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import io.javalin.websocket.WsContext;
 
 import com.bo.UsuarioBO;
-import com.dao.ComunidadeDAO;
-import com.dao.MensagemDAO;
-import com.dao.MensagemGrupoDAO;
-import com.dao.NotificacaoDAO;
-import com.dao.PostDAO;
-import com.dao.SeguidorDAO;
-import com.dao.UsuarioDAO;
-import com.vo.ComunidadeVO;
-import com.vo.UsuarioVO;
-
+import com.dao.*;
+import com.vo.*;
 import io.javalin.Javalin;
 
 public class Main {
-    // ID do cliente do Google Cloud Console (substitua pelo seu)
     private static final String GOOGLE_CLIENT_ID = "1095979412262-me3kh924htbgh5fmt434hqpkhjsv715s.apps.googleusercontent.com";
+    private static final String JWT_SECRET = "VIVER_MAIS_SEGREDO_SUPER_SEGURO";
+    
+    // Mapa para gerir conexões ativas do WebSocket
+    public static Map<Integer, WsContext> sessoesWS = new ConcurrentHashMap<>();
 
     public static void main(String[] args) {
 
         Javalin app = Javalin.create(config -> {
             config.bundledPlugins.enableCors(cors -> cors.addRule(it -> it.anyHost()));
-            // CORREÇÃO DO BUG DE FOTO: aumenta o limite para 20 MB
             config.http.maxRequestSize = 20_000_000L;
         }).start(8080);
 
@@ -40,11 +39,45 @@ public class Main {
         MensagemDAO      msgDAO      = new MensagemDAO();
         MensagemGrupoDAO msgGrupoDAO = new MensagemGrupoDAO();
 
+        // ── WEBSOCKETS (Observer em tempo real) ───────────────────────────
+        app.ws("/ws/notificacoes/{uid}", ws -> {
+            ws.onConnect(ctx -> {
+                int uid = Integer.parseInt(ctx.pathParam("uid"));
+                sessoesWS.put(uid, ctx);
+            });
+            ws.onClose(ctx -> {
+                int uid = Integer.parseInt(ctx.pathParam("uid"));
+                sessoesWS.remove(uid);
+            });
+        });
+
+        // ── FILTRO JWT ────────────────────────────────────────────────────
+        app.before("/api/*", ctx -> {
+            String path = ctx.path();
+            if (path.equals("/api/login") || path.equals("/api/cadastro") 
+                || path.equals("/api/auth/google") || path.equals("/api/auth/completar-perfil") 
+                || path.contains("/disponivel")) return;
+            
+            String authHeader = ctx.header("Authorization");
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                ctx.status(401).result("Acesso Negado: Token JWT ausente.");
+                return;
+            }
+            try {
+                String token = authHeader.replace("Bearer ", "");
+                JWT.require(Algorithm.HMAC256(JWT_SECRET)).build().verify(token);
+            } catch (Exception e) {
+                ctx.status(401).result("Token JWT inválido ou expirado.");
+            }
+        });
+
         // ── AUTH ──────────────────────────────────────────────────────────
         app.post("/api/login", ctx -> {
             try {
                 DadosLogin d = ctx.bodyAsClass(DadosLogin.class);
-                ctx.json(usuarioBO.login(d.email, d.senha));
+                UsuarioVO u = usuarioBO.login(d.email, d.senha);
+                String token = gerarToken(u);
+                ctx.json(Map.of("token", token, "usuario", u));
             } catch (Exception e) { ctx.status(401).result(e.getMessage()); }
         });
 
@@ -58,11 +91,9 @@ public class Main {
         });
 
         // ── GOOGLE OAUTH ──────────────────────────────────────────────────
-        // Frontend envia o credential (JWT) recebido do Google
         app.post("/api/auth/google", ctx -> {
             try {
                 DadosGoogle d = ctx.bodyAsClass(DadosGoogle.class);
-                // Verifica o token com a API do Google
                 URL url = new URL("https://oauth2.googleapis.com/tokeninfo?id_token=" + d.credential);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
@@ -70,24 +101,31 @@ public class Main {
                     throw new Exception("Token Google inválido.");
                 StringBuilder sb = new StringBuilder();
                 try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
-                    String line;
-                    while ((line = br.readLine()) != null) sb.append(line);
+                    String line; while ((line = br.readLine()) != null) sb.append(line);
                 }
                 String json = sb.toString();
-                // Extrai campos do JSON da resposta do Google (parsing com Regex para ignorar espaços)
-                String googleId  = extrairCampo(json, "sub");
-                String email     = extrairCampo(json, "email");
-                String nome      = extrairCampo(json, "name");
-                String foto      = extrairCampo(json, "picture");
-                // Opcional: verifica se o audience (aud) bate com o nosso client_id
-                String aud = extrairCampo(json, "aud");
-                if (!GOOGLE_CLIENT_ID.equals("SEU_GOOGLE_CLIENT_ID_AQUI.apps.googleusercontent.com")
-                        && !GOOGLE_CLIENT_ID.equals(aud))
-                    throw new Exception("Token não pertence a esta aplicação.");
-
+                String googleId = extrairCampo(json, "sub");
+                String email    = extrairCampo(json, "email");
+                String nome     = extrairCampo(json, "name");
+                String foto     = extrairCampo(json, "picture");
+                
                 UsuarioVO usuario = usuarioBO.loginOuCadastrarGoogle(googleId, nome, email, foto);
-                ctx.json(usuario);
+                String token = gerarToken(usuario);
+                boolean precisaCompletar = usuario.getNickname() == null || usuario.getDataNascimento() == null;
+                
+                ctx.json(Map.of("token", token, "usuario", usuario, "precisaCompletar", precisaCompletar));
             } catch (Exception e) { ctx.status(401).result(e.getMessage()); }
+        });
+
+        app.post("/api/auth/completar-perfil", ctx -> {
+            try {
+                DadosCompletarPerfil d = ctx.bodyAsClass(DadosCompletarPerfil.class);
+                usuarioBO.completarPerfilGoogle(d.usuarioId,
+                        d.nickname != null ? d.nickname.replace("@", "") : null,
+                        d.dataNascimento != null ? LocalDate.parse(d.dataNascimento) : null);
+                UsuarioVO atualizado = usuarioDAO.buscarPorId(d.usuarioId);
+                ctx.json(atualizado);
+            } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
 
         // ── FEED ──────────────────────────────────────────────────────────
@@ -109,9 +147,7 @@ public class Main {
 
         app.post("/api/posts/{id}/ver", ctx -> {
             try {
-                int postId = Integer.parseInt(ctx.pathParam("id"));
-                DadosInteracao d = ctx.bodyAsClass(DadosInteracao.class);
-                postDAO.marcarComoVisto(d.usuarioId, postId);
+                postDAO.marcarComoVisto(ctx.bodyAsClass(DadosInteracao.class).usuarioId, Integer.parseInt(ctx.pathParam("id")));
                 ctx.status(200).result("ok");
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
@@ -139,30 +175,23 @@ public class Main {
             catch (Exception e) { ctx.status(500).result(e.getMessage()); }
         });
 
-        // Buscar por e-mail OU @nickname — ANTES de /api/usuarios/{id}
         app.get("/api/usuarios/buscar", ctx -> {
             try {
                 String email    = ctx.queryParam("email");
                 String nickname = ctx.queryParam("nickname");
                 UsuarioVO u = null;
-                if (email != null && !email.isEmpty())
-                    u = usuarioDAO.buscarPorEmail(email);
-                else if (nickname != null && !nickname.isEmpty())
-                    u = usuarioDAO.buscarPorNickname(nickname.replace("@", ""));
+                if (email != null && !email.isEmpty()) u = usuarioDAO.buscarPorEmail(email);
+                else if (nickname != null && !nickname.isEmpty()) u = usuarioDAO.buscarPorNickname(nickname.replace("@", ""));
                 if (u == null) { ctx.status(404).result("Usuário não encontrado."); return; }
-                ctx.json(Map.of("id", u.getId(), "nome", u.getNome(),
-                                "nickname", u.getNickname() != null ? u.getNickname() : ""));
+                ctx.json(Map.of("id", u.getId(), "nome", u.getNome(), "nickname", u.getNickname() != null ? u.getNickname() : ""));
             } catch (Exception e) { ctx.status(500).result(e.getMessage()); }
         });
 
-        // Verificar disponibilidade de @nickname
         app.get("/api/usuarios/nickname/{nick}/disponivel", ctx -> {
             try {
-                String nick = ctx.pathParam("nick").replace("@", "");
                 int excluirId = 0;
                 try { excluirId = Integer.parseInt(ctx.queryParam("excluirId")); } catch (Exception ignored) {}
-                boolean disponivel = usuarioDAO.nicknameDisponivel(nick, excluirId);
-                ctx.json(Map.of("disponivel", disponivel));
+                ctx.json(Map.of("disponivel", usuarioDAO.nicknameDisponivel(ctx.pathParam("nick").replace("@", ""), excluirId)));
             } catch (Exception e) { ctx.status(500).result(e.getMessage()); }
         });
 
@@ -171,8 +200,7 @@ public class Main {
                 int id = Integer.parseInt(ctx.pathParam("id"));
                 UsuarioVO u = usuarioDAO.buscarPorId(id);
                 if (u == null) { ctx.status(404).result("Não encontrado."); return; }
-                ctx.json(Map.of("usuario", u, "posts", postDAO.listarPorUsuario(id),
-                                "estatisticas", usuarioDAO.buscarEstatisticas(id)));
+                ctx.json(Map.of("usuario", u, "posts", postDAO.listarPorUsuario(id), "estatisticas", usuarioDAO.buscarEstatisticas(id)));
             } catch (Exception e) { ctx.status(500).result(e.getMessage()); }
         });
 
@@ -194,29 +222,27 @@ public class Main {
                 int seguidoId = Integer.parseInt(ctx.pathParam("id"));
                 DadosInteracao d = ctx.bodyAsClass(DadosInteracao.class);
                 ctx.result(usuarioBO.seguirOuDeixar(d.usuarioId, seguidoId));
+            } catch (UsuarioBO.AutoSeguirException e) {
+                // Tratamento específico de erro HTTP 409
+                ctx.status(409).result(e.getMessage());
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
 
         app.post("/api/usuarios/{id}/foto", ctx -> {
             try {
                 int id = Integer.parseInt(ctx.pathParam("id"));
-                DadosFoto d = ctx.bodyAsClass(DadosFoto.class);
-                usuarioBO.atualizarFoto(id, d.base64);
+                usuarioBO.atualizarFoto(id, ctx.bodyAsClass(DadosFoto.class).base64);
                 ctx.result("ok");
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
 
-        // Atualizar @nickname
         app.put("/api/usuarios/{id}/nickname", ctx -> {
             try {
                 int id = Integer.parseInt(ctx.pathParam("id"));
-                DadosNickname d = ctx.bodyAsClass(DadosNickname.class);
-                usuarioBO.atualizarNickname(id, d.nickname.replace("@", ""));
+                usuarioBO.atualizarNickname(id, ctx.bodyAsClass(DadosNickname.class).nickname.replace("@", ""));
                 ctx.result("ok");
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
-
-        
 
         // ── NOTIFICAÇÕES ──────────────────────────────────────────────────
         app.get("/api/notificacoes/{uid}", ctx -> {
@@ -239,8 +265,7 @@ public class Main {
         });
         app.get("/api/chat/{uidA}/{uidB}", ctx -> {
             try {
-                int a = Integer.parseInt(ctx.pathParam("uidA"));
-                int b = Integer.parseInt(ctx.pathParam("uidB"));
+                int a = Integer.parseInt(ctx.pathParam("uidA")), b = Integer.parseInt(ctx.pathParam("uidB"));
                 msgDAO.marcarComoLidas(b, a);
                 ctx.json(msgDAO.buscarConversa(a, b));
             } catch (Exception e) { ctx.status(500).result(e.getMessage()); }
@@ -262,79 +287,63 @@ public class Main {
             try { ctx.json(comDAO.listarDoUsuario(Integer.parseInt(ctx.queryParam("usuarioId")))); }
             catch (Exception e) { ctx.status(500).result(e.getMessage()); }
         });
-
         app.post("/api/comunidades", ctx -> {
             try {
                 DadosNovaComunidade d = ctx.bodyAsClass(DadosNovaComunidade.class);
-                if (d.nome == null || d.nome.trim().isEmpty())
-                    throw new Exception("Nome do grupo é obrigatório.");
+                if (d.nome == null || d.nome.trim().isEmpty()) throw new Exception("Nome obrigatório.");
                 ctx.status(201).json(comDAO.salvar(new ComunidadeVO(0, d.nome, d.descricao), d.criadorId));
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
-
-        // Editar grupo (nome, descrição, foto) — só ADMIN
         app.put("/api/comunidades/{id}", ctx -> {
             try {
                 int comunidadeId = Integer.parseInt(ctx.pathParam("id"));
                 DadosEditarGrupo d = ctx.bodyAsClass(DadosEditarGrupo.class);
-                if (!comDAO.ehAdmin(comunidadeId, d.usuarioId))
-                    throw new Exception("Apenas o administrador pode editar o grupo.");
+                if (!comDAO.ehAdmin(comunidadeId, d.usuarioId)) throw new Exception("Apenas o administrador pode editar.");
                 comDAO.atualizar(comunidadeId, d.nome, d.descricao, d.fotoGrupo);
                 ctx.result("ok");
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
-
         app.get("/api/comunidades/{id}/membros", ctx -> {
             try { ctx.json(comDAO.listarMembros(Integer.parseInt(ctx.pathParam("id")))); }
             catch (Exception e) { ctx.status(500).result(e.getMessage()); }
         });
-
         app.post("/api/comunidades/{id}/convidar", ctx -> {
             try {
                 int comunidadeId = Integer.parseInt(ctx.pathParam("id"));
                 DadosConvite d = ctx.bodyAsClass(DadosConvite.class);
-                if (!comDAO.ehMembro(comunidadeId, d.convidanteId))
-                    throw new Exception("Você não é membro deste grupo.");
+                if (!comDAO.ehMembro(comunidadeId, d.convidanteId)) throw new Exception("Você não é membro.");
                 int conviteId = comDAO.convidar(comunidadeId, d.convidanteId, d.convidadoId);
                 UsuarioVO convidante = usuarioDAO.buscarPorId(d.convidanteId);
-                ComunidadeVO grupo   = comDAO.buscarPorId(comunidadeId);
+                ComunidadeVO grupo = comDAO.buscarPorId(comunidadeId);
                 if (convidante != null && grupo != null)
-                    notifDAO.salvar(d.convidadoId,
-                            convidante.getNome() + " te convidou para o grupo \"" + grupo.getNome() + "\" 💬");
+                    notifDAO.salvar(d.convidadoId, convidante.getNome() + " te convidou para \"" + grupo.getNome() + "\" 💬");
                 ctx.status(201).json(Map.of("conviteId", conviteId));
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
-
         app.post("/api/convites/{id}/responder", ctx -> {
             try {
-                int conviteId = Integer.parseInt(ctx.pathParam("id"));
                 DadosRespostaConvite d = ctx.bodyAsClass(DadosRespostaConvite.class);
-                comDAO.responderConvite(conviteId, d.usuarioId, d.aceitar);
+                comDAO.responderConvite(Integer.parseInt(ctx.pathParam("id")), d.usuarioId, d.aceitar);
                 ctx.result(d.aceitar ? "aceito" : "recusado");
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
-
         app.get("/api/convites/pendentes/{uid}", ctx -> {
             try { ctx.json(comDAO.listarConvitesPendentes(Integer.parseInt(ctx.pathParam("uid")))); }
             catch (Exception e) { ctx.status(500).result(e.getMessage()); }
         });
-
         app.get("/api/comunidades/{id}/mensagens", ctx -> {
             try {
                 int comunidadeId = Integer.parseInt(ctx.pathParam("id"));
                 int uid = Integer.parseInt(ctx.queryParam("usuarioId"));
-                if (!comDAO.ehMembro(comunidadeId, uid))
-                    throw new Exception("Acesso negado.");
+                if (!comDAO.ehMembro(comunidadeId, uid)) throw new Exception("Acesso negado.");
                 ctx.json(msgGrupoDAO.listarPorGrupo(comunidadeId));
             } catch (Exception e) { ctx.status(403).result(e.getMessage()); }
         });
-
         app.post("/api/comunidades/{id}/mensagens", ctx -> {
             try {
                 int comunidadeId = Integer.parseInt(ctx.pathParam("id"));
                 DadosMensagemGrupo d = ctx.bodyAsClass(DadosMensagemGrupo.class);
-                if (!comDAO.ehMembro(comunidadeId, d.usuarioId))
-                    throw new Exception("Acesso negado.");
+                if (!comDAO.ehMembro(comunidadeId, d.usuarioId)) throw new Exception("Acesso negado.");
                 msgGrupoDAO.enviar(comunidadeId, d.usuarioId, d.conteudo);
                 ctx.status(201).result("ok");
             } catch (Exception e) { ctx.status(403).result(e.getMessage()); }
@@ -343,16 +352,25 @@ public class Main {
         System.out.println("✅ Todas as rotas configuradas!");
     }
 
-    // Extrai campo de um JSON simples (ignorando espaços com Regex)
     private static String extrairCampo(String json, String campo) {
         java.util.regex.Matcher m = java.util.regex.Pattern.compile("\"" + campo + "\"\\s*:\\s*\"([^\"]+)\"").matcher(json);
         return m.find() ? m.group(1) : "";
     }
 
-    // ── DTOs ──────────────────────────────────────────────────────────────
+    // Método Auxiliar para Gerar Token JWT
+    private static String gerarToken(UsuarioVO u) {
+        return JWT.create()
+            .withSubject(String.valueOf(u.getId()))
+            .withClaim("email", u.getEmail())
+            .withExpiresAt(new java.util.Date(System.currentTimeMillis() + 86400000)) // 24h
+            .sign(Algorithm.HMAC256(JWT_SECRET));
+    }
+
+    // DTOs
     public static class DadosLogin           { public String email, senha;                                                                      public DadosLogin() {} }
     public static class DadosCadastro        { public String nome, nickname, email, senha, dataNascimento;                                      public DadosCadastro() {} }
     public static class DadosGoogle          { public String credential;                                                                        public DadosGoogle() {} }
+    public static class DadosCompletarPerfil { public int usuarioId; public String nickname, dataNascimento;                                    public DadosCompletarPerfil() {} }
     public static class DadosInteracao       { public int usuarioId; public String texto;                                                       public DadosInteracao() {} }
     public static class DadosPost            { public String texto, imagem, destinoTipo; public int destinoId; public UsuarioVO autor;        public DadosPost() {} }
     public static class DadosNovaComunidade  { public String nome, descricao; public int criadorId;                                             public DadosNovaComunidade() {} }
