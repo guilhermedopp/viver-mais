@@ -4,11 +4,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import io.javalin.websocket.WsContext;
+import io.github.cdimascio.dotenv.Dotenv; // IMPORT DO DOTENV
 
 import com.bo.UsuarioBO;
 import com.dao.*;
@@ -17,10 +16,10 @@ import io.javalin.Javalin;
 
 public class Main {
     private static final String GOOGLE_CLIENT_ID = "1095979412262-me3kh924htbgh5fmt434hqpkhjsv715s.apps.googleusercontent.com";
-    private static final String JWT_SECRET = "VIVER_MAIS_SEGREDO_SUPER_SEGURO";
     
-    // Mapa para gerir conexões ativas do WebSocket
-    public static Map<Integer, WsContext> sessoesWS = new ConcurrentHashMap<>();
+    // CARREGA O FICHEIRO .env (E pega a chave JWT em segurança)
+    private static final Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
+    private static final String JWT_SECRET = dotenv.get("JWT_SECRET", "CHAVE_EMERGENCIA_SUPER_SECRETA");
 
     public static void main(String[] args) {
 
@@ -43,11 +42,11 @@ public class Main {
         app.ws("/ws/notificacoes/{uid}", ws -> {
             ws.onConnect(ctx -> {
                 int uid = Integer.parseInt(ctx.pathParam("uid"));
-                sessoesWS.put(uid, ctx);
+                com.observer.Seguidor.sessoesWS.put(uid, ctx);
             });
             ws.onClose(ctx -> {
                 int uid = Integer.parseInt(ctx.pathParam("uid"));
-                sessoesWS.remove(uid);
+                com.observer.Seguidor.sessoesWS.remove(uid);
             });
         });
 
@@ -223,7 +222,6 @@ public class Main {
                 DadosInteracao d = ctx.bodyAsClass(DadosInteracao.class);
                 ctx.result(usuarioBO.seguirOuDeixar(d.usuarioId, seguidoId));
             } catch (UsuarioBO.AutoSeguirException e) {
-                // Tratamento específico de erro HTTP 409
                 ctx.status(409).result(e.getMessage());
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
