@@ -54,11 +54,8 @@ public class PostDAO {
         return listar(usuarioLogadoId, true);
     }
 
-    // CORREÇÃO: SQL Injection eliminado — o ID do usuário não é mais concatenado
-    // diretamente na string SQL. Agora é passado como parâmetro via PreparedStatement.
     private List<PostVO> listar(int usuarioLogadoId, boolean soSeguidos) throws Exception {
 
-        // Quando filtrado, usa subconsulta parametrizada (sem concatenação)
         String condicaoSeguidos = soSeguidos
             ? "AND p.usuario_id IN (SELECT seguido_id FROM seguidores WHERE seguidor_id = ?)"
             : "";
@@ -76,10 +73,9 @@ public class PostDAO {
         try (Connection conn = ConexaoDB.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            // Parâmetros em ordem de aparição nos '?'
-            stmt.setInt(1, usuarioLogadoId); // eu_curto
-            stmt.setInt(2, usuarioLogadoId); // eu_vi
-            if (soSeguidos) stmt.setInt(3, usuarioLogadoId); // subconsulta seguidos
+            stmt.setInt(1, usuarioLogadoId); 
+            stmt.setInt(2, usuarioLogadoId); 
+            if (soSeguidos) stmt.setInt(3, usuarioLogadoId); 
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -152,7 +148,8 @@ public class PostDAO {
         return lista;
     }
 
-    public boolean alternarCurtida(int usuarioId, int postId) throws Exception {
+    // ── ATUALIZADO: Suporte a Múltiplas Reações (Polimorfismo) ─────────────────
+    public boolean alternarCurtida(int usuarioId, int postId, String tipo) throws Exception {
         String check = "SELECT 1 FROM curtidas WHERE usuario_id = ? AND post_id = ?";
         try (Connection conn = ConexaoDB.conectar();
              PreparedStatement s = conn.prepareStatement(check)) {
@@ -165,9 +162,13 @@ public class PostDAO {
                     }
                     return false;
                 } else {
+                    // Grava o "tipo" da reação na base de dados
                     try (PreparedStatement i = conn.prepareStatement(
-                            "INSERT INTO curtidas (usuario_id, post_id) VALUES (?, ?)")) {
-                        i.setInt(1, usuarioId); i.setInt(2, postId); i.executeUpdate();
+                            "INSERT INTO curtidas (usuario_id, post_id, tipo) VALUES (?, ?, ?)")) {
+                        i.setInt(1, usuarioId); 
+                        i.setInt(2, postId); 
+                        i.setString(3, tipo);
+                        i.executeUpdate();
                     }
                     return true;
                 }
