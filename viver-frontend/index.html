@@ -12,46 +12,41 @@
 <body>
     <main class="tela-acesso">
         <header class="marca">
-            <img src="img/logo.png" alt="Logótipo Oficial do VIVER+" class="marca-icone" style="object-fit: contain;">
-            <div>
-                <h1>VIVER+</h1>
-                <p>Rede Social de Carinho e Conexão</p>
-            </div>
+            <img src="img/logo.png" alt="Logótipo Oficial do VIVER+">
+            <h1>VIVER+</h1>
+            <p>Rede Social de Carinho e Conexão</p>
         </header>
 
-        <section class="area-formulario">
-            <h2>ENTRAR</h2>
+        <!-- Utilizamos a classe grupo-card para dar o formato de "Cartão" branco ao formulário -->
+        <section class="area-formulario grupo-card">
+            <h2 style="text-align: center; margin-bottom: 24px; color: var(--cor-primaria-escura);">ENTRAR</h2>
 
             <form id="form-login">
                 <div class="grupo-input">
                     <label for="email">E-mail</label>
-                    <div class="campo-com-icone">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5A2.5 2.5 0 0 1 5.5 4h13A2.5 2.5 0 0 1 21 6.5v11a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5v-11Zm3.1-.5 5.9 5.1L17.9 6H6.1Zm12.9 2.1-6.3 5.4a1.1 1.1 0 0 1-1.4 0L5 8.1v9.4c0 .3.2.5.5.5h13c.3 0 .5-.2.5-.5V8.1Z"/></svg>
-                        <input type="email" id="email" placeholder="Ex: maria.santos@email.com" required>
-                    </div>
+                    <input type="email" id="email" placeholder="Ex: maria.santos@email.com" required>
                 </div>
 
                 <div class="grupo-input">
                     <label for="senha">Senha</label>
-                    <div class="campo-com-icone" style="margin-bottom: 10px;">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 9h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h1V7a5 5 0 0 1 10 0v2Zm-8 0h6V7a3 3 0 0 0-6 0v2Zm3 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg>
-                        <input type="password" id="senha" placeholder="Digite sua senha" required>
-                    </div>
+                    <input type="password" id="senha" placeholder="Digite a sua senha" required>
                     
-                    <label style="display: flex; align-items: center; gap: 8px; font-size: 1.1rem; font-weight: normal; cursor: pointer; color: var(--cor-azul);">
-                        <input type="checkbox" onclick="toggleSenha()" style="width: 20px; height: 20px; cursor: pointer;"> Mostrar Senha
+                    <label style="display: flex; align-items: center; gap: 10px; margin-top: 14px; font-size: 1.15rem; font-weight: 700; cursor: pointer; color: var(--cor-texto-suave);">
+                        <input type="checkbox" onclick="toggleSenha()" style="width: 24px; height: 24px; cursor: pointer; accent-color: var(--cor-primaria-escura);"> 
+                        Mostrar Senha
                     </label>
                 </div>
 
-                <button type="submit" class="btn-primario btn-grande">ENTRAR NA MINHA CONTA</button>
+                <button type="submit" class="btn-primario">ENTRAR NA MINHA CONTA</button>
             </form>
 
-            <div style="display: flex; align-items: center; margin: 24px 0;">
-                <hr style="flex: 1; border: 1px solid #e9ecef;">
-                <span style="margin: 0 15px; color: var(--cor-texto-suave); font-weight: bold; font-size: 1.1rem;">OU</span>
-                <hr style="flex: 1; border: 1px solid #e9ecef;">
+            <div style="display: flex; align-items: center; margin: 30px 0;">
+                <hr style="flex: 1; border: none; border-top: 2px solid var(--cor-borda);">
+                <span style="margin: 0 15px; color: var(--cor-texto-suave); font-weight: 800; font-size: 1.1rem;">OU</span>
+                <hr style="flex: 1; border: none; border-top: 2px solid var(--cor-borda);">
             </div>
 
+            <!-- Botão do Google -->
             <div id="g_id_onload"
                  data-client_id="1095979412262-me3kh924htbgh5fmt434hqpkhjsv715s.apps.googleusercontent.com"
                  data-context="signin"
@@ -69,12 +64,33 @@
                  style="display: flex; justify-content: center; margin-bottom: 24px;">
             </div>
 
-            <div class="area-links">
-                <p>Ainda não tem conta?</p> <a href="cadastro.html">Criar conta</a>
+            <div style="text-align: center; font-size: 1.15rem; font-weight: 700; margin-top: 10px;">
+                <span style="color: var(--cor-texto-suave);">Ainda não tem conta?</span> 
+                <a href="cadastro.html" style="color: var(--cor-azul); text-decoration: none;">Criar conta</a>
             </div>
         </section>
     </main>
 
+    <!-- MODAL: Completar Perfil via Google (Aparece se for a primeira vez do utilizador) -->
+    <div id="modal-completar" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; padding: 20px;">
+        <div class="grupo-card" style="width: 100%; max-width: 400px; background: white;">
+            <h2 style="margin-bottom: 10px; color: var(--cor-primaria-escura);">Falta pouco! 🎉</h2>
+            <p style="margin-bottom: 20px; color: var(--cor-texto-suave); font-size: 1.1rem; font-weight: 600;">Para concluir o acesso via Google, precisamos apenas destes dois detalhes:</p>
+            
+            <div class="grupo-input">
+                <label for="google-nickname">Como quer ser chamado? (@)</label>
+                <input type="text" id="google-nickname" placeholder="Ex: donamaria" required>
+            </div>
+            <div class="grupo-input">
+                <label for="google-data">Data de Nascimento</label>
+                <input type="date" id="google-data" required>
+            </div>
+            
+            <button onclick="salvarPerfilGoogle()" class="btn-primario" style="margin-top: 10px;">Concluir e Entrar</button>
+        </div>
+    </div>
+
+    <!-- SCRIPT DA API -->
     <script src="js/api.js"></script>
     <script src="js/pwa-setup.js"></script> 
     <script>
@@ -83,7 +99,7 @@
             input.type = input.type === 'password' ? 'text' : 'password';
         }
 
-        // Foco no Login: Preencher e-mail automaticamente se vier do cadastro
+        // Foco no Login: Preencher e-mail automaticamente se vier do ecrã de cadastro
         window.addEventListener('load', () => {
             const emailSalvo = localStorage.getItem('emailRecenteCadastro');
             if (emailSalvo) {
@@ -93,10 +109,9 @@
             }
         });
 
-        // Função de Callback chamada pela Google após o login com sucesso
+        // ── FLUXO GOOGLE OAUTH ──
         async function handleCredentialResponse(response) {
             try {
-                // Envia o token da Google para o nosso servidor Javalin validar e fazer o login/cadastro
                 const res = await fetch('http://localhost:8080/api/auth/google', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -104,14 +119,56 @@
                 });
 
                 if (res.ok) {
-                    const usuario = await res.json();
-                    localStorage.setItem('usuarioLogado', JSON.stringify(usuario));
-                    window.location.href = 'feed.html';
+                    const data = await res.json();
+                    
+                    // Salva os dados de Sessão (JWT e Utilizador)
+                    localStorage.setItem('jwtToken', data.token);
+                    localStorage.setItem('usuarioLogado', JSON.stringify(data.usuario));
+                    
+                    // Verifica se o Utilizador é novo e precisa do @nickname
+                    if (data.precisaCompletar) {
+                        document.getElementById('modal-completar').style.display = 'flex';
+                    } else {
+                        window.location.href = 'feed.html';
+                    }
                 } else {
                     alert('Erro ao entrar com Google: ' + await res.text());
                 }
             } catch (error) {
                 alert('Não foi possível conectar ao servidor VIVER+.');
+            }
+        }
+
+        // ── COMPLETAR PERFIL GOOGLE ──
+        async function salvarPerfilGoogle() {
+            const nickname = document.getElementById('google-nickname').value.trim();
+            const dataNascimento = document.getElementById('google-data').value;
+            const user = JSON.parse(localStorage.getItem('usuarioLogado'));
+            
+            if (!nickname || !dataNascimento) {
+                alert('Por favor, preencha os dois campos.');
+                return;
+            }
+
+            try {
+                const res = await fetch('http://localhost:8080/api/auth/completar-perfil', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('jwtToken')}` 
+                    },
+                    body: JSON.stringify({ usuarioId: user.id, nickname: nickname, dataNascimento: dataNascimento })
+                });
+                
+                if (res.ok) {
+                    const usuarioAtualizado = await res.json();
+                    localStorage.setItem('usuarioLogado', JSON.stringify(usuarioAtualizado));
+                    window.location.href = 'feed.html';
+                } else {
+                    alert('Aviso: ' + await res.text());
+                }
+            } catch(e) {
+                alert('Erro ao conectar com o servidor.');
             }
         }
     </script>
