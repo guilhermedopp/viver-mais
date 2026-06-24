@@ -1,317 +1,275 @@
 <!DOCTYPE html>
 <html lang="pt-PT">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VIVER+ - Feed de Momentos</title>
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" type="image/png" href="img/logo.png">
-  <style>
-    .filtro-bar { display:flex; gap:10px; margin-bottom:18px; }
-    .btn-filtro { flex:1; padding:10px; font-size:1.1rem; font-weight:700; border:3px solid var(--cor-borda);
-                  border-radius:99px; background:#fff; cursor:pointer; transition:.2s; }
-    .btn-filtro.ativo { background:var(--cor-primaria); color:#fff; border-color:var(--cor-primaria); }
-    .avatar { width:42px; height:42px; border-radius:50%; object-fit:cover;
-              background:var(--cor-primaria); color:#fff; display:flex; align-items:center;
-              justify-content:center; font-size:1.3rem; font-weight:700; flex-shrink:0; }
-    .badge-notif { background:red; color:#fff; border-radius:99px; font-size:0.75rem;
-                   padding:2px 6px; position:absolute; top:-4px; right:-6px; font-weight:700; }
-    .nav-item-wrap { position:relative; }
-    
-    /* --- CSS DOS BOTÕES DE TOPO --- */
-    .acoes-topo { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
-    .btn-topo {
-      display: inline-flex; align-items: center; gap: 8px; color: #ffffff; text-decoration: none;
-      padding: 8px 16px; border-radius: 50px; font-weight: bold; font-size: 0.9rem;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: all 0.3s ease; border: none; cursor: pointer;
-    }
-    .btn-bate-papo { background-color: #28a745; }
-    .btn-bate-papo:hover { background-color: #218838; transform: translateY(-2px); }
-    .btn-acessibilidade { background-color: var(--cor-azul); }
-    .btn-acessibilidade:hover { filter: brightness(0.9); transform: translateY(-2px); }
-    
-    /* Efeito ao passar o rato nas reações */
-    .btn-reacao { background:none; border:none; cursor:pointer; font-size:1.4rem; transition:transform 0.2s; }
-    .btn-reacao:hover { transform: scale(1.3); }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VIVER+ - Feed de Momentos</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="img/logo.png">
+    <style>
+        /* Estilos MUITO ESPECÍFICOS apenas desta página */
+        .acoes-topo { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+        .btn-reacao { background:none; border:none; cursor:pointer; font-size:1.6rem; transition:transform 0.2s; padding: 4px; }
+        .btn-reacao:hover, .btn-reacao:focus-visible { transform: scale(1.2); outline: none; }
+        .texto-post { font-size: 1.25rem; line-height: 1.6; color: var(--cor-texto); margin-top: 14px; margin-bottom: 14px; }
+        .novo-badge { font-size: 0.75rem; background: var(--cor-primaria-escura); color: #fff; padding: 2px 8px; border-radius: 99px; margin-left: 6px; font-weight: 800; }
+    </style>
 </head>
-<body>
-<main class="tela-acesso" style="max-width:650px; padding-bottom:90px; justify-content:flex-start; background: transparent; box-shadow: none;">
+<body style="padding-bottom: 110px;"> <main class="tela-acesso" style="max-width: 650px; background: transparent; padding-top: 10px;">
 
-  <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding-top:20px;">
-    <div style="display:flex; align-items:center; gap:12px;">
-      <img src="img/logo.png" style="height:50px; object-fit:contain;">
-      <div>
-        <h1 style="font-size:1.8rem; margin:0; color: var(--cor-primaria);">VIVER+</h1>
-        <p id="saudacao" style="margin:0; color:var(--cor-texto-suave); font-weight: 600;">Olá...</p>
-      </div>
-    </div>
-    
-    <div class="acoes-topo">
-      <a href="chat.html" class="btn-topo btn-bate-papo">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-        </svg> Bate Papo
-      </a>
-      <button onclick="alternarAcessibilidade()" class="btn-topo btn-acessibilidade">
-        🔍 Letra Maior
-      </button>
-    </div>
-  </header>
+    <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <div style="display:flex; align-items:center; gap:12px;">
+            <img src="img/logo.png" style="height:56px; object-fit:contain;" alt="Logotipo">
+            <div>
+                <h1 style="font-size: 1.9rem; margin:0; color: var(--cor-primaria-escura); line-height: 1.1;">VIVER+</h1>
+                <p id="saudacao" style="margin:0; color: var(--cor-texto-suave); font-weight: 700; font-size: 1rem;">A carregar...</p>
+            </div>
+        </div>
+        
+        <div class="acoes-topo">
+            <a href="chat.html" class="btn-secundario" style="min-height: 38px; padding: 6px 14px; font-size: 0.95rem;">
+                💬 Bate Papo
+            </a>
+            <button onclick="alternarAcessibilidade()" class="btn-secundario" style="min-height: 38px; padding: 6px 14px; font-size: 0.95rem; background: var(--cor-fundo);">
+                🔍 Letra Maior
+            </button>
+        </div>
+    </header>
 
-  <div class="filtro-bar">
-    <button class="btn-filtro ativo" id="btn-todos"     onclick="filtrar('todos')">Todos</button>
-    <button class="btn-filtro"       id="btn-seguindo"  onclick="filtrar('seguindo')">👥 Seguindo</button>
-    <button class="btn-filtro"       id="btn-novos"     onclick="filtrar('novos')">🆕 Novos</button>
-    <button class="btn-filtro"       id="btn-ja-vistos" onclick="filtrar('vistos')">✅ Já vistos</button>
-  </div>
+    <nav class="filtro-bar" aria-label="Filtros do feed">
+        <button class="btn-filtro ativo" id="btn-todos"     onclick="filtrar('todos')">Todos</button>
+        <button class="btn-filtro"       id="btn-seguindo"  onclick="filtrar('seguindo')">👥 Seguindo</button>
+        <button class="btn-filtro"       id="btn-novos"     onclick="filtrar('novos')">🆕 Novos</button>
+        <button class="btn-filtro"       id="btn-ja-vistos" onclick="filtrar('vistos')">✅ Já vistos</button>
+    </nav>
 
-  <section style="width:100%;">
-    <div id="container-posts">
-      <p style="font-size:1.2rem; color:var(--cor-texto-suave); text-align: center;">A carregar os momentos...</p>
-    </div>
-  </section>
+    <section style="width:100%;">
+        <div id="container-posts">
+            <div class="card-post" style="text-align: center; padding: 40px 20px;">
+                <p style="font-size:1.2rem; color:var(--cor-texto-suave); font-weight: bold;">A carregar os momentos...</p>
+            </div>
+        </div>
+    </section>
 
-  <nav class="barra-navegacao">
-    <a href="feed.html" class="item-nav ativo">
-      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-      <span style="font-size:.9rem;">Início</span>
-    </a>
-    <a href="comunidades.html" class="item-nav">
-      <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-      <span style="font-size:.9rem;">Grupos</span>
-    </a>
-    <a href="publicar.html" class="item-nav">
-      <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-      <span style="font-size:.9rem;">Publicar</span>
-    </a>
-    <a href="notificacoes.html" class="item-nav nav-item-wrap">
-      <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
-      <span id="badge-notif" class="badge-notif" style="display:none;">0</span>
-      <span style="font-size:.9rem;">Avisos</span>
-    </a>
-    <a href="perfil.html" class="item-nav">
-      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-      <span style="font-size:.9rem;">Perfil</span>
-    </a>
-  </nav>
+    <nav class="barra-navegacao" aria-label="Navegação Principal">
+        <a href="feed.html" class="item-nav ativo">
+            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            <span>Início</span>
+        </a>
+        <a href="comunidades.html" class="item-nav">
+            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            <span>Grupos</span>
+        </a>
+        <a href="publicar.html" class="item-nav">
+            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            <span>Publicar</span>
+        </a>
+        <a href="notificacoes.html" class="item-nav">
+            <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+            <span id="badge-notif" class="badge-notif" style="display:none;">0</span>
+            <span>Avisos</span>
+        </a>
+        <a href="perfil.html" class="item-nav">
+            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            <span>Perfil</span>
+        </a>
+    </nav>
 </main>
 
 <script src="js/api.js"></script>
-
 <script>
 const usuario = JSON.parse(localStorage.getItem('usuarioLogado'));
 if (!usuario) window.location.href = 'index.html';
-else document.getElementById('saudacao').textContent = `Olá, ${usuario.nome}! 👋`;
+else document.getElementById('saudacao').textContent = `Olá, ${usuario.nome.split(' ')[0]}! 👋`; // Mostra só o primeiro nome
 
 let todosPosts = [];
 let filtroAtual = 'todos';
 
-// ── Badge de notificações ─────────────────────────────────────────
+// ── Badge de notificações ──
 async function carregarBadgeNotif() {
-  try {
-    const r = await fetch(`${API_URL}/notificacoes/${usuario.id}/nao-lidas`);
-    if (r.ok) {
-      const { total } = await r.json();
-      const badge = document.getElementById('badge-notif');
-      if (total > 0) { badge.textContent = total; badge.style.display = 'flex'; }
-      else badge.style.display = 'none';
-    }
-  } catch (_) {}
+    try {
+        const r = await fetch(`${API_URL}/notificacoes/${usuario.id}/nao-lidas`);
+        if (r.ok) {
+            const { total } = await r.json();
+            const badge = document.getElementById('badge-notif');
+            if (total > 0) { badge.textContent = total; badge.style.display = 'flex'; }
+            else badge.style.display = 'none';
+        }
+    } catch (_) {}
 }
 
-// ── Filtro ────────────────────────────────────────────────────────
+// ── Filtro ──
 function filtrar(tipo) {
-  filtroAtual = tipo;
-  ['todos','seguindo','novos','ja-vistos'].forEach(id => {
-    const btn = document.getElementById('btn-' + id);
-    if(btn) btn.classList.toggle('ativo', id === (tipo === 'vistos' ? 'ja-vistos' : tipo));
-  });
-  
-  if (tipo === 'seguindo' || tipo === 'todos') {
-    carregarFeed(); // Faz requisição nova ao backend
-  } else {
-    renderizarPosts(); // Filtra localmente os novos/vistos
-  }
+    filtroAtual = tipo;
+    ['todos','seguindo','novos','ja-vistos'].forEach(id => {
+        const btn = document.getElementById('btn-' + id);
+        if(btn) btn.classList.toggle('ativo', id === (tipo === 'vistos' ? 'ja-vistos' : tipo));
+    });
+    
+    if (tipo === 'seguindo' || tipo === 'todos') {
+        carregarFeed(); 
+    } else {
+        renderizarPosts(); 
+    }
 }
 
 function renderizarPosts() {
-  const container = document.getElementById('container-posts');
-  let posts = todosPosts;
-  if (filtroAtual === 'novos')   posts = todosPosts.filter(p => !p.visto);
-  if (filtroAtual === 'vistos')  posts = todosPosts.filter(p => p.visto);
+    const container = document.getElementById('container-posts');
+    let posts = todosPosts;
+    if (filtroAtual === 'novos')   posts = todosPosts.filter(p => !p.visto);
+    if (filtroAtual === 'vistos')  posts = todosPosts.filter(p => p.visto);
 
-  if (posts.length === 0) {
-    container.innerHTML = `<div style="background:#fff; padding:30px; border-radius:16px; text-align:center; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-      <p style="font-size:1.2rem; color:var(--cor-texto-suave);">
-      ${filtroAtual === 'novos' ? 'Nenhum momento novo! Você está em dia. ✅' :
-        filtroAtual === 'vistos' ? 'Ainda não viu nenhum momento.' :
-        filtroAtual === 'seguindo' ? 'As pessoas que segue ainda não partilharam momentos.' :
-        'Ainda não há partilhas. Seja o primeiro!'}
-      </p></div>`;
-    return;
-  }
+    if (posts.length === 0) {
+        container.innerHTML = `<div class="card-post" style="text-align:center; padding: 40px 20px;">
+            <p style="font-size:1.2rem; color:var(--cor-texto-suave); font-weight: bold;">
+            ${filtroAtual === 'novos' ? 'Nenhum momento novo! Está em dia. ✅' :
+              filtroAtual === 'vistos' ? 'Ainda não viu nenhum momento.' :
+              filtroAtual === 'seguindo' ? 'As pessoas que segue ainda não partilharam momentos.' :
+              'Ainda não há partilhas. Seja o primeiro!'}
+            </p></div>`;
+        return;
+    }
 
-  container.innerHTML = '';
-  posts.forEach(post => renderCard(post, container));
+    container.innerHTML = '';
+    posts.forEach(post => renderCard(post, container));
 }
 
 function renderCard(post, container) {
-  const data = new Date(post.data).toLocaleDateString('pt-PT', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+    const dataObj = new Date(post.data);
+    const dataFormatada = dataObj.toLocaleDateString('pt-PT', { day:'2-digit', month:'short' }) + ' às ' + dataObj.toLocaleTimeString('pt-PT', { hour:'2-digit', minute:'2-digit' });
 
-  // Avatar do autor
-  const fotoSrc = post.autor.fotoPerfil
-    ? `<img src="${post.autor.fotoPerfil}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;">`
-    : `<div class="avatar">${post.autor.nome.charAt(0).toUpperCase()}</div>`;
+    const fotoSrc = post.autor.fotoPerfil
+        ? `<img src="${post.autor.fotoPerfil}" class="avatar">`
+        : `<div class="avatar">${post.autor.nome.charAt(0).toUpperCase()}</div>`;
 
-  // Imagem anexada ao post
-  const imagemPostHtml = post.imagem 
-    ? `<img src="${post.imagem}" style="width:100%; border-radius:12px; margin-top:12px; object-fit:cover;">` 
-    : '';
+    const imagemPostHtml = post.imagem 
+        ? `<img src="${post.imagem}" style="width:100%; border-radius: 12px; margin-top:8px; border: 1px solid var(--cor-borda); object-fit:cover;">` 
+        : '';
 
-  // Respostas/comentários com link no nome
-  let respostasHtml = '';
-  if (post.respostas && post.respostas.length > 0) {
-    respostasHtml = `<div style="margin-top:10px; padding-top:10px; border-top:1px solid #f0f0f0;">`;
-    post.respostas.forEach(r => {
-      respostasHtml += `
-      <div style="display:flex; gap:10px; margin-top:12px; align-items:flex-start;">
-        <a href="perfil-publico.html?id=${r.autor.id}" style="text-decoration:none;">
-            <div class="avatar" style="width:32px; height:32px; font-size:0.9rem;">
-                ${r.autor.fotoPerfil ? `<img src="${r.autor.fotoPerfil}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : r.autor.nome.charAt(0)}
+    let respostasHtml = '';
+    if (post.respostas && post.respostas.length > 0) {
+        respostasHtml = `<div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--cor-fundo);">`;
+        post.respostas.forEach(r => {
+            respostasHtml += `
+            <div style="display:flex; gap:12px; margin-bottom:12px; align-items:flex-start;">
+                <a href="perfil-publico.html?id=${r.autor.id}" style="text-decoration:none; flex-shrink: 0;">
+                    ${r.autor.fotoPerfil ? `<img src="${r.autor.fotoPerfil}" class="avatar" style="width:36px; height:36px; font-size:1rem;">` : `<div class="avatar" style="width:36px; height:36px; font-size:1rem;">${r.autor.nome.charAt(0)}</div>`}
+                </a>
+                <div style="background: var(--cor-secundaria); border-radius: 14px; padding: 10px 14px; flex: 1;">
+                    <a href="perfil-publico.html?id=${r.autor.id}" style="font-size:1rem; font-weight:800; color:var(--cor-azul); text-decoration:none;">${r.autor.nome}</a>
+                    <p style="font-size:1.1rem; margin-top:4px; color:var(--cor-texto);">${r.conteudo}</p>
+                </div>
+            </div>`;
+        });
+        respostasHtml += `</div>`;
+    }
+
+    const numReacoes = post.curtidas ? post.curtidas.length : (post.totalCurtidas || 0);
+    const borderCor = !post.visto ? 'var(--cor-primaria-escura)' : 'transparent';
+
+    const card = document.createElement('article');
+    card.id = `post-${post.id}`;
+    card.className = 'card-post';
+    card.style.borderColor = borderCor;
+
+    card.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div style="display:flex; gap:14px; align-items:center;">
+                <a href="perfil-publico.html?id=${post.autor.id}" style="text-decoration:none;">${fotoSrc}</a>
+                <div>
+                    <a href="perfil-publico.html?id=${post.autor.id}" style="font-size:1.2rem; font-weight:800; color:var(--cor-texto); text-decoration:none;">${post.autor.nome}</a>
+                    ${!post.visto ? '<span class="novo-badge">Novo</span>' : ''}
+                    <p style="font-size:0.9rem; color:var(--cor-texto-suave); margin-top:2px; font-weight:600;">${dataFormatada}</p>
+                </div>
             </div>
-        </a>
-        <div style="background: #f8f9fa; border-radius: 12px; padding: 8px 12px; flex: 1;">
-            <a href="perfil-publico.html?id=${r.autor.id}" style="font-size:0.95rem; font-weight:bold; color:var(--cor-azul); text-decoration:none;">${r.autor.nome}</a>
-            <p style="font-size:1rem; margin-top:2px; color:var(--cor-texto);">${r.conteudo}</p>
         </div>
-      </div>`;
-    });
-    respostasHtml += `</div>`;
-  }
-
-  const numReacoes = post.curtidas ? post.curtidas.length : (post.totalCurtidas || 0);
-
-  const card = document.createElement('article');
-  card.id = `post-${post.id}`;
-  card.style.cssText = 'background:#fff; border-radius:16px; padding:20px; margin-bottom:20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: border 0.3s; border: 2px solid transparent;';
-  if (!post.visto) card.style.borderColor = 'var(--cor-primaria)';
-
-  card.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
-      <div style="display:flex;gap:12px;align-items:center;">
-        <a href="perfil-publico.html?id=${post.autor.id}" style="text-decoration:none;">${fotoSrc}</a>
-        <div>
-          <a href="perfil-publico.html?id=${post.autor.id}" style="font-size:1.15rem;font-weight:700;color:var(--cor-texto);text-decoration:none;">${post.autor.nome}</a>
-          ${!post.visto ? '<span style="font-size:0.75rem;background:var(--cor-primaria);color:#fff;padding:2px 8px;border-radius:99px;margin-left:6px;">Novo</span>' : ''}
-          <p style="font-size:0.85rem;color:var(--cor-texto-suave);margin:0;">${data}</p>
+        
+        <p class="texto-post">${post.conteudo}</p>
+        ${imagemPostHtml}
+        
+        <div style="display:flex; gap:15px; border-top:2px solid var(--cor-fundo); padding-top:16px; margin-top:16px; align-items:center;">
+            <div style="display:flex; gap:6px; background:var(--cor-fundo); padding:6px 12px; border-radius:99px;">
+                <button class="btn-reacao" onclick="reagirPost(${post.id}, 'curtida')" title="Curtir">❤️</button>
+                <button class="btn-reacao" onclick="reagirPost(${post.id}, 'abraco')" title="Abraço">🫂</button>
+                <button class="btn-reacao" onclick="reagirPost(${post.id}, 'parabens')" title="Parabéns">👏</button>
+            </div>
+            <span style="color:var(--cor-texto-suave); font-size:1.1rem; font-weight:800;">${numReacoes}</span>
+            
+            <button onclick="abrirResposta(${post.id})" style="background:none; border:none; font-size:1.05rem; font-weight:800; cursor:pointer; color:var(--cor-azul); margin-left:auto;">
+                💬 Comentar (${post.respostas ? post.respostas.length : 0})
+            </button>
         </div>
-      </div>
-    </div>
-    
-    <p style="font-size:1.2rem;line-height:1.5;color:var(--cor-texto);margin-top:12px;">${post.conteudo}</p>
-    ${imagemPostHtml}
-    
-    <div style="display:flex; gap:15px; border-top:1px solid var(--cor-borda); padding-top:14px; margin-top:15px; align-items:center;">
-        <div style="display:flex; gap:10px; background:var(--cor-fundo); padding:6px 14px; border-radius:30px;">
-            <button class="btn-reacao" onclick="reagirPost(${post.id}, 'curtida')" title="Curtir">❤️</button>
-            <button class="btn-reacao" onclick="reagirPost(${post.id}, 'abraco')" title="Abraço">🫂</button>
-            <button class="btn-reacao" onclick="reagirPost(${post.id}, 'parabens')" title="Parabéns">👏</button>
-        </div>
-        <span style="color:var(--cor-texto-suave); font-size:1rem; font-weight:bold;">
-            ${numReacoes}
-        </span>
-        <button onclick="abrirResposta(${post.id})" style="background:none;border:none;font-size:1.05rem;font-weight:700;cursor:pointer;color:var(--cor-texto-suave);margin-left:auto;">
-            💬 Comentar (${post.respostas ? post.respostas.length : 0})
-        </button>
-    </div>
 
-    ${respostasHtml}
-    
-    <div id="area-resp-${post.id}" style="display:none;margin-top:15px;">
-      <textarea id="txt-resp-${post.id}" placeholder="Escreva uma palavra de carinho..."
-        style="width:100%;min-height:60px;padding:12px;border:2px solid var(--cor-borda);border-radius:12px;font-size:1.05rem;resize:none;"></textarea>
-      <button onclick="enviarResposta(${post.id})" class="btn-primario"
-        style="width:100%;margin-top:8px;padding:10px;font-size:1.1rem;border:none;border-radius:12px;cursor:pointer;">
-        Publicar Comentário
-      </button>
-    </div>
-  `;
-  container.appendChild(card);
+        ${respostasHtml}
+        
+        <div id="area-resp-${post.id}" style="display:none; margin-top:16px;">
+            <textarea id="txt-resp-${post.id}" placeholder="Escreva uma palavra de carinho..." class="campo-com-icone" style="min-height:80px; resize:none;"></textarea>
+            <button onclick="enviarResposta(${post.id})" class="btn-primario" style="margin-top:10px; min-height: 48px;">
+                Publicar Comentário
+            </button>
+        </div>
+    `;
+    container.appendChild(card);
 }
 
-// ── Reagir (Substitui o Curtir Simples) ───────────────────────────
+// ── Funções de API mantidas intactas ──
 async function reagirPost(postId, tipo) {
-  try {
-    const r = await fetch(`${API_URL}/posts/${postId}/reagir`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ usuarioId: usuario.id, tipo: tipo })
-    });
-    if (r.ok) {
-        carregarFeed(); // Recarrega para atualizar os números de reações
-    }
-  } catch (_) { alert('Erro ao processar reação.'); }
+    try {
+        const r = await fetch(`${API_URL}/posts/${postId}/reagir`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ usuarioId: usuario.id, tipo: tipo })
+        });
+        if (r.ok) carregarFeed(); 
+    } catch (_) { alert('Erro ao processar reação.'); }
 }
 
 function abrirResposta(postId) {
-  const area = document.getElementById(`area-resp-${postId}`);
-  area.style.display = area.style.display === 'none' ? 'block' : 'none';
+    const area = document.getElementById(`area-resp-${postId}`);
+    area.style.display = area.style.display === 'none' ? 'block' : 'none';
 }
 
-// ── Responder ─────────────────────────────────────────────────────
 async function enviarResposta(postId) {
-  const txt = document.getElementById(`txt-resp-${postId}`).value.trim();
-  if (!txt) { alert('Escreva algo antes de comentar.'); return; }
-  try {
-    const r = await fetch(`${API_URL}/posts/${postId}/responder`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ usuarioId: usuario.id, texto: txt })
-    });
-    if (r.ok) {
-      carregarFeed(); // Recarrega para mostrar o novo comentário
-    } else {
-      alert(await r.text());
-    }
-  } catch (_) { alert('Erro ao enviar comentário.'); }
-}
-
-// ── Marcar como visto ─────────────────────────────────────────────
-async function marcarVistos(posts) {
-  const naoVistos = posts.filter(p => !p.visto);
-  for (const p of naoVistos) {
+    const txt = document.getElementById(`txt-resp-${postId}`).value.trim();
+    if (!txt) { alert('Escreva algo antes de comentar.'); return; }
     try {
-      await fetch(`${API_URL}/posts/${p.id}/ver`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ usuarioId: usuario.id })
-      });
-    } catch (_) {}
-  }
+        const r = await fetch(`${API_URL}/posts/${postId}/responder`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ usuarioId: usuario.id, texto: txt })
+        });
+        if (r.ok) carregarFeed(); 
+        else alert(await r.text());
+    } catch (_) { alert('Erro ao enviar comentário.'); }
 }
 
-// ── Carregar feed ─────────────────────────────────────────────────
-async function carregarFeed() {
-  try {
-    let url = `${API_URL}/posts?usuarioId=${usuario.id}`;
-    if (filtroAtual === 'seguindo') url += '&filtro=seguindo';
-    
-    const r = await fetch(url);
-    if (r.ok) {
-      todosPosts = await r.json();
-      renderizarPosts();
-      // Marca os posts visíveis como vistos após 2 segundos
-      setTimeout(() => marcarVistos(todosPosts.filter(p => !p.visto)), 2000);
+async function marcarVistos(posts) {
+    const naoVistos = posts.filter(p => !p.visto);
+    for (const p of naoVistos) {
+        try {
+            await fetch(`${API_URL}/posts/${p.id}/ver`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ usuarioId: usuario.id })
+            });
+        } catch (_) {}
     }
-  } catch (_) { document.getElementById('container-posts').innerHTML = '<p>Erro ao carregar o feed.</p>'; }
 }
 
-// Inicialização
+async function carregarFeed() {
+    try {
+        let url = `${API_URL}/posts?usuarioId=${usuario.id}`;
+        if (filtroAtual === 'seguindo') url += '&filtro=seguindo';
+        const r = await fetch(url);
+        if (r.ok) {
+            todosPosts = await r.json();
+            renderizarPosts();
+            setTimeout(() => marcarVistos(todosPosts.filter(p => !p.visto)), 2000);
+        }
+    } catch (_) { document.getElementById('container-posts').innerHTML = '<p class="texto-post" style="text-align:center;">Erro ao carregar o feed. Verifique a sua ligação.</p>'; }
+}
+
 carregarFeed();
 carregarBadgeNotif();
 
-// ── WEBSOCKETS (Observer de Notificações ao Vivo) ─────────────────
+// ── WEBSOCKETS ──
 try {
     const ws = new WebSocket(`ws://localhost:8080/ws/notificacoes/${usuario.id}`);
     ws.onmessage = (event) => {
