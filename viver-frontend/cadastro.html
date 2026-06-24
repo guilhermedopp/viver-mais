@@ -2,80 +2,74 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VIVER+ - Criar Conta</title>
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        .area-formulario { max-width: 400px; margin: auto; padding: 20px; }
-        .grupo-input { margin-bottom: 15px; }
-        .grupo-input label { display: block; font-weight: bold; margin-bottom: 5px; color: #333; }
-        .grupo-input input { 
-            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;
-            font-size: 1rem;
-        }
-        .btn-primario { 
-            width: 100%; padding: 15px; background: #28a745; color: white; border: none; 
-            border-radius: 50px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px;
-        }
-        /* Estilo para quando o botão estiver desativado por e-mail falso */
-        .btn-primario:disabled {
-            background: #a5d6a7;
-            cursor: not-allowed;
-        }
-        #status-nick, #status-email { font-size: 0.85rem; display: block; margin-top: 5px; }
-        .toggle-senha { font-size: 0.9rem; color: #28a745; cursor: pointer; margin-top: 5px; display: inline-block; }
-    </style>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="img/logo.png">
 </head>
 <body>
     <main class="tela-acesso">
-        <header class="marca" style="text-align: center; margin-bottom: 20px;">
-            <h1 style="color: #28a745; font-size: 2.5rem;">VIVER+</h1>
+        <header class="marca">
+            <img src="img/logo.png" alt="Logótipo Oficial do VIVER+">
+            <h1>VIVER+</h1>
             <p>Junte-se à nossa comunidade!</p>
         </header>
 
-        <section class="area-formulario">
+        <section class="area-formulario grupo-card">
+            <h2 style="text-align: center; margin-bottom: 24px; color: var(--cor-primaria-escura);">CRIAR CONTA</h2>
+
             <form id="form-cadastro">
                 <div class="grupo-input">
-                    <label>Nome Completo</label>
-                    <input type="text" id="nome" placeholder="Seu nome" required>
+                    <label for="nome">Nome Completo</label>
+                    <input type="text" id="nome" placeholder="O seu nome" required>
                 </div>
 
                 <div class="grupo-input">
-                    <label>Escolha seu @nickname</label>
+                    <label for="nickname">Escolha o seu @nickname</label>
                     <input type="text" id="nickname" placeholder="ex: maria_silva" required>
-                    <small id="status-nick"></small>
+                    <small id="status-nick" style="font-size: 1rem; font-weight: 800; display: block; margin-top: 8px;"></small>
                 </div>
 
                 <div class="grupo-input">
-                    <label>E-mail</label>
+                    <label for="email">E-mail</label>
                     <input type="email" id="email" placeholder="seu@email.com" required>
-                    <small id="status-email"></small>
+                    <small id="status-email" style="font-size: 1rem; font-weight: 800; display: block; margin-top: 8px; line-height: 1.4;"></small>
                 </div>
 
                 <div class="grupo-input">
-                    <label>Data de Nascimento</label>
+                    <label for="dataNascimento">Data de Nascimento</label>
                     <input type="date" id="dataNascimento" required>
                 </div>
 
                 <div class="grupo-input">
-                    <label>Senha</label>
-                    <input type="password" id="senha" placeholder="••••••" required>
+                    <label for="senha">Senha</label>
+                    <input type="password" id="senha" placeholder="Mínimo de 8 caracteres (Letras e Números)" required>
                 </div>
 
                 <div class="grupo-input">
-                    <label>Confirmar Senha</label>
-                    <input type="password" id="confirmaSenha" placeholder="••••••" required>
-                    <span class="toggle-senha" onclick="toggleSenha()">👁️ Mostrar senhas</span>
+                    <label for="confirmaSenha">Confirmar Senha</label>
+                    <input type="password" id="confirmaSenha" placeholder="Repita a senha" required>
+                    
+                    <label style="display: flex; align-items: center; gap: 10px; margin-top: 14px; font-size: 1.15rem; font-weight: 700; cursor: pointer; color: var(--cor-texto-suave);">
+                        <input type="checkbox" onclick="toggleSenha()" style="width: 24px; height: 24px; cursor: pointer; accent-color: var(--cor-primaria-escura);"> 
+                        Mostrar senhas
+                    </label>
                 </div>
 
-                <button type="submit" class="btn-primario" id="btn-submit">CRIAR CONTA</button>
+                <button type="submit" class="btn-primario" id="btn-submit" style="margin-top: 10px;">CRIAR A MINHA CONTA</button>
             </form>
-            <div class="area-links" style="text-align: center; margin-top: 15px;">
-                <p>Já tem conta? <a href="index.html" style="color: #28a745; font-weight: bold;">Entrar</a></p>
+            
+            <div style="text-align: center; font-size: 1.15rem; font-weight: 700; margin-top: 24px;">
+                <span style="color: var(--cor-texto-suave);">Já tem conta?</span> 
+                <a href="index.html" style="color: var(--cor-azul); text-decoration: none;">Entrar aqui</a>
             </div>
         </section>
     </main>
 
+    <script src="js/pwa-setup.js"></script> 
     <script>
+        // LÓGICA PRESERVADA E INTACTA
         function toggleSenha() {
             const senha = document.getElementById('senha');
             const confirma = document.getElementById('confirmaSenha');
@@ -93,10 +87,12 @@
             const nick = inputNick.value.replace('@', '');
             if (nick.length < 3) { statusNick.innerText = ""; return; }
             timerNick = setTimeout(async () => {
-                const res = await fetch(`http://localhost:8080/api/usuarios/nickname/${nick}/disponivel`);
-                const data = await res.json();
-                statusNick.innerText = data.disponivel ? "✅ Disponível" : "❌ Já em uso";
-                statusNick.style.color = data.disponivel ? "green" : "red";
+                try {
+                    const res = await fetch(`http://localhost:8080/api/usuarios/nickname/${nick}/disponivel`);
+                    const data = await res.json();
+                    statusNick.innerText = data.disponivel ? "✅ Disponível" : "❌ Já em uso";
+                    statusNick.style.color = data.disponivel ? "var(--cor-sucesso)" : "var(--cor-erro)";
+                } catch(e) { console.error(e); }
             }, 500);
         });
 
@@ -113,12 +109,14 @@
             if (!email.includes('@') || !email.includes('.')) { 
                 statusEmail.innerText = ""; 
                 btnSubmit.disabled = false;
+                btnSubmit.style.opacity = "1";
                 return; 
             }
 
             statusEmail.innerText = "A verificar e-mail na internet...";
             statusEmail.style.color = "var(--cor-texto-suave)";
-            btnSubmit.disabled = true; // Desativa o botão enquanto verifica
+            btnSubmit.disabled = true;
+            btnSubmit.style.opacity = "0.5";
 
             timerEmail = setTimeout(async () => {
                 try {
@@ -126,12 +124,11 @@
                     const resDB = await fetch(`http://localhost:8080/api/usuarios/buscar?email=${encodeURIComponent(email)}`);
                     if (resDB.ok) {
                         statusEmail.innerText = "❌ Este e-mail já tem conta no VIVER+";
-                        statusEmail.style.color = "red";
+                        statusEmail.style.color = "var(--cor-erro)";
                         return; // O botão continua desativado
                     }
 
                     // 2. Verifica se o e-mail existe no MUNDO REAL usando API Externa
-                    // ATENÇÃO: Substitua a string abaixo pela sua API KEY do abstractapi.com
                     const API_KEY = "26522ba265584d59b8fe1046455f8fc2"; 
                     const urlMundo = `https://emailvalidation.abstractapi.com/v1/?api_key=${API_KEY}&email=${encodeURIComponent(email)}`;
                     
@@ -140,22 +137,22 @@
                     
                     if (dataMundo.deliverability === "DELIVERABLE") {
                         statusEmail.innerText = "✅ E-mail válido e verdadeiro!";
-                        statusEmail.style.color = "green";
-                        btnSubmit.disabled = false; // Liberta o botão para registo
+                        statusEmail.style.color = "var(--cor-sucesso)";
+                        btnSubmit.disabled = false;
+                        btnSubmit.style.opacity = "1";
                     } else if (dataMundo.deliverability === "UNDELIVERABLE") {
                         statusEmail.innerText = "❌ Este e-mail não existe no mundo real.";
-                        statusEmail.style.color = "red"; 
-                        // Botão continua desativado
+                        statusEmail.style.color = "var(--cor-erro)"; 
                     } else {
                         statusEmail.innerText = "⚠️ E-mail com formato válido, mas não foi possível garantir se existe.";
-                        statusEmail.style.color = "orange";
-                        btnSubmit.disabled = false; // Liberta o botão para não prender o utilizador
+                        statusEmail.style.color = "#F57C00";
+                        btnSubmit.disabled = false;
+                        btnSubmit.style.opacity = "1";
                     }
-
                 } catch (e) {
-                    console.error("Erro na verificação externa:", e);
                     statusEmail.innerText = "";
-                    btnSubmit.disabled = false; // Em caso de erro de rede, liberta para o utilizador tentar
+                    btnSubmit.disabled = false;
+                    btnSubmit.style.opacity = "1";
                 }
             }, 1200);
         });
@@ -180,18 +177,22 @@
                 senha: senha
             };
 
-            const res = await fetch('http://localhost:8080/api/cadastro', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(payload)
-            });
+            try {
+                const res = await fetch('http://localhost:8080/api/cadastro', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
 
-            if (res.ok) {
-                localStorage.setItem('emailRecenteCadastro', payload.email);
-                alert('Conta criada com sucesso!');
-                window.location.href = 'index.html';
-            } else {
-                alert('Erro: ' + await res.text());
+                if (res.ok) {
+                    localStorage.setItem('emailRecenteCadastro', payload.email);
+                    alert('Conta criada com sucesso!');
+                    window.location.href = 'index.html';
+                } else {
+                    alert('Erro: ' + await res.text());
+                }
+            } catch(e) {
+                alert('Erro ao ligar ao servidor VIVER+.');
             }
         });
     </script>
