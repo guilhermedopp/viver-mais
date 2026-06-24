@@ -2,64 +2,81 @@
 <html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VIVER+ - O Meu Perfil</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="icon" type="image/png" href="img/logo.png">
 </head>
-<body>
+<body style="padding-bottom: 110px;">
 
-    <main class="tela-acesso" style="max-width: 650px; padding-bottom: 90px; justify-content: flex-start;">
+    <main class="tela-acesso" style="max-width: 650px; background: transparent; padding-top: 10px;">
         
-        <header style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 30px; padding-top: 20px;">
+        <header style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 24px;">
             
             <input type="file" id="input-foto" accept="image/*" style="display: none;">
             
-            <div id="avatar-perfil" onclick="document.getElementById('input-foto').click()" style="width: 120px; height: 120px; background: var(--cor-primaria); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; font-weight: bold; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(27, 184, 47, 0.3); cursor: pointer; overflow: hidden; position: relative; border: 4px solid var(--cor-fundo);">
+            <div id="avatar-perfil" onclick="document.getElementById('input-foto').click()" 
+                 style="width: 120px; height: 120px; background: var(--cor-primaria-escura); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; font-weight: 900; box-shadow: var(--sombra-suave); cursor: pointer; overflow: hidden; border: 4px solid white;">
                 <span id="letra-avatar">?</span>
             </div>
-            <p style="font-size: 0.9rem; color: var(--cor-texto-suave); margin-bottom: 15px; cursor: pointer;" onclick="document.getElementById('input-foto').click()">Tocar para alterar foto</p>
+            
+            <button onclick="document.getElementById('input-foto').click()" style="background: none; border: none; color: var(--cor-azul); font-weight: 800; font-size: 1.05rem; margin-top: 14px; cursor: pointer; text-decoration: underline;">
+                Alterar fotografia
+            </button>
 
-            <h1 id="nome-perfil" style="font-size: 2.2rem; color: var(--cor-azul); margin-bottom: 5px;">Carregando...</h1>
-            <p id="email-perfil" style="font-size: 1.2rem; color: var(--cor-texto-suave); margin-bottom: 20px;">...</p>
-            
-            <div style="display: flex; gap: 25px; margin-bottom: 20px;">
-                <div style="text-align: center;"><strong id="num-posts" style="display: block; font-size: 1.4rem;">0</strong> posts</div>
-                <div style="text-align: center;"><strong id="num-seguidores" style="display: block; font-size: 1.4rem;">0</strong> seguidores</div>
-                <div style="text-align: center;"><strong id="num-seguindo" style="display: block; font-size: 1.4rem;">0</strong> seguindo</div>
-            </div>
-            
-            <button id="btn-sair-perfil" class="btn-primario" onclick="terminarSessao()" style="padding: 10px 30px; border-radius: 99px; background: #eefaf0; color: var(--cor-erro); border: 2px solid var(--cor-erro); font-weight: bold; cursor: pointer;">Terminar Sessão</button>
+            <h1 id="nome-perfil" style="font-size: 2.2rem; color: var(--cor-texto); margin-top: 16px; margin-bottom: 4px;">Carregando...</h1>
+            <p id="email-perfil" style="font-size: 1.15rem; color: var(--cor-texto-suave); font-weight: 600;">...</p>
         </header>
 
-        <div style="width: 100%; height: 3px; background: var(--cor-borda); margin-bottom: 25px; border-radius: 2px;"></div>
+        <div class="grupo-card" style="display: flex; justify-content: space-around; padding: 20px; margin-bottom: 24px;">
+            <div style="text-align: center;">
+                <strong id="num-posts" style="display: block; font-size: 1.6rem; color: var(--cor-primaria-escura);">0</strong>
+                <span style="font-size: 0.95rem; color: var(--cor-texto-suave); font-weight: 800;">Momentos</span>
+            </div>
+            <div style="width: 2px; background: var(--cor-fundo); border-radius: 2px;"></div>
+            <div style="text-align: center;">
+                <strong id="num-seguidores" style="display: block; font-size: 1.6rem; color: var(--cor-primaria-escura);">0</strong>
+                <span style="font-size: 0.95rem; color: var(--cor-texto-suave); font-weight: 800;">Seguidores</span>
+            </div>
+            <div style="width: 2px; background: var(--cor-fundo); border-radius: 2px;"></div>
+            <div style="text-align: center;">
+                <strong id="num-seguindo" style="display: block; font-size: 1.6rem; color: var(--cor-primaria-escura);">0</strong>
+                <span style="font-size: 0.95rem; color: var(--cor-texto-suave); font-weight: 800;">A Seguir</span>
+            </div>
+        </div>
+            
+        <button id="btn-sair-perfil" class="btn-secundario" onclick="terminarSessao()" style="background: #ffebee; color: var(--cor-erro); margin-bottom: 30px;">
+            🚪 Terminar Sessão
+        </button>
 
         <section>
-            <h2 style="font-size: 1.6rem; text-align: left; margin-bottom: 15px; color: var(--cor-azul);">As minhas memórias</h2>
+            <h2 style="font-size: 1.6rem; text-align: left; margin-bottom: 16px; color: var(--cor-azul);">Os meus momentos</h2>
             <div id="container-meus-posts">
-                <p style="font-size: 1.2rem; color: var(--cor-texto-suave);">A procurar os seus momentos...</p>
+                <div class="card-post" style="text-align: center;">
+                    <p style="font-size: 1.15rem; color: var(--cor-texto-suave); font-weight: bold;">A procurar...</p>
+                </div>
             </div>
         </section>
 
-        <nav class="barra-navegacao">
+        <nav class="barra-navegacao" aria-label="Navegação Principal">
             <a href="feed.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>Início</span></a>
-            <a href="chat.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg><span>Chat</span></a>
-            <a href="publicar.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>Publicar</span></a>
             <a href="comunidades.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><span>Grupos</span></a>
+            <a href="publicar.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>Publicar</span></a>
             <a href="notificacoes.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><span>Avisos</span></a>
             <a href="perfil.html" class="item-nav ativo"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span>Perfil</span></a>
         </nav>
     </main>
 
+    <script src="js/api.js"></script>
+    <script src="js/pwa-setup.js"></script>
     <script>
-        const API_URL = 'http://localhost:8080/api';
         let usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
 
         if (!usuarioLogado) {
             window.location.href = 'index.html';
         } else {
             document.getElementById('nome-perfil').textContent = usuarioLogado.nome;
-            document.getElementById('email-perfil').textContent = usuarioLogado.email;
+            document.getElementById('email-perfil').textContent = usuarioLogado.email || ("@" + usuarioLogado.nickname);
             
             if (usuarioLogado.fotoPerfil) {
                 document.getElementById('avatar-perfil').innerHTML = `<img src="${usuarioLogado.fotoPerfil}" style="width: 100%; height: 100%; object-fit: cover;">`;
@@ -73,6 +90,7 @@
 
         function terminarSessao() {
             localStorage.removeItem('usuarioLogado');
+            localStorage.removeItem('jwtToken'); // Remove também o token de segurança!
             window.location.href = 'index.html';
         }
 
@@ -88,6 +106,7 @@
             } catch (e) { console.error("Erro ao carregar stats:", e); }
         }
 
+        // Alteração da foto de Perfil
         document.getElementById('input-foto').addEventListener('change', async function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -110,21 +129,28 @@
             reader.readAsDataURL(file);
         });
 
+        // Carregar os Posts Pessoais
         async function carregarMeusPosts() {
             try {
                 const r = await fetch(`${API_URL}/usuarios/${usuarioLogado.id}`);
                 if (r.ok) {
                     const dados = await r.json();
                     const container = document.getElementById('container-meus-posts');
+                    
                     if(!dados.posts || dados.posts.length === 0) {
-                        container.innerHTML = '<p style="color:var(--cor-texto-suave);">Ainda não partilhou momentos.</p>';
+                        container.innerHTML = `
+                            <div class="card-post" style="text-align: center;">
+                                <p style="color:var(--cor-texto-suave); font-size: 1.1rem; font-weight: bold;">Ainda não partilhou momentos. Vá à aba Publicar! 🌱</p>
+                            </div>`;
                         return;
                     }
+
+                    // Utiliza a classe .card-post para alinhar com o Feed
                     container.innerHTML = dados.posts.map(p => `
-                        <article style="background: white; border: 3px solid #e9ecef; border-radius: 14px; padding: 20px; margin-bottom: 15px;">
-                            <p style="font-size: 0.9rem; color: gray; margin-bottom: 6px;">${new Date(p.data).toLocaleDateString('pt-PT')}</p>
-                            <p style="font-size: 1.3rem;">${p.conteudo}</p>
-                            ${p.imagem ? `<img src="${p.imagem}" style="width:100%; border-radius:12px; margin-top:12px; border:2px solid var(--cor-borda); object-fit:cover;">` : ''}
+                        <article class="card-post">
+                            <p style="font-size: 0.9rem; color: var(--cor-texto-suave); font-weight: 700; margin-bottom: 8px;">${new Date(p.data).toLocaleDateString('pt-PT')}</p>
+                            <p style="font-size: 1.2rem; color: var(--cor-texto); line-height: 1.5;">${p.conteudo}</p>
+                            ${p.imagem ? `<img src="${p.imagem}" style="width:100%; border-radius:12px; margin-top:12px; border:1px solid var(--cor-borda); object-fit:cover;">` : ''}
                         </article>
                     `).join('');
                 }
