@@ -9,15 +9,14 @@
     <link rel="icon" type="image/png" href="img/logo.png">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
-<body>
-    <main class="tela-acesso">
+<body style="padding-bottom: 0; display: block; overflow-x: hidden;">
+    <main class="tela-acesso" style="margin: 0 auto; justify-content: center; min-height: 100dvh; padding-bottom: 20px;">
         <header class="marca">
             <img src="img/logo.png" alt="Logótipo Oficial do VIVER+">
             <h1>VIVER+</h1>
             <p>Rede Social de Carinho e Conexão</p>
         </header>
 
-        <!-- Utilizamos a classe grupo-card para dar o formato de "Cartão" branco ao formulário -->
         <section class="area-formulario grupo-card">
             <h2 style="text-align: center; margin-bottom: 24px; color: var(--cor-primaria-escura);">ENTRAR</h2>
 
@@ -46,32 +45,31 @@
                 <hr style="flex: 1; border: none; border-top: 2px solid var(--cor-borda);">
             </div>
 
-            <!-- Botão do Google -->
-            <div id="g_id_onload"
-                 data-client_id="1095979412262-me3kh924htbgh5fmt434hqpkhjsv715s.apps.googleusercontent.com"
-                 data-context="signin"
-                 data-ux_mode="popup"
-                 data-callback="handleCredentialResponse"
-                 data-auto_prompt="false">
-            </div>
-            <div class="g_id_signin"
-                 data-type="standard"
-                 data-shape="pill"
-                 data-theme="outline"
-                 data-text="signin_with"
-                 data-size="large"
-                 data-logo_alignment="left"
-                 style="display: flex; justify-content: center; margin-bottom: 24px;">
+            <div style="width: 100%; overflow: hidden; display: flex; justify-content: center;">
+                <div id="g_id_onload"
+                     data-client_id="1095979412262-me3kh924htbgh5fmt434hqpkhjsv715s.apps.googleusercontent.com"
+                     data-context="signin"
+                     data-ux_mode="popup"
+                     data-callback="handleCredentialResponse"
+                     data-auto_prompt="false">
+                </div>
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-shape="pill"
+                     data-theme="outline"
+                     data-text="signin_with"
+                     data-size="large"
+                     data-logo_alignment="left">
+                </div>
             </div>
 
-            <div style="text-align: center; font-size: 1.15rem; font-weight: 700; margin-top: 10px;">
+            <div style="text-align: center; font-size: 1.15rem; font-weight: 700; margin-top: 20px;">
                 <span style="color: var(--cor-texto-suave);">Ainda não tem conta?</span> 
                 <a href="cadastro.html" style="color: var(--cor-azul); text-decoration: none;">Criar conta</a>
             </div>
         </section>
     </main>
 
-    <!-- MODAL: Completar Perfil via Google (Aparece se for a primeira vez do utilizador) -->
     <div id="modal-completar" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; padding: 20px;">
         <div class="grupo-card" style="width: 100%; max-width: 400px; background: white;">
             <h2 style="margin-bottom: 10px; color: var(--cor-primaria-escura);">Falta pouco! 🎉</h2>
@@ -90,7 +88,6 @@
         </div>
     </div>
 
-    <!-- SCRIPT DA API -->
     <script src="js/api.js"></script>
     <script src="js/pwa-setup.js"></script> 
     <script>
@@ -99,7 +96,6 @@
             input.type = input.type === 'password' ? 'text' : 'password';
         }
 
-        // Foco no Login: Preencher e-mail automaticamente se vier do ecrã de cadastro
         window.addEventListener('load', () => {
             const emailSalvo = localStorage.getItem('emailRecenteCadastro');
             if (emailSalvo) {
@@ -109,10 +105,48 @@
             }
         });
 
+        // ── AQUI ESTÁ A CORREÇÃO PRINCIPAL: O EVENTO DE LOGIN! ──
+        document.getElementById('form-login').addEventListener('submit', async (e) => {
+            e.preventDefault(); // Impede que o telemóvel recarregue a página
+            
+            const email = document.getElementById('email').value.trim();
+            const senha = document.getElementById('senha').value;
+            const btn = e.target.querySelector('button');
+            
+            btn.disabled = true;
+            btn.textContent = 'A ENTRAR...';
+            btn.style.opacity = '0.7';
+
+            try {
+                const res = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, senha })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    localStorage.setItem('jwtToken', data.token);
+                    localStorage.setItem('usuarioLogado', JSON.stringify(data.usuario));
+                    window.location.href = 'feed.html';
+                } else {
+                    alert('Erro: E-mail ou senha incorretos.');
+                    btn.disabled = false;
+                    btn.textContent = 'ENTRAR NA MINHA CONTA';
+                    btn.style.opacity = '1';
+                }
+            } catch (err) {
+                alert('Erro de ligação. Se estiver no telemóvel, troque o "localhost" no api.js pelo IP do seu PC!');
+                btn.disabled = false;
+                btn.textContent = 'ENTRAR NA MINHA CONTA';
+                btn.style.opacity = '1';
+            }
+        });
+
         // ── FLUXO GOOGLE OAUTH ──
         async function handleCredentialResponse(response) {
             try {
-                const res = await fetch('http://localhost:8080/api/auth/google', {
+                const res = await fetch(`${API_URL}/auth/google`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ credential: response.credential })
@@ -120,22 +154,19 @@
 
                 if (res.ok) {
                     const data = await res.json();
-                    
-                    // Salva os dados de Sessão (JWT e Utilizador)
                     localStorage.setItem('jwtToken', data.token);
                     localStorage.setItem('usuarioLogado', JSON.stringify(data.usuario));
                     
-                    // Verifica se o Utilizador é novo e precisa do @nickname
                     if (data.precisaCompletar) {
                         document.getElementById('modal-completar').style.display = 'flex';
                     } else {
                         window.location.href = 'feed.html';
                     }
                 } else {
-                    alert('Erro ao entrar com Google: ' + await res.text());
+                    alert('Erro ao entrar com Google.');
                 }
             } catch (error) {
-                alert('Não foi possível conectar ao servidor VIVER+.');
+                alert('Erro de ligação ao servidor.');
             }
         }
 
@@ -151,7 +182,7 @@
             }
 
             try {
-                const res = await fetch('http://localhost:8080/api/auth/completar-perfil', {
+                const res = await fetch(`${API_URL}/auth/completar-perfil`, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
