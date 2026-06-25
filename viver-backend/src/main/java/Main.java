@@ -16,6 +16,7 @@ import com.vo.*;
 import io.javalin.Javalin;
 
 public class Main {
+    // Agora esta variável é usada para validação de segurança!
     private static final String GOOGLE_CLIENT_ID = "1095979412262-me3kh924htbgh5fmt434hqpkhjsv715s.apps.googleusercontent.com";
     private static final Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
     private static final String JWT_SECRET = dotenv.get("JWT_SECRET", "CHAVE_EMERGENCIA_SUPER_SECRETA");
@@ -99,10 +100,19 @@ public class Main {
                     String line; while ((line = br.readLine()) != null) sb.append(line);
                 }
                 String json = sb.toString();
+
+                // ── VALIDAÇÃO DE SEGURANÇA (Resolve o aviso no VS Code) ──
+                String aud = extrairCampo(json, "aud");
+                if (!GOOGLE_CLIENT_ID.equals(aud)) {
+                    throw new Exception("Acesso Negado: O Token não pertence ao VIVER+.");
+                }
+                // ─────────────────────────────────────────────────────────
+
                 String googleId = extrairCampo(json, "sub");
                 String email    = extrairCampo(json, "email");
                 String nome     = extrairCampo(json, "name");
                 String foto     = extrairCampo(json, "picture");
+                
                 UsuarioVO usuario = usuarioBO.loginOuCadastrarGoogle(googleId, nome, email, foto);
                 boolean precisaCompletar = usuario.getNickname() == null || usuario.getDataNascimento() == null;
                 ctx.json(Map.of("token", gerarToken(usuario), "usuario", usuario, "precisaCompletar", precisaCompletar));
@@ -144,7 +154,6 @@ public class Main {
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
 
-        // BUG CORRIGIDO: rota /api/posts/{id}/reagir definida UMA ÚNICA VEZ (era duplicada)
         app.post("/api/posts/{id}/reagir", ctx -> {
             try {
                 int postId = Integer.parseInt(ctx.pathParam("id"));
@@ -362,18 +371,18 @@ public class Main {
     }
 
     // DTOs
-    public static class DadosLogin           { public String email, senha;                                                                   public DadosLogin() {} }
-    public static class DadosCadastro        { public String nome, nickname, email, senha, dataNascimento;                                   public DadosCadastro() {} }
-    public static class DadosGoogle          { public String credential;                                                                     public DadosGoogle() {} }
-    public static class DadosCompletarPerfil { public int usuarioId; public String nickname, dataNascimento;                                 public DadosCompletarPerfil() {} }
-    public static class DadosInteracao       { public int usuarioId; public String texto, tipo;                                             public DadosInteracao() {} }
+    public static class DadosLogin           { public String email, senha;                                                 public DadosLogin() {} }
+    public static class DadosCadastro        { public String nome, nickname, email, senha, dataNascimento;                 public DadosCadastro() {} }
+    public static class DadosGoogle          { public String credential;                                                   public DadosGoogle() {} }
+    public static class DadosCompletarPerfil { public int usuarioId; public String nickname, dataNascimento;               public DadosCompletarPerfil() {} }
+    public static class DadosInteracao       { public int usuarioId; public String texto, tipo;                            public DadosInteracao() {} }
     public static class DadosPost            { public String texto, imagem, destinoTipo; public int destinoId; public UsuarioVO autor;        public DadosPost() {} }
-    public static class DadosNovaComunidade  { public String nome, descricao; public int criadorId;                                         public DadosNovaComunidade() {} }
-    public static class DadosEditarGrupo     { public int usuarioId; public String nome, descricao, fotoGrupo;                               public DadosEditarGrupo() {} }
-    public static class DadosFoto            { public String base64;                                                                         public DadosFoto() {} }
-    public static class DadosMensagem        { public int remetenteId, destinatarioId; public String conteudo;                               public DadosMensagem() {} }
-    public static class DadosMensagemGrupo   { public int usuarioId; public String conteudo;                                                public DadosMensagemGrupo() {} }
-    public static class DadosConvite         { public int convidanteId, convidadoId;                                                        public DadosConvite() {} }
-    public static class DadosRespostaConvite { public int usuarioId; public boolean aceitar;                                                 public DadosRespostaConvite() {} }
-    public static class DadosNickname        { public String nickname;                                                                       public DadosNickname() {} }
+    public static class DadosNovaComunidade  { public String nome, descricao; public int criadorId;                        public DadosNovaComunidade() {} }
+    public static class DadosEditarGrupo     { public int usuarioId; public String nome, descricao, fotoGrupo;             public DadosEditarGrupo() {} }
+    public static class DadosFoto            { public String base64;                                                       public DadosFoto() {} }
+    public static class DadosMensagem        { public int remetenteId, destinatarioId; public String conteudo;             public DadosMensagem() {} }
+    public static class DadosMensagemGrupo   { public int usuarioId; public String conteudo;                               public DadosMensagemGrupo() {} }
+    public static class DadosConvite         { public int convidanteId, convidadoId;                                       public DadosConvite() {} }
+    public static class DadosRespostaConvite { public int usuarioId; public boolean aceitar;                               public DadosRespostaConvite() {} }
+    public static class DadosNickname        { public String nickname;                                                     public DadosNickname() {} }
 }
