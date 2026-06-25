@@ -154,10 +154,14 @@
           window.location.href = 'feed.html';
         }
       } else {
-        alert('Erro ao entrar com Google: ' + await res.text());
+        const msgEl = document.getElementById('msg-login');
+        msgEl.textContent = 'Erro ao entrar com Google: ' + await res.text();
+        msgEl.style.display = 'block';
       }
     } catch (e) {
-      alert('Não foi possível conectar ao servidor VIVER+.');
+      const msgEl = document.getElementById('msg-login');
+      msgEl.textContent = 'Não foi possível conectar ao servidor VIVER+.';
+      msgEl.style.display = 'block';
     }
   }
 

@@ -32,3 +32,22 @@ function alternarAcessibilidade() {
     if (btn) btn.textContent = activo ? '🔍 Letra Normal' : '🔍 Letra Maior';
 }
 
+function mostrarToast(mensagem, tipo) {
+    tipo = tipo || '';
+    let ctn = document.getElementById('__toast_ctn__');
+    if (!ctn) {
+        ctn = document.createElement('div');
+        ctn.id = '__toast_ctn__';
+        ctn.className = 'toast-ctn';
+        document.body.appendChild(ctn);
+    }
+    const t = document.createElement('div');
+    t.className = 'toast' + (tipo ? ' ' + tipo : '');
+    t.textContent = mensagem;
+    ctn.appendChild(t);
+    setTimeout(function () {
+        t.classList.add('saindo');
+        setTimeout(function () { t.remove(); }, 300);
+    }, 3500);
+}
+

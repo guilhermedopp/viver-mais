@@ -224,6 +224,13 @@ public class Main {
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
 
+        app.get("/api/usuarios/{id}/amigos", ctx -> {
+            try {
+                int id = Integer.parseInt(ctx.pathParam("id"));
+                ctx.json(new SeguidorDAO().listarAmigos(id));
+            } catch (Exception e) { ctx.status(500).result(e.getMessage()); }
+        });
+
         app.post("/api/usuarios/{id}/seguir", ctx -> {
             try {
                 int seguidoId = Integer.parseInt(ctx.pathParam("id"));

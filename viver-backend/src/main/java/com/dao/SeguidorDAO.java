@@ -45,6 +45,32 @@ public class SeguidorDAO {
         }
     }
 
+    // Retorna seguidores mútuos (ambos se seguem)
+    public List<UsuarioVO> listarAmigos(int usuarioId) throws Exception {
+        String sql = "SELECT u.id, u.nome, u.nickname, u.email, u.foto_perfil " +
+                     "FROM usuarios u " +
+                     "WHERE EXISTS (SELECT 1 FROM seguidores WHERE seguidor_id = ? AND seguido_id = u.id) " +
+                     "  AND EXISTS (SELECT 1 FROM seguidores WHERE seguidor_id = u.id AND seguido_id = ?) " +
+                     "ORDER BY u.nome ASC";
+        List<UsuarioVO> lista = new ArrayList<>();
+        try (Connection conn = ConexaoDB.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, usuarioId);
+            stmt.setInt(2, usuarioId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    UsuarioVO u = new UsuarioVO(rs.getInt("id"), rs.getString("nome"),
+                            rs.getString("nickname"), rs.getString("email"), "", null);
+                    u.setFotoPerfil(rs.getString("foto_perfil"));
+                    lista.add(u);
+                }
+            }
+        } catch (Exception e) {
+            throw new Exception("Erro ao listar amigos: " + e.getMessage());
+        }
+        return lista;
+    }
+
     // Lista quem segue o usuário indicado (usada pelo Observer para notificar)
     public List<UsuarioVO> listarSeguidores(int usuarioId) throws Exception {
         String sql = "SELECT u.id, u.nome, u.email FROM seguidores s " +
