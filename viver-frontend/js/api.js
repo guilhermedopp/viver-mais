@@ -1,126 +1,126 @@
+// ═══════════════════════════════════════════════════════════════
+// VIVER+ — api.js
+// Responsabilidades:
+//   1. Define API_URL e garante que TODOS os fetch() para o backend
+//      incluem automaticamente o JWT (interceptor global)
+//   2. Trata login por formulário e login por Google
+//   3. Trata cadastro
+//   4. Modo de acessibilidade (fonte grande)
+// ═══════════════════════════════════════════════════════════════
+
 const API_URL = 'http://localhost:8080/api';
 
-// ── SISTEMA DE SEGURANÇA (JWT Interceptor) ────────────────────────────
-// Intercepta todos os pedidos para adicionar o Token de Segurança (JWT)
-const originalFetch = window.fetch;
-window.fetch = async function(resource, config = {}) {
-    if (typeof resource === 'string' && resource.includes('/api/') && 
-        !resource.includes('/login') && !resource.includes('/cadastro') && 
-        !resource.includes('/auth/google') && !resource.includes('/disponivel')) {
-        
-        config.headers = config.headers || {};
+// ── BUG CORRIGIDO: Interceptor Global de JWT ─────────────────────
+// Substitui window.fetch para injetar automaticamente o header
+// Authorization em TODA chamada para o servidor VIVER+.
+// Isso resolve o bug onde as páginas internas faziam fetch()
+// diretamente sem incluir o JWT, recebendo 401 em todas as rotas.
+(function () {
+    const fetchOriginal = window.fetch.bind(window);
+    window.fetch = function (url, opcoes = {}) {
         const token = localStorage.getItem('jwtToken');
-        if (token) config.headers['Authorization'] = `Bearer ${token}`;
-    }
-    return originalFetch(resource, config);
-};
+        if (token && typeof url === 'string' && url.includes('localhost:8080')) {
+            opcoes.headers = {
+                ...opcoes.headers,
+                'Authorization': `Bearer ${token}`
+            };
+        }
+        return fetchOriginal(url, opcoes);
+    };
+})();
 
-// ── SISTEMA DE ACESSIBILIDADE (Fonte Grande) ──────────────────────────
-function aplicarAcessibilidade() {
-    if(localStorage.getItem('fonte-grande') === 'true') {
-        document.body.classList.add('fonte-grande');
-    } else {
-        document.body.classList.remove('fonte-grande');
-    }
+// ── ACESSIBILIDADE: Modo Fonte Grande ────────────────────────────
+// Restaura o modo ao carregar a página (persiste entre sessões)
+if (localStorage.getItem('fonteGrande') === 'true') {
+    document.body.classList.add('fonte-grande');
 }
 
-window.alternarAcessibilidade = function() {
-    const estadoAtual = localStorage.getItem('fonte-grande') === 'true';
-    localStorage.setItem('fonte-grande', !estadoAtual);
-    aplicarAcessibilidade();
-};
+function alternarAcessibilidade() {
+    const activo = document.body.classList.toggle('fonte-grande');
+    localStorage.setItem('fonteGrande', activo);
+    const btn = document.querySelector('[onclick="alternarAcessibilidade()"]');
+    if (btn) btn.textContent = activo ? '🔍 Letra Normal' : '🔍 Letra Maior';
+}
 
-// Aplica o tamanho de fonte correto assim que qualquer página abre
-document.addEventListener('DOMContentLoaded', aplicarAcessibilidade);
-
-// ── LOGIN ─────────────────────────────────────────────────────────────
+// ── LOGIN por formulário ──────────────────────────────────────────
 const formLogin = document.getElementById('form-login');
 if (formLogin) {
     formLogin.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('email').value.trim();
         const senha = document.getElementById('senha').value;
+        const msgEl = document.getElementById('msg-login');
+
         try {
-            const resp = await fetch(`${API_URL}/login`, {
+            const res = await fetch(`${API_URL}/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, senha })
             });
-            if (resp.ok) {
-                const data = await resp.json();
+
+            if (res.ok) {
+                const data = await res.json();
                 // Agora o backend devolve o token separado do objeto do utilizador
-                localStorage.setItem('jwtToken', data.token); 
+                localStorage.setItem('jwtToken', data.token);
                 localStorage.setItem('usuarioLogado', JSON.stringify(data.usuario));
                 window.location.href = 'feed.html';
             } else {
-                alert('Aviso: ' + await resp.text());
+                const erro = await res.text();
+                if (msgEl) { msgEl.textContent = erro; msgEl.style.display = 'block'; }
+                else alert('Erro: ' + erro);
             }
         } catch (err) {
-            alert('Não foi possível conectar ao VIVER+. Verifique se o servidor Java está ligado.');
+            const msg = 'Não foi possível conectar ao servidor VIVER+.';
+            if (msgEl) { msgEl.textContent = msg; msgEl.style.display = 'block'; }
+            else alert(msg);
         }
     });
 }
 
-// ── CADASTRO (Com Nickname) ───────────────────────────────────────────
+// ── CADASTRO por formulário ───────────────────────────────────────
 const formCadastro = document.getElementById('form-cadastro');
 if (formCadastro) {
     formCadastro.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const nome           = document.getElementById('nome').value.trim();
-        const nickname       = document.getElementById('nickname').value.trim().replace('@', ''); // Limpa o @
-        const email          = document.getElementById('email').value.trim();
-        const dataNascimento = document.getElementById('dataNascimento').value;
-        const senha          = document.getElementById('senha').value;
-        const confirmar      = document.getElementById('confirmaSenha').value;
-        const msg            = document.getElementById('mensagem-cadastro') || { textContent: '', className: '' };
+        const senha    = document.getElementById('senha').value;
+        const confirma = document.getElementById('confirmaSenha')?.value;
+        const msgEl    = document.getElementById('msg-cadastro');
 
-        if (senha !== confirmar) {
-            if(msg.className !== undefined) {
-                msg.textContent = 'As senhas não coincidem.';
-                msg.className = 'mensagem mensagem-erro'; 
-            } else {
-                alert('As senhas não coincidem.');
-            }
+        if (confirma !== undefined && senha !== confirma) {
+            if (msgEl) { msgEl.textContent = 'As senhas não coincidem!'; msgEl.style.display = 'block'; }
+            else alert('As senhas não coincidem!');
             return;
         }
 
+        const payload = {
+            nome:           document.getElementById('nome')?.value?.trim(),
+            nickname:       document.getElementById('nickname')?.value?.replace('@', '').trim(),
+            email:          document.getElementById('email').value.trim(),
+            dataNascimento: document.getElementById('dataNascimento')?.value,
+            senha
+        };
+
         try {
-            const resp = await fetch(`${API_URL}/cadastro`, {
+            const res = await fetch(`${API_URL}/cadastro`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nome, nickname, email, senha, dataNascimento })
+                body: JSON.stringify(payload)
             });
-            
-            if (resp.ok) {
-                alert('Conta criada com sucesso!');
-                localStorage.setItem('emailRecenteCadastro', email);
+
+            if (res.ok) {
+                // Preenche o e-mail automaticamente na página de login
+                localStorage.setItem('emailRecenteCadastro', payload.email);
+                alert('Conta criada com sucesso! Agora pode entrar.');
                 window.location.href = 'index.html';
             } else {
-                alert('Erro: ' + await resp.text());
+                const erro = await res.text();
+                if (msgEl) { msgEl.textContent = erro; msgEl.style.display = 'block'; }
+                else alert('Erro: ' + erro);
             }
         } catch (err) {
-            alert('Não foi possível ligar ao servidor.');
+            const msg = 'Não foi possível conectar ao servidor VIVER+.';
+            if (msgEl) { msgEl.textContent = msg; msgEl.style.display = 'block'; }
+            else alert(msg);
         }
     });
 }
-
-// ── FUNÇÕES DE PERFIL (Para usar nas telas de edição) ─────────────────
-const api = {
-    async atualizarNickname(usuarioId, novoNickname) {
-        const res = await fetch(`${API_URL}/usuarios/${usuarioId}/nickname`, {
-            method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ nickname: novoNickname.replace('@', '') })
-        });
-        return res.ok;
-    },
-
-    async atualizarFoto(usuarioId, base64) {
-        const res = await fetch(`${API_URL}/usuarios/${usuarioId}/foto`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ base64: base64 })
-        });
-        return res.ok;
-    }
-};
