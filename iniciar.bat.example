@@ -6,9 +6,10 @@ echo =========================================
 :: SUBSTITUA "SUA_SENHA_AQUI" PELA SENHA DO SEU MYSQL LOCAL (SEM ASPAS E SEM ESPACOS)
 set DB_PASSWORD=SUA_SENHA_AQUI
 
-:: Limpa a porta 8080 de processos zumbis
-echo [0/2] A limpar processos antigos na porta 8080...
+:: Limpa portas de processos zumbis (backend 8080 e frontend 3000)
+echo [0/2] A limpar processos antigos nas portas 8080 e 3000...
 for /f "tokens=5" %%a in ('netstat -aon ^| find ":8080" ^| find "LISTENING"') do taskkill /f /pid %%a >nul 2>&1
+for /f "tokens=5" %%a in ('netstat -aon ^| find ":3000" ^| find "LISTENING"') do taskkill /f /pid %%a >nul 2>&1
 
 echo [1/2] A ligar o servidor Java (Javalin)...
 start "Servidor VIVER+" cmd /k "npm run watch"

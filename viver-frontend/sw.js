@@ -1,4 +1,4 @@
-const CACHE_NAME = 'viver-mais-v3';
+const CACHE_NAME = 'viver-mais-v4';
 
 const ARQUIVOS_CACHE = [
   './',
@@ -57,21 +57,19 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Arquivos estáticos: cache primeiro, rede como fallback
+  // Arquivos estáticos: rede primeiro, cache como fallback (garante conteúdo atualizado)
   event.respondWith(
-    caches.match(event.request).then((respostaCache) => {
-      if (respostaCache) return respostaCache;
-      return fetch(event.request).then((respostaRede) => {
-        // Guarda em cache para próxima vez
-        if (respostaRede && respostaRede.status === 200) {
-          const copia = respostaRede.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copia));
-        }
-        return respostaRede;
-      });
+    fetch(event.request).then((respostaRede) => {
+      if (respostaRede && respostaRede.status === 200) {
+        const copia = respostaRede.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copia));
+      }
+      return respostaRede;
     }).catch(() => {
-      // Offline: tenta o index.html como fallback
-      return caches.match('./index.html');
+      // Offline: tenta o cache como fallback
+      return caches.match(event.request).then((respostaCache) => {
+        return respostaCache || caches.match('./index.html');
+      });
     })
   );
 });
