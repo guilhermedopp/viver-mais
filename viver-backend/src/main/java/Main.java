@@ -51,6 +51,9 @@ public class Main {
 
         // ── FILTRO JWT ─────────────────────────────────────────────────────
         app.before("/api/*", ctx -> {
+            // Preflight CORS (OPTIONS) não carrega token — deixa o plugin CORS responder
+            if ("OPTIONS".equals(ctx.req().getMethod())) return;
+
             String path = ctx.path();
             // Rotas públicas que não precisam de token
             if (path.equals("/api/login") || path.equals("/api/cadastro")
@@ -262,8 +265,13 @@ public class Main {
         });
 
         // ── CHAT ──────────────────────────────────────────────────────────
+        // Rotas estáticas ANTES das dinâmicas para evitar conflito de matching
         app.get("/api/chat/contatos/{uid}", ctx -> {
             try { ctx.json(msgDAO.listarContatos(Integer.parseInt(ctx.pathParam("uid")))); }
+            catch (Exception e) { ctx.status(500).result(e.getMessage()); }
+        });
+        app.get("/api/chat/nao-lidas/{uid}", ctx -> {
+            try { ctx.json(Map.of("total", msgDAO.contarNaoLidas(Integer.parseInt(ctx.pathParam("uid"))))); }
             catch (Exception e) { ctx.status(500).result(e.getMessage()); }
         });
         app.get("/api/chat/{uidA}/{uidB}", ctx -> {
@@ -279,10 +287,6 @@ public class Main {
                 msgDAO.enviar(d.remetenteId, d.destinatarioId, d.conteudo);
                 ctx.status(201).result("ok");
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
-        });
-        app.get("/api/chat/nao-lidas/{uid}", ctx -> {
-            try { ctx.json(Map.of("total", msgDAO.contarNaoLidas(Integer.parseInt(ctx.pathParam("uid"))))); }
-            catch (Exception e) { ctx.status(500).result(e.getMessage()); }
         });
 
         // ── GRUPOS ────────────────────────────────────────────────────────
