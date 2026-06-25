@@ -1,194 +1,184 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VIVER+ - Entrar</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" href="img/logo.png">
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>VIVER+ - Entrar</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="img/logo.png">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
-<body style="padding-bottom: 0; background: var(--cor-fundo);">
-    
-    <main class="tela-acesso" style="margin: 0 auto; justify-content: flex-start; padding-top: 5vh; min-height: 100vh;">
-        
-        <header class="marca" style="margin-bottom: 24px;">
-            <img src="img/logo.png" alt="Logótipo Oficial do VIVER+">
-            <h1>VIVER+</h1>
-            <p>Rede Social de Carinho e Conexão</p>
-        </header>
+<body>
 
-        <section class="area-formulario grupo-card">
-            <h2 style="text-align: center; margin-bottom: 24px; color: var(--cor-primaria-escura);">ENTRAR</h2>
+<div class="pagina-auth">
 
-            <form id="form-login">
-                <div class="grupo-input">
-                    <label for="email">E-mail</label>
-                    <input type="email" id="email" placeholder="Ex: maria.santos@email.com" required>
-                </div>
+  <div class="auth-hero">
+    <img src="img/logo.png" alt="VIVER+"
+         style="width:110px;height:110px;object-fit:contain;border-radius:50%;background:rgba(255,255,255,.15);padding:6px;">
+    <h1 class="auth-titulo">VIVER+</h1>
+    <p class="auth-subtitulo">Rede Social de Carinho e Conexão</p>
+  </div>
 
-                <div class="grupo-input">
-                    <label for="senha">Senha</label>
-                    <input type="password" id="senha" placeholder="Digite a sua senha" required>
-                    
-                    <label style="display: flex; align-items: center; gap: 10px; margin-top: 14px; font-size: 1.15rem; font-weight: 700; cursor: pointer; color: var(--cor-texto-suave);">
-                        <input type="checkbox" onclick="toggleSenha()" style="width: 24px; height: 24px; cursor: pointer; accent-color: var(--cor-primaria-escura);"> 
-                        Mostrar Senha
-                    </label>
-                </div>
+  <div class="auth-card">
+    <h2>Entrar</h2>
 
-                <button type="submit" class="btn-primario" style="margin-top: 10px;">ENTRAR NA MINHA CONTA</button>
-            </form>
+    <p id="msg-login" style="display:none;background:#fee2e2;color:#991b1b;padding:12px 14px;border-radius:10px;font-weight:700;font-size:.95rem;margin-bottom:16px;"></p>
 
-            <div style="display: flex; align-items: center; margin: 30px 0;">
-                <hr style="flex: 1; border: none; border-top: 2px solid var(--cor-borda);">
-                <span style="margin: 0 15px; color: var(--cor-texto-suave); font-weight: 800; font-size: 1.1rem;">OU</span>
-                <hr style="flex: 1; border: none; border-top: 2px solid var(--cor-borda);">
-            </div>
+    <form id="form-login">
 
-            <div style="display: flex; justify-content: center; overflow: hidden; margin-bottom: 24px;">
-                <div id="g_id_onload"
-                     data-client_id="1095979412262-me3kh924htbgh5fmt434hqpkhjsv715s.apps.googleusercontent.com"
-                     data-context="signin"
-                     data-ux_mode="popup"
-                     data-callback="handleCredentialResponse"
-                     data-auto_prompt="false">
-                </div>
-                <div class="g_id_signin"
-                     data-type="standard"
-                     data-shape="pill"
-                     data-theme="outline"
-                     data-text="signin_with"
-                     data-size="large"
-                     data-logo_alignment="left">
-                </div>
-            </div>
-
-            <div style="text-align: center; font-size: 1.15rem; font-weight: 700;">
-                <span style="color: var(--cor-texto-suave);">Ainda não tem conta?</span> 
-                <a href="cadastro.html" style="color: var(--cor-azul); text-decoration: none;">Criar conta</a>
-            </div>
-        </section>
-    </main>
-
-    <div id="modal-completar" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center; padding: 20px;">
-        <div class="grupo-card" style="width: 100%; max-width: 400px; background: white;">
-            <h2 style="margin-bottom: 10px; color: var(--cor-primaria-escura);">Falta pouco! 🎉</h2>
-            <p style="margin-bottom: 20px; color: var(--cor-texto-suave); font-size: 1.1rem; font-weight: 600;">Para concluir o acesso via Google, precisamos apenas destes dois detalhes:</p>
-            
-            <div class="grupo-input">
-                <label for="google-nickname">Como quer ser chamado? (@)</label>
-                <input type="text" id="google-nickname" placeholder="Ex: donamaria" required>
-            </div>
-            <div class="grupo-input">
-                <label for="google-data">Data de Nascimento</label>
-                <input type="date" id="google-data" required>
-            </div>
-            
-            <button onclick="salvarPerfilGoogle()" class="btn-primario" style="margin-top: 10px;">Concluir e Entrar</button>
+      <div class="campo">
+        <label for="email">E-mail</label>
+        <div class="input-icone">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5A2.5 2.5 0 0 1 5.5 4h13A2.5 2.5 0 0 1 21 6.5v11a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5v-11Zm3.1-.5 5.9 5.1L17.9 6H6.1Zm12.9 2.1-6.3 5.4a1.1 1.1 0 0 1-1.4 0L5 8.1v9.4c0 .3.2.5.5.5h13c.3 0 .5-.2.5-.5V8.1Z"/></svg>
+          <input type="email" id="email" placeholder="Ex: maria.santos@email.com" autocomplete="email" required>
         </div>
+      </div>
+
+      <div class="campo">
+        <label for="senha">Senha</label>
+        <div class="input-icone">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 9h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h1V7a5 5 0 0 1 10 0v2Zm-8 0h6V7a3 3 0 0 0-6 0v2Zm3 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg>
+          <input type="password" id="senha" placeholder="Digite a sua senha" autocomplete="current-password" required>
+        </div>
+        <label style="display:flex;align-items:center;gap:10px;margin-top:12px;font-size:1rem;font-weight:700;cursor:pointer;color:var(--texto-suave);">
+          <input type="checkbox" onclick="toggleSenha()" style="width:22px;height:22px;cursor:pointer;accent-color:var(--verde);"> Mostrar senha
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-primario" style="margin-top:8px;">ENTRAR NA MINHA CONTA</button>
+    </form>
+
+    <div class="divisor">OU</div>
+
+    <div id="g_id_onload"
+         data-client_id="1095979412262-me3kh924htbgh5fmt434hqpkhjsv715s.apps.googleusercontent.com"
+         data-context="signin"
+         data-ux_mode="popup"
+         data-callback="handleCredentialResponse"
+         data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin"
+         data-type="standard" data-shape="pill" data-theme="outline"
+         data-text="signin_with" data-size="large" data-logo_alignment="left"
+         style="display:flex;justify-content:center;">
     </div>
 
-    <script src="js/api.js"></script>
-    <script src="js/pwa-setup.js"></script> 
-    <script>
-        function toggleSenha() {
-            const input = document.getElementById('senha');
-            input.type = input.type === 'password' ? 'text' : 'password';
+    <div class="link-pagina" style="margin-top:24px;">
+      Ainda não tem conta? <a href="cadastro.html">Criar conta</a>
+    </div>
+  </div>
+</div>
+
+<div id="modal-completar" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);">
+  <div style="background:#fff;border-radius:24px 24px 0 0;padding:28px 24px 48px;width:100%;max-width:480px;">
+    <h2 style="font-size:1.4rem;font-weight:800;color:var(--texto);margin-bottom:8px;">Falta pouco! 🌱</h2>
+    <p style="color:var(--texto-suave);font-size:.95rem;font-weight:600;margin-bottom:24px;">Para entrar no VIVER+ precisamos de mais dois detalhes.</p>
+    <p id="msg-modal" style="display:none;background:#fee2e2;color:#991b1b;padding:10px 14px;border-radius:10px;font-weight:700;font-size:.9rem;margin-bottom:14px;"></p>
+
+    <div class="campo">
+      <label for="google-nickname">Escolha o seu @apelido</label>
+      <div class="input-icone">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+        <input type="text" id="google-nickname" placeholder="Ex: donamaria" autocapitalize="none">
+      </div>
+      <small id="status-nick-modal" style="font-weight:700;margin-top:6px;display:block;"></small>
+    </div>
+
+    <div class="campo">
+      <label for="google-data">Data de Nascimento</label>
+      <input type="date" id="google-data">
+      <small style="color:var(--texto-suave);font-weight:600;">O VIVER+ é para pessoas com 60 anos ou mais.</small>
+    </div>
+
+    <button onclick="salvarPerfilGoogle()" class="btn btn-primario" style="margin-top:12px;">CONCLUIR E ENTRAR</button>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/pwa-setup.js"></script>
+<script>
+  function toggleSenha() {
+    const inp = document.getElementById('senha');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+  }
+
+  window.addEventListener('load', () => {
+    const emailSalvo = localStorage.getItem('emailRecenteCadastro');
+    if (emailSalvo) {
+      document.getElementById('email').value = emailSalvo;
+      document.getElementById('senha').focus();
+      localStorage.removeItem('emailRecenteCadastro');
+    }
+  });
+
+  async function handleCredentialResponse(response) {
+    try {
+      const res = await fetch(`${API_URL}/auth/google`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: response.credential })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        localStorage.setItem('jwtToken', data.token);
+        localStorage.setItem('usuarioLogado', JSON.stringify(data.usuario));
+        if (data.precisaCompletar) {
+          document.getElementById('modal-completar').style.display = 'flex';
+        } else {
+          window.location.href = 'feed.html';
         }
+      } else {
+        alert('Erro ao entrar com Google: ' + await res.text());
+      }
+    } catch (e) {
+      alert('Não foi possível conectar ao servidor VIVER+.');
+    }
+  }
 
-        window.addEventListener('load', () => {
-            const emailSalvo = localStorage.getItem('emailRecenteCadastro');
-            if (emailSalvo) {
-                document.getElementById('email').value = emailSalvo;
-                document.getElementById('senha').focus();
-                localStorage.removeItem('emailRecenteCadastro');
-            }
-        });
+  const nickInput = document.getElementById('google-nickname');
+  let timerNick;
+  nickInput.addEventListener('input', () => {
+    clearTimeout(timerNick);
+    const nick = nickInput.value.trim();
+    const status = document.getElementById('status-nick-modal');
+    if (nick.length < 3) { status.textContent = ''; return; }
+    timerNick = setTimeout(async () => {
+      try {
+        const r = await fetch(`${API_URL}/usuarios/nickname/${encodeURIComponent(nick)}/disponivel`);
+        const d = await r.json();
+        status.textContent = d.disponivel ? '✅ Disponível!' : '❌ Já está em uso';
+        status.style.color = d.disponivel ? 'var(--verde-escuro)' : '#dc2626';
+      } catch (_) {}
+    }, 500);
+  });
 
-        // Evento de Login único! Sem duplicação.
-        document.getElementById('form-login').addEventListener('submit', async (e) => {
-            e.preventDefault(); 
-            
-            const email = document.getElementById('email').value.trim();
-            const senha = document.getElementById('senha').value;
-            const btn = e.target.querySelector('button[type="submit"]');
-            
-            btn.disabled = true;
-            btn.textContent = 'A ENTRAR...';
-            btn.style.opacity = '0.7';
-
-            try {
-                const res = await fetch(`${API_URL}/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, senha })
-                });
-
-                if (res.ok) {
-                    const data = await res.json();
-                    localStorage.setItem('jwtToken', data.token);
-                    localStorage.setItem('usuarioLogado', JSON.stringify(data.usuario));
-                    window.location.href = 'feed.html';
-                } else {
-                    alert('Erro: E-mail ou senha incorretos.');
-                    btn.disabled = false;
-                    btn.textContent = 'ENTRAR NA MINHA CONTA';
-                    btn.style.opacity = '1';
-                }
-            } catch (err) {
-                alert('Erro de ligação. O servidor está desligado ou o IP mudou.');
-                btn.disabled = false;
-                btn.textContent = 'ENTRAR NA MINHA CONTA';
-                btn.style.opacity = '1';
-            }
-        });
-
-        // Fluxo Google
-        async function handleCredentialResponse(response) {
-            try {
-                const res = await fetch(`${API_URL}/auth/google`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ credential: response.credential })
-                });
-
-                if (res.ok) {
-                    const data = await res.json();
-                    localStorage.setItem('jwtToken', data.token);
-                    localStorage.setItem('usuarioLogado', JSON.stringify(data.usuario));
-                    
-                    if (data.precisaCompletar) {
-                        document.getElementById('modal-completar').style.display = 'flex';
-                    } else {
-                        window.location.href = 'feed.html';
-                    }
-                } else { alert('Erro ao entrar com Google.'); }
-            } catch (error) { alert('Erro de ligação ao servidor.'); }
-        }
-
-        async function salvarPerfilGoogle() {
-            const nickname = document.getElementById('google-nickname').value.trim();
-            const dataNascimento = document.getElementById('google-data').value;
-            const user = JSON.parse(localStorage.getItem('usuarioLogado'));
-            
-            if (!nickname || !dataNascimento) { alert('Por favor, preencha os dois campos.'); return; }
-
-            try {
-                const res = await fetch(`${API_URL}/auth/completar-perfil`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('jwtToken')}` },
-                    body: JSON.stringify({ usuarioId: user.id, nickname: nickname, dataNascimento: dataNascimento })
-                });
-                
-                if (res.ok) {
-                    const usuarioAtualizado = await res.json();
-                    localStorage.setItem('usuarioLogado', JSON.stringify(usuarioAtualizado));
-                    window.location.href = 'feed.html';
-                } else { alert('Aviso: ' + await res.text()); }
-            } catch(e) { alert('Erro ao ligar ao servidor.'); }
-        }
-    </script>
+  async function salvarPerfilGoogle() {
+    const nickname = document.getElementById('google-nickname').value.trim();
+    const dataNasc = document.getElementById('google-data').value;
+    const user = JSON.parse(localStorage.getItem('usuarioLogado'));
+    const msgEl = document.getElementById('msg-modal');
+    msgEl.style.display = 'none';
+    if (!nickname || !dataNasc) {
+      msgEl.textContent = 'Por favor, preencha os dois campos.';
+      msgEl.style.display = 'block'; return;
+    }
+    try {
+      const res = await fetch(`${API_URL}/auth/completar-perfil`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usuarioId: user.id, nickname, dataNascimento: dataNasc })
+      });
+      if (res.ok) {
+        localStorage.setItem('usuarioLogado', JSON.stringify(await res.json()));
+        window.location.href = 'feed.html';
+      } else {
+        msgEl.textContent = await res.text();
+        msgEl.style.display = 'block';
+      }
+    } catch (e) {
+      msgEl.textContent = 'Erro ao conectar com o servidor.';
+      msgEl.style.display = 'block';
+    }
+  }
+</script>
 </body>
 </html>

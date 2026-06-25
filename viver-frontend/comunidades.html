@@ -1,195 +1,173 @@
 <!DOCTYPE html>
 <html lang="pt-PT">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VIVER+ - Grupos</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="icon" type="image/png" href="img/logo.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>VIVER+ - Grupos</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="img/logo.png">
 </head>
-<body style="padding-bottom: 110px;">
-<main class="tela-acesso" style="max-width: 650px; background: transparent; padding-top: 10px;">
+<body>
+<div class="app">
 
-    <header style="margin-bottom: 24px; text-align: center; padding-top: 10px;">
-        <h1 style="font-size: 2.2rem; color: var(--cor-primaria-escura);">Os Meus Grupos</h1>
-        <p style="color: var(--cor-texto-suave); font-weight: 600; font-size: 1.1rem; margin-top: 4px;">Partilhe interesses em comum</p>
-    </header>
+  <header class="page-header">
+    <div class="logo-mini"><img src="img/logo.png" alt="VIVER+"><span>VIVER+</span></div>
+    <h1 style="font-size:1.3rem;font-weight:800;flex:1;text-align:right;">Os Meus Grupos</h1>
+  </header>
 
-    <section id="area-convites" style="width: 100%; display: none; margin-bottom: 24px;">
-        <h2 style="font-size: 1.4rem; color: #E65100; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-            <span>🔔</span> Novos Convites
-        </h2>
-        <div id="lista-convites"></div>
+  <div class="page-content">
+
+    <section id="area-convites" style="display:none;margin-bottom:20px;">
+      <p class="secao-titulo" style="color:var(--aviso);padding-left:0;">🔔 Novos Convites</p>
+      <div id="lista-convites"></div>
     </section>
 
-    <button onclick="document.getElementById('modal-criar-grupo').style.display='flex'" class="btn-primario" style="margin-bottom: 24px;">
-        ➕ Criar Novo Grupo
+    <button onclick="document.getElementById('modal-criar-grupo').classList.add('aberto')"
+            class="btn btn-primario" style="margin-bottom:20px;">
+      ➕ Criar Novo Grupo
     </button>
 
-    <section style="width: 100%;">
-        <div id="lista-grupos">
-            <div class="grupo-card" style="text-align: center;">
-                <p style="color: var(--cor-texto-suave); font-weight: bold; font-size: 1.1rem;">A procurar os seus grupos...</p>
-            </div>
-        </div>
-    </section>
-
-    <div id="modal-criar-grupo" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 2000; padding: 20px;">
-        <div class="grupo-card" style="width: 100%; max-width: 450px; background: white; margin: 0;">
-            <h3 style="font-size: 1.8rem; color: var(--cor-primaria-escura); margin-bottom: 16px; text-align: center;">Criar Grupo</h3>
-            
-            <div class="grupo-input">
-                <label for="nome-grupo">Nome do Grupo</label>
-                <input type="text" id="nome-grupo" placeholder="Ex: Amantes de Jardinagem" required>
-            </div>
-            
-            <div class="grupo-input">
-                <label for="desc-grupo">Sobre o que é este grupo?</label>
-                <textarea id="desc-grupo" placeholder="Descreva os interesses do grupo..." required style="min-height: 100px; resize: none;"></textarea>
-            </div>
-            
-            <div style="display: flex; gap: 12px; margin-top: 20px;">
-                <button onclick="document.getElementById('modal-criar-grupo').style.display='none'" class="btn-secundario" style="flex: 1; background: #f1f3f5; color: var(--cor-texto);">Cancelar</button>
-                <button onclick="criarGrupo()" class="btn-primario" style="flex: 1;">Criar</button>
-            </div>
-        </div>
+    <div id="lista-grupos">
+      <div class="spinner">A procurar os seus grupos...</div>
     </div>
+  </div>
 
-    <nav class="barra-navegacao" aria-label="Navegação Principal">
-        <a href="feed.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>Início</span></a>
-        <a href="comunidades.html" class="item-nav ativo"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><span>Grupos</span></a>
-        <a href="publicar.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>Publicar</span></a>
-        <a href="notificacoes.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><span>Avisos</span></a>
-        <a href="perfil.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span>Perfil</span></a>
-    </nav>
-</main>
+  <!-- Modal criar grupo -->
+  <div id="modal-criar-grupo" class="modal-overlay">
+    <div class="modal">
+      <h3>Criar Grupo</h3>
+      <div class="campo">
+        <label for="nome-grupo">Nome do Grupo</label>
+        <input type="text" id="nome-grupo" placeholder="Ex: Amantes de Jardinagem">
+      </div>
+      <div class="campo">
+        <label for="desc-grupo">Sobre o que é este grupo?</label>
+        <textarea id="desc-grupo" placeholder="Descreva os interesses do grupo..."
+          style="min-height:100px;padding:14px;border:2px solid var(--borda);border-radius:16px;font-family:inherit;font-weight:600;resize:none;background:var(--verde-fundo);color:var(--texto);"></textarea>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:8px;">
+        <button onclick="document.getElementById('modal-criar-grupo').classList.remove('aberto')" class="btn btn-ghost" style="flex:1;">Cancelar</button>
+        <button onclick="criarGrupo()" class="btn btn-primario" style="flex:1;">Criar</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="nav" aria-label="Navegação principal">
+    <a href="feed.html"         class="nav-item"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>Início</span></a>
+    <a href="comunidades.html"  class="nav-item ativo"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><span>Grupos</span></a>
+    <a href="publicar.html"     class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>Publicar</span></a>
+    <a href="notificacoes.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><span>Avisos</span></a>
+    <a href="perfil.html"       class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span>Perfil</span></a>
+  </nav>
+</div>
 
 <script src="js/api.js"></script>
-<script src="js/pwa-setup.js"></script>
 <script>
 const usuario = JSON.parse(localStorage.getItem('usuarioLogado'));
 if (!usuario) window.location.href = 'index.html';
 
 async function carregarConvites() {
-    try {
-        const r = await fetch(`${API_URL}/convites/pendentes/${usuario.id}`);
-        const convites = await r.json();
-        const area = document.getElementById('area-convites');
-        const lista = document.getElementById('lista-convites');
-        
-        if (convites.length > 0) {
-            area.style.display = 'block';
-            lista.innerHTML = convites.map(c => `
-                <div class="grupo-card" style="background: #FFF3E0; border-color: #FFB74D;">
-                    <div style="flex: 1;">
-                        <p style="font-size: 1.15rem; color: var(--cor-texto); line-height: 1.4;">
-                            <strong style="color: #E65100;">${c.quemConvidou}</strong> convidou-o para o grupo <strong>"${c.grupoNome}"</strong>.
-                        </p>
-                        <div style="display: flex; gap: 12px; margin-top: 16px;">
-                            <button onclick="responderConvite(${c.conviteId}, true)" class="btn-primario" style="background: #2E7D32; min-height: 44px; font-size: 1.1rem;">Aceitar</button>
-                            <button onclick="responderConvite(${c.conviteId}, false)" class="btn-secundario" style="background: transparent; border: 2px solid #D32F2F; color: #D32F2F; min-height: 44px; font-size: 1.1rem;">Recusar</button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        } else {
-            area.style.display = 'none';
-        }
-    } catch (e) { console.error("Erro ao carregar convites"); }
+  try {
+    const r = await fetch(`${API_URL}/convites/pendentes/${usuario.id}`);
+    const convites = await r.json();
+    const area = document.getElementById('area-convites');
+    const lista = document.getElementById('lista-convites');
+    if (convites.length > 0) {
+      area.style.display = 'block';
+      lista.innerHTML = convites.map(c => `
+        <div class="convite-card">
+          <p><strong style="color:var(--aviso);">${c.quemConvidou}</strong> convidou-o para o grupo <strong>"${c.grupoNome}"</strong>.</p>
+          <div class="convite-acoes">
+            <button onclick="responderConvite(${c.conviteId}, true)" class="btn btn-primario btn-sm" style="flex:1;">Aceitar</button>
+            <button onclick="responderConvite(${c.conviteId}, false)" class="btn btn-perigo btn-sm" style="flex:1;">Recusar</button>
+          </div>
+        </div>`).join('');
+    } else { area.style.display = 'none'; }
+  } catch (e) {}
 }
 
 async function responderConvite(conviteId, aceitar) {
-    try {
-        const r = await fetch(`${API_URL}/convites/${conviteId}/responder`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ usuarioId: usuario.id, aceitar })
-        });
-        if (r.ok) { carregarConvites(); carregarGrupos(); }
-    } catch (e) { alert("Erro ao responder ao convite."); }
+  try {
+    const r = await fetch(`${API_URL}/convites/${conviteId}/responder`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ usuarioId: usuario.id, aceitar })
+    });
+    if (r.ok) { carregarConvites(); carregarGrupos(); }
+  } catch (e) { alert("Erro ao responder ao convite."); }
 }
 
 async function carregarGrupos() {
-    const container = document.getElementById('lista-grupos');
-    try {
-        const r = await fetch(`${API_URL}/comunidades?usuarioId=${usuario.id}`);
-        const grupos = await r.json();
-        if (grupos.length === 0) {
-            container.innerHTML = `
-                <div class="grupo-card" style="text-align: center; flex-direction: column; padding: 40px 20px;">
-                    <div style="font-size: 3rem; margin-bottom: 10px;">👥</div>
-                    <p style="font-size: 1.2rem; color: var(--cor-texto-suave); font-weight: bold;">Ainda não pertence a nenhum grupo.</p>
-                </div>`;
-            return;
-        }
-        
-        container.innerHTML = grupos.map(g => `
-            <article class="grupo-card" style="display: flex; gap: 16px; align-items: flex-start;">
-                <div class="avatar" style="width: 56px; height: 56px; background: var(--cor-secundaria); color: var(--cor-primaria-escura); flex-shrink: 0;">👥</div>
-                <div style="flex: 1;">
-                    <h3 style="font-size: 1.35rem; margin: 0 0 6px; color: var(--cor-azul);">${g.nome}</h3>
-                    <p style="font-size: 1.05rem; color: var(--cor-texto-suave); margin: 0 0 16px; line-height: 1.4;">${g.descricao || 'Sem descrição'}</p>
-                    <div style="display: flex; gap: 12px;">
-                        <button onclick="abrirChat(${g.id})" class="btn-primario" style="flex: 1; min-height: 44px; font-size: 1rem; padding: 8px;">💬 Chat</button>
-                        <button onclick="convidarAlguem(${g.id}, '${g.nome.replace(/'/g, "\\'")}')" class="btn-secundario" style="flex: 1; min-height: 44px; font-size: 1rem; padding: 8px; border: 2px solid var(--cor-primaria-escura);">➕ Convidar</button>
-                    </div>
-                </div>
-            </article>
-        `).join('');
-    } catch (e) { container.innerHTML = '<p style="color:var(--cor-erro); font-weight: bold; text-align:center;">Erro de ligação ao servidor.</p>'; }
+  const container = document.getElementById('lista-grupos');
+  try {
+    const r = await fetch(`${API_URL}/comunidades?usuarioId=${usuario.id}`);
+    const grupos = await r.json();
+    if (grupos.length === 0) {
+      container.innerHTML = '<div class="empty-state"><div class="icone">👥</div><p>Ainda não pertence a nenhum grupo.</p></div>';
+      return;
+    }
+    container.innerHTML = grupos.map(g => `
+      <article class="grupo-card">
+        <div class="grupo-icone">👥</div>
+        <div class="grupo-info">
+          <p class="grupo-nome">${g.nome}</p>
+          <p class="grupo-desc">${g.descricao || 'Sem descrição'}</p>
+          <div class="grupo-acoes">
+            <button onclick="abrirChat(${g.id})" class="btn btn-primario btn-sm" style="flex:1;">💬 Chat</button>
+            <button onclick="convidarAlguem(${g.id}, '${g.nome.replace(/'/g, "\\'")}')" class="btn btn-secundario btn-sm" style="flex:1;">➕ Convidar</button>
+          </div>
+        </div>
+      </article>`).join('');
+  } catch (e) {
+    container.innerHTML = '<p style="color:var(--erro);text-align:center;font-weight:700;">Erro de ligação ao servidor.</p>';
+  }
 }
 
 async function criarGrupo() {
-    const nome = document.getElementById('nome-grupo').value.trim();
-    const desc = document.getElementById('desc-grupo').value.trim();
-    if (!nome) { alert('Digite o nome do grupo.'); return; }
-    
-    try {
-        const r = await fetch(`${API_URL}/comunidades`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nome, descricao: desc, criadorId: usuario.id })
-        });
-        if (r.ok) {
-            document.getElementById('modal-criar-grupo').style.display = 'none';
-            document.getElementById('nome-grupo').value = '';
-            document.getElementById('desc-grupo').value = '';
-            carregarGrupos();
-        } else { alert(await r.text()); }
-    } catch (e) { alert("Erro ao criar grupo."); }
+  const nome = document.getElementById('nome-grupo').value.trim();
+  const desc = document.getElementById('desc-grupo').value.trim();
+  if (!nome) { alert('Digite o nome do grupo.'); return; }
+  try {
+    const r = await fetch(`${API_URL}/comunidades`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome, descricao: desc, criadorId: usuario.id })
+    });
+    if (r.ok) {
+      document.getElementById('modal-criar-grupo').classList.remove('aberto');
+      document.getElementById('nome-grupo').value = '';
+      document.getElementById('desc-grupo').value = '';
+      carregarGrupos();
+    } else { alert(await r.text()); }
+  } catch (e) { alert("Erro ao criar grupo."); }
 }
 
 function abrirChat(grupoId) { window.location.href = `chat.html?grupo=${grupoId}`; }
 
 async function convidarAlguem(grupoId, nomeGrupo) {
-    const entrada = prompt(`Convide um amigo para o grupo "${nomeGrupo}".\n\nDigite o E-MAIL exato do seu amigo:`);
-    if (!entrada) return;
-    
-    let convidadoId;
-    if (entrada.includes('@')) {
-        try {
-            const r = await fetch(`${API_URL}/usuarios/buscar?email=${encodeURIComponent(entrada.trim())}`);
-            if (!r.ok) { alert("Nenhum amigo encontrado com este e-mail."); return; }
-            const user = await r.json();
-            convidadoId = user.id;
-        } catch (e) { alert("Erro de ligação."); return; }
-    } else {
-        alert("Por favor, digite o e-mail completo do seu amigo."); return;
-    }
-    
-    try {
-        const r = await fetch(`${API_URL}/comunidades/${grupoId}/convidar`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ convidanteId: usuario.id, convidadoId: convidadoId })
-        });
-        if (r.ok) alert("Convite enviado com sucesso!");
-        else alert(await r.text());
-    } catch (e) { alert("Erro ao enviar convite."); }
+  const entrada = prompt(`Convide um amigo para o grupo "${nomeGrupo}".\n\nDigite o E-MAIL ou @apelido do seu amigo:`);
+  if (!entrada) return;
+  let convidadoId;
+  const termo = entrada.trim();
+  try {
+    let url;
+    if (termo.includes('@') && termo.includes('.')) url = `${API_URL}/usuarios/buscar?email=${encodeURIComponent(termo)}`;
+    else url = `${API_URL}/usuarios/buscar?nickname=${encodeURIComponent(termo.replace('@',''))}`;
+    const r = await fetch(url);
+    if (!r.ok) { alert("Nenhum amigo encontrado."); return; }
+    convidadoId = (await r.json()).id;
+  } catch (e) { alert("Erro de ligação."); return; }
+  try {
+    const r = await fetch(`${API_URL}/comunidades/${grupoId}/convidar`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ convidanteId: usuario.id, convidadoId })
+    });
+    if (r.ok) alert("Convite enviado com sucesso!");
+    else alert(await r.text());
+  } catch (e) { alert("Erro ao enviar convite."); }
 }
 
 carregarConvites();
 carregarGrupos();
 </script>
+<script src="js/pwa-setup.js"></script>
 </body>
 </html>

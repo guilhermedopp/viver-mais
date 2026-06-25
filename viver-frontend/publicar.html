@@ -8,60 +8,55 @@
   <link rel="icon" type="image/png" href="img/logo.png">
 </head>
 <body>
-<main class="tela-acesso" style="max-width:650px;padding-bottom:90px;justify-content:flex-start;">
+<div class="app">
 
-  <header class="cabecalho-simples" style="margin-bottom:24px;border-bottom:2px solid var(--cor-borda);padding-bottom:15px;padding-top:20px;">
-    <h1 style="font-size:2rem;color:var(--cor-azul);">Novo Momento</h1>
+  <header class="page-header">
+    <div class="logo-mini"><img src="img/logo.png" alt="VIVER+"><span>VIVER+</span></div>
+    <h1 style="font-size:1.3rem;font-weight:800;flex:1;text-align:right;">Novo Momento</h1>
   </header>
 
-  <section class="area-formulario" style="box-shadow:none;padding:0;">
+  <div class="page-content">
     <form id="form-publicar">
 
-      <div class="grupo-input" style="margin-bottom:20px;">
-        <label for="destino-post" style="font-size:1.4rem;margin-bottom:10px;display:block;color:var(--cor-azul);">Onde quer partilhar?</label>
-        <select id="destino-post" style="width:100%;padding:15px;font-size:1.2rem;border:3px solid var(--cor-borda);border-radius:12px;background:#fff;cursor:pointer;color:var(--cor-texto);">
+      <div class="campo">
+        <label for="destino-post">Onde quer partilhar?</label>
+        <select id="destino-post">
           <option value="0">🌎 No meu Feed (Público)</option>
         </select>
       </div>
 
-      <div class="grupo-input">
-        <label for="texto-post" style="font-size:1.4rem;margin-bottom:15px;display:block;color:var(--cor-azul);">O que gostaria de partilhar hoje?</label>
-        <textarea id="texto-post" placeholder="Escreva aqui o seu pensamento, memória ou carinho..." required
-          style="width:100%;min-height:160px;padding:20px;font-size:1.3rem;border:3px solid var(--cor-borda);border-radius:12px;font-family:inherit;resize:none;background:#f7fbfd;"></textarea>
-        <small id="contador-chars" style="color:var(--cor-texto-suave);font-size:1rem;text-align:right;display:block;margin-top:6px;">0 / 500</small>
+      <div class="campo">
+        <label for="texto-post">O que gostaria de partilhar hoje?</label>
+        <textarea id="texto-post" maxlength="500" placeholder="Escreva aqui o seu pensamento, memória ou carinho..." required
+          style="min-height:160px;padding:16px;border:2px solid var(--borda);border-radius:16px;font-family:inherit;font-weight:600;resize:none;background:var(--verde-fundo);color:var(--texto);"></textarea>
+        <small id="contador-chars" style="text-align:right;display:block;">0 / 500</small>
       </div>
 
-      <div class="grupo-input" style="margin-top:16px;">
-        <label style="font-size:1.4rem;margin-bottom:10px;display:block;color:var(--cor-azul);">📷 Adicionar uma foto (opcional)</label>
+      <div class="campo">
+        <label>📷 Adicionar uma foto (opcional)</label>
         <input type="file" id="input-imagem" accept="image/*" style="display:none;">
         <button type="button" onclick="document.getElementById('input-imagem').click()"
-          class="btn-secundario"
-          style="width:100%;padding:14px;font-size:1.2rem;border:3px dashed var(--cor-borda);border-radius:12px;background:#f7fbfd;cursor:pointer;">
+          class="btn btn-secundario" style="border:2px dashed var(--verde-pastel);width:100%;">
           Toque para escolher uma foto
         </button>
-        <div id="preview-imagem" style="display:none;margin-top:12px;text-align:center;">
-          <img id="img-preview" style="max-width:100%;max-height:300px;border-radius:12px;border:3px solid var(--cor-borda);">
-          <button type="button" onclick="removerImagem()"
-            style="display:block;margin:8px auto 0;background:none;border:none;color:var(--cor-erro);font-size:1.1rem;cursor:pointer;">
-            ✕ Remover foto
-          </button>
+        <div class="foto-preview" id="preview-imagem" style="display:none;">
+          <img id="img-preview" alt="Pré-visualização">
+          <button type="button" class="remover" onclick="removerImagem()">✕</button>
         </div>
       </div>
 
-      <button type="submit" class="btn-primario btn-grande" id="btn-enviar" style="min-height:65px;margin-top:20px;">PUBLICAR</button>
+      <button type="submit" class="btn btn-primario" id="btn-enviar" style="margin-top:8px;">PUBLICAR</button>
     </form>
-  </section>
+  </div>
 
-  <nav class="barra-navegacao">
-    <a href="feed.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>Início</span></a>
-    <a href="chat.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg><span>Chat</span></a>
-    <a href="comunidades.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><span>Grupos</span></a>
-    <a href="publicar.html" class="item-nav ativo"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>Publicar</span></a>
-    <a href="notificacoes.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><span>Avisos</span></a>
-    <a href="perfil.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span>Perfil</span></a>
+  <nav class="nav" aria-label="Navegação principal">
+    <a href="feed.html"         class="nav-item"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>Início</span></a>
+    <a href="comunidades.html"  class="nav-item"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><span>Grupos</span></a>
+    <a href="publicar.html"     class="nav-item ativo"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>Publicar</span></a>
+    <a href="notificacoes.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><span>Avisos</span></a>
+    <a href="perfil.html"       class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span>Perfil</span></a>
   </nav>
-
-</main>
+</div>
 
 <script src="js/api.js"></script>
 <script>
@@ -70,15 +65,13 @@ if (!usuarioLogado) window.location.href = 'index.html';
 
 let imagemBase64 = null;
 
-// Contador de caracteres
 document.getElementById('texto-post').addEventListener('input', function() {
   const n = this.value.length;
   const el = document.getElementById('contador-chars');
   el.textContent = `${n} / 500`;
-  el.style.color = n > 450 ? 'var(--cor-erro)' : 'var(--cor-texto-suave)';
+  el.style.color = n > 450 ? 'var(--erro)' : 'var(--texto-suave)';
 });
 
-// Preview da imagem
 document.getElementById('input-imagem').addEventListener('change', function(e) {
   const file = e.target.files[0];
   if (!file) return;
@@ -97,7 +90,6 @@ function removerImagem() {
   document.getElementById('input-imagem').value = '';
 }
 
-// Carrega grupos no select
 async function carregarGrupos() {
   try {
     const r = await fetch(`${API_URL}/comunidades?usuarioId=${usuarioLogado.id}`);
@@ -119,45 +111,25 @@ document.getElementById('form-publicar').addEventListener('submit', async (e) =>
   const btn = document.getElementById('btn-enviar');
   const texto = document.getElementById('texto-post').value.trim();
   const destinoSelecionado = document.getElementById('destino-post').value;
-
-  let destinoTipo = 'USUARIO';
-  let destinoId   = usuarioLogado.id;
-  if (destinoSelecionado !== '0') {
-    destinoTipo = 'COMUNIDADE';
-    destinoId   = parseInt(destinoSelecionado);
-  }
+  let destinoTipo = 'USUARIO', destinoId = usuarioLogado.id;
+  if (destinoSelecionado !== '0') { destinoTipo = 'COMUNIDADE'; destinoId = parseInt(destinoSelecionado); }
 
   btn.textContent = 'A PUBLICAR...';
   btn.disabled = true;
-
   try {
     const r = await fetch(`${API_URL}/posts`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      // BUG CORRIGIDO: envia apenas id e nome do autor.
-      // Antes enviava "autor: usuarioLogado" completo, o que incluía fotoPerfil
-      // em base64 (vários MB). Combinado com a imagem do post, ultrapassava o
-      // limite do servidor e a publicação falhava silenciosamente.
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        texto,
-        imagem: imagemBase64,
-        autor:  { id: usuarioLogado.id, nome: usuarioLogado.nome },
-        destinoTipo,
-        destinoId
+        texto, imagem: imagemBase64,
+        autor: { id: usuarioLogado.id, nome: usuarioLogado.nome },
+        destinoTipo, destinoId
       })
     });
-
-    if (r.ok) {
-      window.location.href = 'feed.html';
-    } else {
-      alert(await r.text());
-      btn.textContent = 'PUBLICAR';
-      btn.disabled = false;
-    }
+    if (r.ok) window.location.href = 'feed.html';
+    else { alert(await r.text()); btn.textContent = 'PUBLICAR'; btn.disabled = false; }
   } catch (_) {
     alert('Não foi possível publicar. Verifique o servidor.');
-    btn.textContent = 'PUBLICAR';
-    btn.disabled = false;
+    btn.textContent = 'PUBLICAR'; btn.disabled = false;
   }
 });
 

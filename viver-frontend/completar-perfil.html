@@ -8,65 +8,53 @@
   <link rel="icon" type="image/png" href="img/logo.png">
 </head>
 <body>
-  <main class="tela-acesso">
-    <header class="marca" style="margin-bottom: 24px;">
-      <img src="img/logo.png" alt="VIVER+" class="marca-icone" style="object-fit:contain;">
-      <div>
-        <h1>VIVER+</h1>
-        <p>Quase lá!</p>
+
+<div class="pagina-auth">
+
+  <div class="auth-hero" style="padding:48px 28px 44px;">
+    <img src="img/logo.png" alt="VIVER+"
+         style="width:90px;height:90px;object-fit:contain;border-radius:50%;background:rgba(255,255,255,.18);padding:6px;">
+    <h1 class="auth-titulo">VIVER+</h1>
+    <p class="auth-subtitulo">Quase lá!</p>
+  </div>
+
+  <div class="auth-card">
+    <h2>Falta pouco! 🌱</h2>
+    <p style="color:var(--texto-suave);font-size:1rem;font-weight:600;margin-bottom:24px;">
+      Para entrar no VIVER+ precisamos de mais dois dados.
+    </p>
+
+    <p id="msg-erro" style="display:none;background:#fee2e2;color:#991b1b;padding:12px 16px;border-radius:10px;font-weight:700;margin-bottom:16px;font-size:.95rem;"></p>
+
+    <form id="form-completar">
+      <div class="campo">
+        <label for="nickname">Escolha o seu @apelido</label>
+        <div class="input-icone">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+          <input type="text" id="nickname" placeholder="ex: dona_maria" autocomplete="off" autocapitalize="none">
+        </div>
+        <small id="status-nick"></small>
       </div>
-    </header>
 
-    <section class="area-formulario">
-      <h2 style="font-size:1.8rem;">Falta pouco! 🌱</h2>
-      <p style="text-align:center;color:var(--cor-texto-suave);font-size:1.1rem;margin-bottom:24px;">
-        Para entrar no VIVER+ precisamos de mais dois dados.
-      </p>
+      <div class="campo">
+        <label for="dataNascimento">Data de Nascimento</label>
+        <input type="date" id="dataNascimento">
+        <small style="color:var(--texto-suave);">O VIVER+ é exclusivo para pessoas com 60 anos ou mais.</small>
+      </div>
 
-      <div id="msg-erro" style="display:none;background:#fee2e2;color:#991b1b;padding:12px 16px;border-radius:12px;font-weight:700;margin-bottom:16px;font-size:1rem;"></div>
-
-      <form id="form-completar">
-        <div class="grupo-input">
-          <label style="font-size:1.3rem;">Escolha o seu @apelido</label>
-          <div class="campo-com-icone">
-            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
-            <input type="text" id="nickname" placeholder="ex: dona_maria" autocomplete="off" autocapitalize="none">
-          </div>
-          <small id="status-nick" style="display:block;margin-top:6px;font-size:1rem;font-weight:700;"></small>
-        </div>
-
-        <div class="grupo-input">
-          <label style="font-size:1.3rem;">Data de Nascimento</label>
-          <div class="campo-com-icone">
-            <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
-            <input type="date" id="dataNascimento">
-          </div>
-          <small style="display:block;margin-top:6px;font-size:.95rem;color:var(--cor-texto-suave);">
-            O VIVER+ é exclusivo para pessoas com 60 anos ou mais.
-          </small>
-        </div>
-
-        <button type="submit" class="btn-primario btn-grande" style="margin-top:12px;">
-          ENTRAR NO VIVER+
-        </button>
-      </form>
-    </section>
-  </main>
+      <button type="submit" class="btn btn-primario" style="margin-top:12px;">ENTRAR NO VIVER+</button>
+    </form>
+  </div>
+</div>
 
 <script src="js/api.js"></script>
 <script>
-// Recupera os dados do utilizador Google que ainda não está completo
 const dadosPendentes = JSON.parse(sessionStorage.getItem('googlePendente') || 'null');
-if (!dadosPendentes) {
-  // Se não há dados pendentes, não há razão para estar aqui
-  window.location.href = 'index.html';
-}
+if (!dadosPendentes) window.location.href = 'index.html';
 
-// Validação de nickname em tempo real
-const inputNick   = document.getElementById('nickname');
-const statusNick  = document.getElementById('status-nick');
+const inputNick = document.getElementById('nickname');
+const statusNick = document.getElementById('status-nick');
 let timerNick;
-
 inputNick.addEventListener('input', () => {
   clearTimeout(timerNick);
   const nick = inputNick.value.replace('@', '').trim();
@@ -76,40 +64,28 @@ inputNick.addEventListener('input', () => {
       const r = await fetch(`${API_URL}/usuarios/nickname/${encodeURIComponent(nick)}/disponivel`);
       const data = await r.json();
       statusNick.textContent = data.disponivel ? '✅ Disponível!' : '❌ Já está em uso';
-      statusNick.style.color = data.disponivel ? 'var(--cor-sucesso)' : 'var(--cor-erro)';
+      statusNick.style.color = data.disponivel ? 'var(--verde-escuro)' : 'var(--erro)';
     } catch (_) {}
   }, 500);
 });
 
 document.getElementById('form-completar').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const msgEl  = document.getElementById('msg-erro');
-  const nick   = inputNick.value.replace('@', '').trim();
+  const msgEl = document.getElementById('msg-erro');
+  const nick = inputNick.value.replace('@', '').trim();
   const dataNasc = document.getElementById('dataNascimento').value;
-
   msgEl.style.display = 'none';
-
   if (!nick || !dataNasc) {
     msgEl.textContent = 'Por favor preencha todos os campos.';
-    msgEl.style.display = 'block';
-    return;
+    msgEl.style.display = 'block'; return;
   }
-
   try {
     const r = await fetch(`${API_URL}/auth/completar-perfil`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        usuarioId:      dadosPendentes.usuario.id,
-        nickname:       nick,
-        dataNascimento: dataNasc
-      })
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ usuarioId: dadosPendentes.usuario.id, nickname: nick, dataNascimento: dataNasc })
     });
-
     if (r.ok) {
-      const usuarioAtualizado = await r.json();
-      // Atualiza o localStorage com os dados completos
-      localStorage.setItem('usuarioLogado', JSON.stringify(usuarioAtualizado));
+      localStorage.setItem('usuarioLogado', JSON.stringify(await r.json()));
       sessionStorage.removeItem('googlePendente');
       window.location.href = 'feed.html';
     } else {
