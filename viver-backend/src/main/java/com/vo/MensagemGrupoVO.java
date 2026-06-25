@@ -2,32 +2,21 @@ package com.vo;
 
 import java.util.Date;
 
-public class MensagemGrupoVO {
-    private int id;
+public class MensagemGrupoVO extends MensagemBase {
+
     private int comunidadeId;
-    private UsuarioVO autor;
-    private String conteudo;
-    private Date dataCriacao;
 
     public MensagemGrupoVO() {}
 
-    public MensagemGrupoVO(int id, int comunidadeId, UsuarioVO autor, String conteudo, Date dataCriacao) {
-        this.id = id;
+    public MensagemGrupoVO(int id, int comunidadeId, UsuarioVO autor,
+                            String conteudo, Date dataCriacao) {
+        super(id, conteudo, autor, dataCriacao);
         this.comunidadeId = comunidadeId;
-        this.autor = autor;
-        this.conteudo = conteudo;
-        this.dataCriacao = dataCriacao;
     }
 
-    public int getId()             { return id; }
-    public int getComunidadeId()   { return comunidadeId; }
-    public UsuarioVO getAutor()    { return autor; }
-    public String getConteudo()    { return conteudo; }
-    public Date getDataCriacao()   { return dataCriacao; }
+    @Override
+    public String getTipo() { return "GRUPO"; }
 
-    public void setId(int id) { this.id = id; }
-    public void setComunidadeId(int comunidadeId) { this.comunidadeId = comunidadeId; }
-    public void setAutor(UsuarioVO autor) { this.autor = autor; }
-    public void setConteudo(String conteudo) { this.conteudo = conteudo; }
-    public void setDataCriacao(Date dataCriacao) { this.dataCriacao = dataCriacao; }
+    public int getComunidadeId()        { return comunidadeId; }
+    public void setComunidadeId(int id) { this.comunidadeId = id; }
 }
