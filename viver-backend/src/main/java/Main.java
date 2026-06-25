@@ -66,7 +66,7 @@ public class Main {
                 String token = authHeader.replace("Bearer ", "");
                 JWT.require(Algorithm.HMAC256(JWT_SECRET)).build().verify(token);
             } catch (Exception e) {
-                ctx.status(401).result("Token JWT inválido ou expirado.");
+                throw new io.javalin.http.UnauthorizedResponse("Token JWT inválido ou expirado.");
             }
         });
 

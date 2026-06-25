@@ -48,8 +48,13 @@
 
 <script src="js/api.js"></script>
 <script>
-const dadosPendentes = JSON.parse(sessionStorage.getItem('googlePendente') || 'null');
-if (!dadosPendentes) window.location.href = 'index.html';
+const _tokenPendente = localStorage.getItem('jwtToken');
+const _usuarioPendente = JSON.parse(localStorage.getItem('usuarioLogado') || 'null');
+if (!_tokenPendente || !_usuarioPendente) {
+  window.location.href = 'index.html';
+  throw new Error('Não autenticado');
+}
+const dadosPendentes = { token: _tokenPendente, usuario: _usuarioPendente };
 
 const inputNick = document.getElementById('nickname');
 const statusNick = document.getElementById('status-nick');

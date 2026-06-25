@@ -54,8 +54,11 @@
 <script src="js/api.js"></script>
 <script>
 const usuario = JSON.parse(localStorage.getItem('usuarioLogado'));
-if (!usuario) window.location.href = 'index.html';
-else document.getElementById('saudacao').textContent = `Olá, ${usuario.nome.split(' ')[0]}! 👋`;
+if (!usuario) {
+  window.location.href = 'index.html';
+  throw new Error('Não autenticado');
+}
+document.getElementById('saudacao').textContent = `Olá, ${usuario.nome.split(' ')[0]}! 👋`;
 
 let todosPosts = [], filtroAtual = 'todos';
 
@@ -194,6 +197,12 @@ async function carregarFeed() {
       todosPosts = await r.json();
       renderizarPosts();
       setTimeout(() => marcarVistos(todosPosts.filter(p => !p.visto)), 2000);
+    } else if (r.status === 401) {
+      localStorage.removeItem('jwtToken');
+      localStorage.removeItem('usuarioLogado');
+      window.location.href = 'index.html';
+    } else {
+      document.getElementById('container-posts').innerHTML = '<div style="padding:40px;text-align:center;color:var(--erro);">Erro ao carregar os momentos. Verifique o servidor.</div>';
     }
   } catch (_) {
     document.getElementById('container-posts').innerHTML = '<div style="padding:40px;text-align:center;color:var(--erro);">Erro ao carregar. Verifique o servidor.</div>';
