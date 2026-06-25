@@ -8,137 +8,115 @@
   <link rel="icon" type="image/png" href="img/logo.png">
 </head>
 <body>
-<main class="tela-acesso" style="max-width:650px; padding-bottom:90px; justify-content:flex-start;">
+<div class="app">
 
-  <header style="display:flex; align-items:center; gap:12px; padding-top:16px; margin-bottom:20px;">
-    <button onclick="history.back()" style="background:none;border:none;font-size:1.8rem;cursor:pointer;">←</button>
-    <h1 style="font-size:1.6rem; color:var(--cor-azul); margin:0;">Perfil</h1>
-  </header>
-
-  <div id="container-perfil" style="text-align:center; margin-bottom:24px;">
-    <p style="color:var(--cor-texto-suave);">A carregar perfil...</p>
+  <!-- Hero verde -->
+  <div class="perfil-topo" style="position:relative;">
+    <button onclick="history.back()" style="position:absolute;top:16px;left:16px;background:rgba(255,255,255,.2);border:none;border-radius:50%;width:40px;height:40px;font-size:1.4rem;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;">←</button>
+    <div id="avatar-pub" class="avatar avatar-xl" style="margin:0 auto 8px;border:4px solid rgba(255,255,255,.4);"></div>
   </div>
 
-  <section>
-    <h2 style="font-size:1.5rem; text-align:left; margin-bottom:14px; color:var(--cor-azul);">Momentos partilhados</h2>
-    <div id="container-posts"><p style="color:var(--cor-texto-suave);">A carregar...</p></div>
-  </section>
+  <!-- Card branco -->
+  <div class="perfil-card" id="container-perfil">
+    <div class="spinner">A carregar perfil...</div>
+  </div>
 
-  <nav class="barra-navegacao">
-    <a href="feed.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>Início</span></a>
-    <a href="comunidades.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><span>Grupos</span></a>
-    <a href="publicar.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>Publicar</span></a>
-    <a href="notificacoes.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><span>Avisos</span></a>
-    <a href="perfil.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span>Eu</span></a>
+  <!-- Posts do perfil -->
+  <div class="page-content">
+    <p class="secao-titulo">Momentos partilhados</p>
+    <div id="container-posts"><div class="spinner">A carregar...</div></div>
+  </div>
+
+  <nav class="nav" aria-label="Navegação principal">
+    <a href="feed.html"         class="nav-item"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>Início</span></a>
+    <a href="comunidades.html"  class="nav-item"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><span>Grupos</span></a>
+    <a href="publicar.html"     class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>Publicar</span></a>
+    <a href="notificacoes.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><span>Avisos</span></a>
+    <a href="perfil.html"       class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span>Eu</span></a>
   </nav>
-</main>
+</div>
 
+<script src="js/api.js"></script>
 <script>
 const API_URL = 'http://localhost:8080/api';
 const eu = JSON.parse(localStorage.getItem('usuarioLogado'));
 if (!eu) window.location.href = 'index.html';
-
-const params = new URLSearchParams(window.location.search);
-const perfilId = parseInt(params.get('id'));
-
+const perfilId = parseInt(new URLSearchParams(window.location.search).get('id'));
 if (perfilId === eu.id) window.location.href = 'perfil.html';
 
 async function carregarPerfil() {
   try {
     const r = await fetch(`${API_URL}/usuarios/${perfilId}`);
-    if (!r.ok) { alert('Usuário não encontrado.'); history.back(); return; }
-
+    if (!r.ok) { history.back(); return; }
     const { usuario, posts, estatisticas } = await r.json();
     const sigo = await verificarSeguimento();
 
-    const avatarHtml = usuario.fotoPerfil
-      ? `<img src="${usuario.fotoPerfil}" style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:4px solid var(--cor-primaria);">`
-      : `<div style="width:90px;height:90px;border-radius:50%;background:var(--cor-primaria);color:#fff; display:flex;align-items:center;justify-content:center;font-size:2.5rem;font-weight:700;border:4px solid var(--cor-primaria-escura);">${usuario.nome.charAt(0).toUpperCase()}</div>`;
+    // Avatar no hero
+    const av = document.getElementById('avatar-pub');
+    if (usuario.fotoPerfil) av.innerHTML = `<img src="${usuario.fotoPerfil}" alt="${usuario.nome}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    else av.innerHTML = `<span style="font-size:2.5rem;font-weight:800;">${usuario.nome.charAt(0).toUpperCase()}</span>`;
 
     document.getElementById('container-perfil').innerHTML = `
-      ${avatarHtml}
-      <h2 style="font-size:1.8rem; color:var(--cor-azul); margin:12px 0 4px;">${usuario.nome}</h2>
-      <p style="color:var(--cor-texto-suave); font-size:1.1rem; margin-bottom:16px;">${usuario.email}</p>
-      
-      <div style="display:flex; gap:25px; justify-content:center; margin-bottom:20px;">
-          <div style="text-align:center;"><strong style="display:block; font-size:1.3rem;">${estatisticas.totalPosts}</strong> posts</div>
-          <div style="text-align:center;"><strong style="display:block; font-size:1.3rem;">${estatisticas.totalSeguidores}</strong> seguidores</div>
-          <div style="text-align:center;"><strong style="display:block; font-size:1.3rem;">${estatisticas.totalSeguindo}</strong> seguindo</div>
+      <h1 class="perfil-nome">${usuario.nome}</h1>
+      ${usuario.nickname ? `<p class="perfil-nick">@${usuario.nickname}</p>` : ''}
+      <p style="font-size:.9rem;color:var(--texto-suave);font-weight:600;margin-bottom:20px;">${usuario.email}</p>
+      <div class="perfil-stats">
+        <div class="stat"><strong>${estatisticas.totalPosts}</strong><span>posts</span></div>
+        <div class="stat"><strong>${estatisticas.totalSeguidores}</strong><span>seguidores</span></div>
+        <div class="stat"><strong>${estatisticas.totalSeguindo}</strong><span>seguindo</span></div>
       </div>
-
-      <div style="display:flex; gap:10px; justify-content:center;">
+      <div class="perfil-acoes">
         <button id="btn-seguir" onclick="toggleSeguir()"
-          class="${sigo ? 'btn-secundario' : 'btn-primario'}"
-          style="padding:10px 24px; border-radius:99px; border:none; font-size:1.1rem; font-weight:700; cursor:pointer; min-height:auto;">
+          class="btn ${sigo ? 'btn-secundario' : 'btn-primario'}" style="flex:1;">
           ${sigo ? '✅ Seguindo' : '➕ Seguir'}
         </button>
-        <button onclick="irParaChat(${usuario.id}, '${usuario.nome}')"
-          class="btn-secundario"
-          style="padding:10px 24px; border-radius:99px; border:none; font-size:1.1rem; font-weight:700; cursor:pointer; min-height:auto; background:#e9ecef;">
+        <button onclick="window.location.href='chat.html'"
+          class="btn btn-secundario" style="flex:1;">
           💬 Mensagem
         </button>
-      </div>
-    `;
+      </div>`;
 
-    const container = document.getElementById('container-posts');
-    if (!posts || posts.length === 0) {
-      container.innerHTML = '<p style="color:var(--cor-texto-suave);">Ainda não partilhou momentos.</p>';
+    const c = document.getElementById('container-posts');
+    if (!posts?.length) {
+      c.innerHTML = '<div class="empty-state"><div class="icone">📝</div><p>Ainda não partilhou momentos.</p></div>';
       return;
     }
-    container.innerHTML = '';
-    posts.forEach(post => {
-      const data = new Date(post.data).toLocaleDateString('pt-PT', { day:'2-digit', month:'short' });
-      const card = document.createElement('article');
-      card.style.cssText = 'background:#fff;border:2px solid #e9ecef;border-radius:12px;padding:16px;margin-bottom:14px;text-align:left;';
-      
-      // Inclui a imagem se o post tiver
-      const imagemHtml = post.imagem ? `<img src="${post.imagem}" style="width:100%; border-radius:12px; margin-top:10px; object-fit:cover; border:2px solid var(--cor-borda);">` : '';
-      
-      card.innerHTML = `<p style="font-size:0.9rem;color:gray;margin-bottom:6px;">${data}</p><p style="font-size:1.2rem;font-weight:500;color:#111;">${post.conteudo}</p>${imagemHtml}`;
-      container.appendChild(card);
-    });
-  } catch (err) {
-    document.getElementById('container-perfil').innerHTML = '<p style="color:red;">Erro ao carregar perfil.</p>';
+    c.innerHTML = posts.map(p => `
+      <article class="post-card" style="margin-bottom:12px;">
+        <p class="post-data" style="padding:14px 16px 0;">${new Date(p.data).toLocaleDateString('pt-PT',{day:'2-digit',month:'short'})}</p>
+        <p class="post-corpo">${p.conteudo}</p>
+        ${p.imagem ? `<img src="${p.imagem}" class="post-imagem" style="border-radius:0 0 16px 16px;">` : ''}
+      </article>`).join('');
+  } catch (_) {
+    document.getElementById('container-perfil').innerHTML = '<p style="color:var(--erro);padding:20px;">Erro ao carregar perfil.</p>';
   }
-}
-
-function irParaChat(id, nome) {
-  window.location.href = 'chat.html';
 }
 
 async function verificarSeguimento() {
   try {
     const r = await fetch(`${API_URL}/usuarios/${perfilId}/sigo?usuarioId=${eu.id}`);
-    if (r.ok) {
-      const json = await r.json();
-      return json.sigo;
-    }
-  } catch (e) {}
-  return false; 
+    if (r.ok) return (await r.json()).sigo;
+  } catch (_) {}
+  return false;
 }
 
 async function toggleSeguir() {
   const btn = document.getElementById('btn-seguir');
   try {
     const r = await fetch(`${API_URL}/usuarios/${perfilId}/seguir`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ usuarioId: eu.id })
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({usuarioId: eu.id})
     });
     if (r.ok) {
-      const resultado = await r.text();
-      if (resultado === 'seguiu') {
-        btn.textContent = '✅ Seguindo';
-        btn.className = 'btn-secundario';
-      } else {
-        btn.textContent = '➕ Seguir';
-        btn.className = 'btn-primario';
-      }
+      const res = await r.text();
+      btn.textContent = res === 'seguiu' ? '✅ Seguindo' : '➕ Seguir';
+      btn.className   = `btn ${res === 'seguiu' ? 'btn-secundario' : 'btn-primario'}`;
     }
-  } catch (_) { alert('Erro ao processar.'); }
+  } catch (_) {}
 }
 
 carregarPerfil();
 </script>
+<script src="js/pwa-setup.js"></script>
 </body>
 </html>

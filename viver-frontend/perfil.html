@@ -1,161 +1,148 @@
 <!DOCTYPE html>
 <html lang="pt-PT">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VIVER+ - O Meu Perfil</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="icon" type="image/png" href="img/logo.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VIVER+ - O Meu Perfil</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="img/logo.png">
 </head>
-<body style="padding-bottom: 110px;">
+<body>
+<div class="app">
 
-    <main class="tela-acesso" style="max-width: 650px; background: transparent; padding-top: 10px;">
-        
-        <header style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 24px;">
-            
-            <input type="file" id="input-foto" accept="image/*" style="display: none;">
-            
-            <div id="avatar-perfil" onclick="document.getElementById('input-foto').click()" 
-                 style="width: 120px; height: 120px; background: var(--cor-primaria-escura); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; font-weight: 900; box-shadow: var(--sombra-suave); cursor: pointer; overflow: hidden; border: 4px solid white;">
-                <span id="letra-avatar">?</span>
-            </div>
-            
-            <button onclick="document.getElementById('input-foto').click()" style="background: none; border: none; color: var(--cor-azul); font-weight: 800; font-size: 1.05rem; margin-top: 14px; cursor: pointer; text-decoration: underline;">
-                Alterar fotografia
-            </button>
+  <!-- Hero verde (fundo) -->
+  <div class="perfil-topo">
+    <input type="file" id="input-foto" accept="image/*" style="display:none;">
+    <div id="avatar-perfil" onclick="document.getElementById('input-foto').click()"
+         class="avatar avatar-xl"
+         style="cursor:pointer; margin:0 auto 8px; border:4px solid rgba(255,255,255,.4);">
+      <span id="letra-avatar" style="font-size:2.8rem;"></span>
+    </div>
+    <p style="font-size:.85rem;color:rgba(255,255,255,.75);font-weight:700;cursor:pointer;" onclick="document.getElementById('input-foto').click()">
+      Toque para alterar foto
+    </p>
+  </div>
 
-            <h1 id="nome-perfil" style="font-size: 2.2rem; color: var(--cor-texto); margin-top: 16px; margin-bottom: 4px;">Carregando...</h1>
-            <p id="email-perfil" style="font-size: 1.15rem; color: var(--cor-texto-suave); font-weight: 600;">...</p>
-        </header>
+  <!-- Card branco deslizante -->
+  <div class="perfil-card">
+    <h1 class="perfil-nome" id="nome-perfil">A carregar...</h1>
+    <p class="perfil-nick" id="nick-perfil"></p>
+    <p style="font-size:.95rem;color:var(--texto-suave);font-weight:600;margin-bottom:20px;" id="email-perfil"></p>
 
-        <div class="grupo-card" style="display: flex; justify-content: space-around; padding: 20px; margin-bottom: 24px;">
-            <div style="text-align: center;">
-                <strong id="num-posts" style="display: block; font-size: 1.6rem; color: var(--cor-primaria-escura);">0</strong>
-                <span style="font-size: 0.95rem; color: var(--cor-texto-suave); font-weight: 800;">Momentos</span>
-            </div>
-            <div style="width: 2px; background: var(--cor-fundo); border-radius: 2px;"></div>
-            <div style="text-align: center;">
-                <strong id="num-seguidores" style="display: block; font-size: 1.6rem; color: var(--cor-primaria-escura);">0</strong>
-                <span style="font-size: 0.95rem; color: var(--cor-texto-suave); font-weight: 800;">Seguidores</span>
-            </div>
-            <div style="width: 2px; background: var(--cor-fundo); border-radius: 2px;"></div>
-            <div style="text-align: center;">
-                <strong id="num-seguindo" style="display: block; font-size: 1.6rem; color: var(--cor-primaria-escura);">0</strong>
-                <span style="font-size: 0.95rem; color: var(--cor-texto-suave); font-weight: 800;">A Seguir</span>
-            </div>
-        </div>
-            
-        <button id="btn-sair-perfil" class="btn-secundario" onclick="terminarSessao()" style="background: #ffebee; color: var(--cor-erro); margin-bottom: 30px;">
-            🚪 Terminar Sessão
-        </button>
+    <!-- Estatísticas -->
+    <div class="perfil-stats">
+      <div class="stat"><strong id="num-posts">–</strong><span>posts</span></div>
+      <div class="stat"><strong id="num-seguidores">–</strong><span>seguidores</span></div>
+      <div class="stat"><strong id="num-seguindo">–</strong><span>seguindo</span></div>
+    </div>
 
-        <section>
-            <h2 style="font-size: 1.6rem; text-align: left; margin-bottom: 16px; color: var(--cor-azul);">Os meus momentos</h2>
-            <div id="container-meus-posts">
-                <div class="card-post" style="text-align: center;">
-                    <p style="font-size: 1.15rem; color: var(--cor-texto-suave); font-weight: bold;">A procurar...</p>
-                </div>
-            </div>
-        </section>
+    <!-- Ações -->
+    <div class="perfil-acoes">
+      <button onclick="terminarSessao()" class="btn btn-perigo btn-sm">
+        Terminar Sessão
+      </button>
+    </div>
+  </div>
 
-        <nav class="barra-navegacao" aria-label="Navegação Principal">
-            <a href="feed.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>Início</span></a>
-            <a href="comunidades.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><span>Grupos</span></a>
-            <a href="publicar.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>Publicar</span></a>
-            <a href="notificacoes.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><span>Avisos</span></a>
-            <a href="perfil.html" class="item-nav ativo"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span>Perfil</span></a>
-        </nav>
-    </main>
+  <!-- Separador -->
+  <div style="height:1.5px;background:var(--verde-claro);margin:0 16px;"></div>
 
-    <script src="js/api.js"></script>
-    <script src="js/pwa-setup.js"></script>
-    <script>
-        let usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
+  <!-- Meus posts -->
+  <div class="page-content">
+    <p class="secao-titulo">As minhas memórias</p>
+    <div id="container-meus-posts">
+      <div class="spinner">A carregar...</div>
+    </div>
+  </div>
 
-        if (!usuarioLogado) {
-            window.location.href = 'index.html';
-        } else {
-            document.getElementById('nome-perfil').textContent = usuarioLogado.nome;
-            document.getElementById('email-perfil').textContent = usuarioLogado.email || ("@" + usuarioLogado.nickname);
-            
-            if (usuarioLogado.fotoPerfil) {
-                document.getElementById('avatar-perfil').innerHTML = `<img src="${usuarioLogado.fotoPerfil}" style="width: 100%; height: 100%; object-fit: cover;">`;
-            } else {
-                document.getElementById('letra-avatar').textContent = usuarioLogado.nome.charAt(0).toUpperCase();
-            }
-            
-            carregarEstatisticas();
-            carregarMeusPosts();
-        }
+  <nav class="nav" aria-label="Navegação principal">
+    <a href="feed.html"         class="nav-item"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>Início</span></a>
+    <a href="comunidades.html"  class="nav-item"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><span>Grupos</span></a>
+    <a href="publicar.html"     class="nav-item"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>Publicar</span></a>
+    <a href="notificacoes.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><span>Avisos</span></a>
+    <a href="perfil.html"       class="nav-item ativo"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span>Perfil</span></a>
+  </nav>
+</div>
 
-        function terminarSessao() {
-            localStorage.removeItem('usuarioLogado');
-            localStorage.removeItem('jwtToken'); // Remove também o token de segurança!
-            window.location.href = 'index.html';
-        }
+<script src="js/api.js"></script>
+<script>
+const API_URL = 'http://localhost:8080/api';
+let usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado'));
+if (!usuarioLogado) window.location.href = 'index.html';
 
-        async function carregarEstatisticas() {
-            try {
-                const r = await fetch(`${API_URL}/usuarios/${usuarioLogado.id}/estatisticas`);
-                if (r.ok) {
-                    const stats = await r.json();
-                    document.getElementById('num-posts').textContent = stats.totalPosts;
-                    document.getElementById('num-seguidores').textContent = stats.totalSeguidores;
-                    document.getElementById('num-seguindo').textContent = stats.totalSeguindo;
-                }
-            } catch (e) { console.error("Erro ao carregar stats:", e); }
-        }
+function setAvatar(foto, nome) {
+  const el = document.getElementById('avatar-perfil');
+  if (foto) {
+    el.innerHTML = `<img src="${foto}" alt="${nome}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+  } else {
+    el.innerHTML = `<span style="font-size:2.8rem;font-weight:800;">${nome.charAt(0).toUpperCase()}</span>`;
+  }
+}
 
-        // Alteração da foto de Perfil
-        document.getElementById('input-foto').addEventListener('change', async function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = async (event) => {
-                const base64 = event.target.result;
-                document.getElementById('avatar-perfil').innerHTML = `<img src="${base64}" style="width: 100%; height: 100%; object-fit: cover;">`;
-                try {
-                    await fetch(`${API_URL}/usuarios/${usuarioLogado.id}/foto`, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({base64})
-                    });
-                    usuarioLogado.fotoPerfil = base64;
-                    localStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
-                } catch (err) {
-                    alert("Erro ao guardar a foto no servidor.");
-                }
-            };
-            reader.readAsDataURL(file);
-        });
+// Inicializa
+document.getElementById('nome-perfil').textContent   = usuarioLogado.nome;
+document.getElementById('email-perfil').textContent  = usuarioLogado.email;
+document.getElementById('nick-perfil').textContent   = usuarioLogado.nickname ? `@${usuarioLogado.nickname}` : '';
+setAvatar(usuarioLogado.fotoPerfil, usuarioLogado.nome);
+carregarEstatisticas();
+carregarMeusPosts();
 
-        // Carregar os Posts Pessoais
-        async function carregarMeusPosts() {
-            try {
-                const r = await fetch(`${API_URL}/usuarios/${usuarioLogado.id}`);
-                if (r.ok) {
-                    const dados = await r.json();
-                    const container = document.getElementById('container-meus-posts');
-                    
-                    if(!dados.posts || dados.posts.length === 0) {
-                        container.innerHTML = `
-                            <div class="card-post" style="text-align: center;">
-                                <p style="color:var(--cor-texto-suave); font-size: 1.1rem; font-weight: bold;">Ainda não partilhou momentos. Vá à aba Publicar! 🌱</p>
-                            </div>`;
-                        return;
-                    }
+function terminarSessao() {
+  localStorage.removeItem('usuarioLogado');
+  localStorage.removeItem('jwtToken');
+  window.location.href = 'index.html';
+}
 
-                    // Utiliza a classe .card-post para alinhar com o Feed
-                    container.innerHTML = dados.posts.map(p => `
-                        <article class="card-post">
-                            <p style="font-size: 0.9rem; color: var(--cor-texto-suave); font-weight: 700; margin-bottom: 8px;">${new Date(p.data).toLocaleDateString('pt-PT')}</p>
-                            <p style="font-size: 1.2rem; color: var(--cor-texto); line-height: 1.5;">${p.conteudo}</p>
-                            ${p.imagem ? `<img src="${p.imagem}" style="width:100%; border-radius:12px; margin-top:12px; border:1px solid var(--cor-borda); object-fit:cover;">` : ''}
-                        </article>
-                    `).join('');
-                }
-            } catch(e) { console.error("Erro ao carregar posts:", e); }
-        }
-    </script>
+async function carregarEstatisticas() {
+  try {
+    const r = await fetch(`${API_URL}/usuarios/${usuarioLogado.id}/estatisticas`);
+    if (r.ok) {
+      const s = await r.json();
+      document.getElementById('num-posts').textContent     = s.totalPosts;
+      document.getElementById('num-seguidores').textContent = s.totalSeguidores;
+      document.getElementById('num-seguindo').textContent  = s.totalSeguindo;
+    }
+  } catch (_) {}
+}
+
+document.getElementById('input-foto').addEventListener('change', async function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (ev) => {
+    const base64 = ev.target.result;
+    setAvatar(base64, usuarioLogado.nome);
+    try {
+      await fetch(`${API_URL}/usuarios/${usuarioLogado.id}/foto`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({base64})
+      });
+      usuarioLogado.fotoPerfil = base64;
+      localStorage.setItem('usuarioLogado', JSON.stringify(usuarioLogado));
+    } catch (_) { alert('Erro ao guardar a foto.'); }
+  };
+  reader.readAsDataURL(file);
+});
+
+async function carregarMeusPosts() {
+  try {
+    const r = await fetch(`${API_URL}/usuarios/${usuarioLogado.id}`);
+    if (!r.ok) return;
+    const { posts } = await r.json();
+    const c = document.getElementById('container-meus-posts');
+    if (!posts?.length) {
+      c.innerHTML = '<div class="empty-state"><div class="icone">📝</div><p>Ainda não partilhou momentos.</p></div>';
+      return;
+    }
+    c.innerHTML = posts.map(p => `
+      <article class="post-card" style="margin-bottom:12px;">
+        <p class="post-data" style="padding:14px 16px 0;">${new Date(p.data).toLocaleDateString('pt-PT',{day:'2-digit',month:'short',year:'numeric'})}</p>
+        <p class="post-corpo">${p.conteudo}</p>
+        ${p.imagem ? `<img src="${p.imagem}" class="post-imagem" style="border-radius:0 0 16px 16px;">` : ''}
+      </article>`).join('');
+  } catch (_) {}
+}
+</script>
+<script src="js/pwa-setup.js"></script>
 </body>
 </html>
