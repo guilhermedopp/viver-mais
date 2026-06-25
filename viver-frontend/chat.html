@@ -3,65 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VIVER+ - Chat</title>
+    <title>VIVER+ - Mensagens</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="icon" type="image/png" href="img/logo.png">
-    <style>
-        /* Estilos específicos das bolhas do chat (Mantidos locais mas com variáveis globais) */
-        .bolha-chat { max-width: 85%; padding: 14px 18px; border-radius: 18px; font-size: 1.15rem; margin-bottom: 12px; line-height: 1.4; box-shadow: 0 2px 5px rgba(0,0,0,0.05); word-wrap: break-word; }
-        .bolha-minha { background: var(--cor-primaria-escura); color: #fff; border-bottom-right-radius: 4px; align-self: flex-end; }
-        .bolha-outro { background: var(--cor-painel); color: var(--cor-texto); border: 1px solid var(--cor-borda); border-bottom-left-radius: 4px; align-self: flex-start; }
-        .autor-grupo { font-size: 0.9rem; color: var(--cor-primaria-escura); margin-bottom: 6px; font-weight: 900; }
-    </style>
 </head>
-<body style="padding-bottom: 0;"> <main class="tela-acesso" style="max-width: 650px; padding: 0; position: relative; background: var(--cor-fundo);">
+<body>
+<div class="app">
 
-    <div id="tela-lista" style="width: 100%; height: 100dvh; padding: 20px 20px 110px 20px; overflow-y: auto;">
-        <header style="margin-bottom: 24px; padding-top: 10px; text-align: center;">
-            <h1 style="font-size: 2.2rem; color: var(--cor-primaria-escura);">Mensagens</h1>
-            <p style="color: var(--cor-texto-suave); font-weight: 600; font-size: 1.1rem; margin-top: 4px;">Escolha com quem quer falar</p>
+    <!-- Lista de contactos -->
+    <div id="tela-lista">
+        <header class="page-header">
+            <div class="logo-mini">
+                <img src="img/logo.png" alt="VIVER+">
+                <span>VIVER+</span>
+            </div>
+            <h1 style="font-size:1.3rem;font-weight:800;flex:1;text-align:right;">Mensagens</h1>
         </header>
 
-        <div class="filtro-bar">
-            <button class="btn-filtro ativo" id="btn-amigos" onclick="mudarAba('amigos')" style="flex: 1;">👤 Amigos</button>
-            <button class="btn-filtro"       id="btn-grupos" onclick="mudarAba('grupos')" style="flex: 1;">👥 Grupos</button>
+        <div class="filtros">
+            <button class="filtro ativo" id="btn-amigos" onclick="mudarAba('amigos')" style="flex:1;">Amigos</button>
+            <button class="filtro"       id="btn-grupos" onclick="mudarAba('grupos')" style="flex:1;">Grupos</button>
         </div>
 
-        <div id="lista-conteudo">
-            <div class="grupo-card" style="text-align: center;"><p style="color: var(--cor-texto-suave); font-weight: bold;">A carregar conversas...</p></div>
+        <div class="page-content" id="lista-conteudo">
+            <div class="spinner">A carregar conversas...</div>
         </div>
     </div>
 
-    <div id="tela-conversa" style="display: none; width: 100%; height: 100dvh; flex-direction: column; background: var(--cor-fundo); position: absolute; top: 0; left: 0; z-index: 2000;">
-        
-        <header style="display: flex; align-items: center; gap: 16px; padding: 16px 20px; background: #fff; border-bottom: 2px solid var(--cor-borda); box-shadow: 0 4px 10px rgba(0,0,0,0.03); z-index: 10;">
-            <button onclick="fecharConversa()" style="background: var(--cor-secundaria); border: none; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; color: var(--cor-primaria-escura);">
-                ←
+    <!-- Conversa (overlay full-screen) -->
+    <div id="tela-conversa" class="chat-overlay">
+        <div class="chat-header">
+            <button onclick="fecharConversa()" class="btn-icone" aria-label="Voltar">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
             </button>
             <div id="conversa-avatar"></div>
-            <h2 id="conversa-nome" style="font-size: 1.4rem; color: var(--cor-azul); margin: 0; line-height: 1.2;">Nome</h2>
-        </header>
-
-        <div id="area-mensagens" style="flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column;">
+            <h2 id="conversa-nome" style="font-size:1.15rem;font-weight:800;color:var(--texto);flex:1;margin:0;">–</h2>
         </div>
 
-        <div style="padding: 16px 20px; background: #fff; border-top: 2px solid var(--cor-borda); display: flex; gap: 12px; padding-bottom: calc(16px + env(safe-area-inset-bottom));">
-            <input type="text" id="input-msg" placeholder="A sua mensagem..." 
-                   style="flex: 1; padding: 16px 20px; border: 2px solid var(--cor-borda); border-radius: 99px; font-size: 1.15rem; font-family: 'Nunito', sans-serif; outline: none;">
-            <button onclick="enviarMensagem()" class="btn-primario" style="width: auto; min-width: 60px; padding: 0 24px; border-radius: 99px;">
-                Enviar
+        <div id="area-mensagens" class="chat-msgs"></div>
+
+        <div class="chat-input-bar">
+            <input type="text" id="input-msg" class="chat-input" placeholder="A sua mensagem...">
+            <button onclick="enviarMensagem()" class="btn-enviar" aria-label="Enviar">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>
             </button>
         </div>
     </div>
 
-    <nav class="barra-navegacao" id="nav-bar">
-        <a href="feed.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>Início</span></a>
-        <a href="comunidades.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><span>Grupos</span></a>
-        <a href="publicar.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>Publicar</span></a>
-        <a href="notificacoes.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><span>Avisos</span></a>
-        <a href="perfil.html" class="item-nav"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span>Perfil</span></a>
+    <nav class="nav" id="nav-bar" aria-label="Navegação principal">
+        <a href="feed.html"         class="nav-item"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>Início</span></a>
+        <a href="comunidades.html"  class="nav-item"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><span>Grupos</span></a>
+        <a href="publicar.html"     class="nav-pub" aria-label="Publicar momento"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></a>
+        <a href="notificacoes.html" class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><span>Avisos</span></a>
+        <a href="perfil.html"       class="nav-item"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span>Perfil</span></a>
     </nav>
-</main>
+</div>
 
 <script src="js/api.js"></script>
 <script src="js/pwa-setup.js"></script>
@@ -73,7 +69,6 @@ let abaAtual = 'amigos';
 let chatAtivo = { tipo: null, id: null, nome: null };
 let loopMensagens = null;
 
-// Verifica se veio da página de grupos (URL query params)
 const urlParams = new URLSearchParams(window.location.search);
 const grupoIdAbertura = urlParams.get('grupo');
 
@@ -86,54 +81,55 @@ function mudarAba(aba) {
 
 async function carregarLista() {
     const container = document.getElementById('lista-conteudo');
-    container.innerHTML = '<div class="grupo-card" style="text-align: center;"><p style="color: var(--cor-texto-suave); font-weight: bold;">A carregar...</p></div>';
+    container.innerHTML = '<div class="spinner">A carregar...</div>';
 
     try {
         if (abaAtual === 'amigos') {
             const r = await fetch(`${API_URL}/usuarios`);
             const usuarios = await r.json();
             const contatos = usuarios.filter(u => u.id !== usuario.id);
-            
+
             if (contatos.length === 0) {
-                container.innerHTML = '<div class="grupo-card" style="text-align: center;"><p>Sem contactos. Vá à página de Grupos para conhecer pessoas!</p></div>';
+                container.innerHTML = '<div class="empty-state"><div class="icone">👥</div><p>Sem contactos ainda. Vá à página de Grupos para conhecer pessoas!</p></div>';
                 return;
             }
 
             container.innerHTML = contatos.map(c => `
-                <div class="grupo-card" onclick="abrirConversa('PRIVADO', ${c.id}, '${c.nome}')" style="cursor: pointer; display: flex; gap: 16px; align-items: center; padding: 14px 20px;">
-                    ${c.fotoPerfil ? `<img src="${c.fotoPerfil}" class="avatar">` : `<div class="avatar">${c.nome.charAt(0)}</div>`}
-                    <div style="flex: 1;">
-                        <strong style="font-size: 1.25rem; color: var(--cor-texto); display: block;">${c.nome}</strong>
-                        <span style="color: var(--cor-texto-suave); font-size: 0.95rem; font-weight: 600;">Tocar para conversar</span>
+                <div class="chat-contato" onclick="abrirConversa('PRIVADO', ${c.id}, '${c.nome.replace(/'/g, "\\'")}')">
+                    ${c.fotoPerfil
+                        ? `<img src="${c.fotoPerfil}" class="avatar avatar-md" alt="${c.nome}">`
+                        : `<div class="avatar avatar-md">${c.nome.charAt(0).toUpperCase()}</div>`}
+                    <div>
+                        <p class="chat-contato-nome">${c.nome}</p>
+                        <p class="chat-contato-sub">Tocar para conversar</p>
                     </div>
-                </div>
-            `).join('');
+                </div>`).join('');
         } else {
             const r = await fetch(`${API_URL}/comunidades?usuarioId=${usuario.id}`);
             const grupos = await r.json();
 
             if (grupos.length === 0) {
-                container.innerHTML = '<div class="grupo-card" style="text-align: center;"><p>Não pertence a nenhum grupo. Vá à aba Grupos!</p></div>';
+                container.innerHTML = '<div class="empty-state"><div class="icone">💬</div><p>Não pertence a nenhum grupo. Vá à aba Grupos!</p></div>';
                 return;
             }
 
             container.innerHTML = grupos.map(g => `
-                <div class="grupo-card" onclick="abrirConversa('GRUPO', ${g.id}, '${g.nome}')" style="cursor: pointer; display: flex; gap: 16px; align-items: center; padding: 14px 20px;">
-                    <div class="avatar" style="background: var(--cor-secundaria); color: var(--cor-primaria-escura);">👥</div>
-                    <div style="flex: 1;">
-                        <strong style="font-size: 1.25rem; color: var(--cor-texto); display: block;">${g.nome}</strong>
-                        <span style="color: var(--cor-texto-suave); font-size: 0.95rem; font-weight: 600;">Chat de grupo</span>
+                <div class="chat-contato" onclick="abrirConversa('GRUPO', ${g.id}, '${g.nome.replace(/'/g, "\\'")}')">
+                    <div class="avatar avatar-md" style="background:var(--verde-claro);color:var(--verde-escuro);font-size:1.3rem;">👥</div>
+                    <div>
+                        <p class="chat-contato-nome">${g.nome}</p>
+                        <p class="chat-contato-sub">Chat de grupo</p>
                     </div>
-                </div>
-            `).join('');
+                </div>`).join('');
 
-            // Se veio com um ID na URL, abre automaticamente
             if (grupoIdAbertura && chatAtivo.id === null) {
                 const grp = grupos.find(x => x.id == grupoIdAbertura);
                 if (grp) abrirConversa('GRUPO', grp.id, grp.nome);
             }
         }
-    } catch (e) { container.innerHTML = '<div class="grupo-card" style="text-align: center;"><p style="color: red; font-weight: bold;">Erro de ligação.</p></div>'; }
+    } catch (e) {
+        container.innerHTML = '<p style="color:var(--erro);text-align:center;padding:24px;font-weight:700;">Erro de ligação.</p>';
+    }
 }
 
 function abrirConversa(tipo, id, nome) {
@@ -141,14 +137,14 @@ function abrirConversa(tipo, id, nome) {
     document.getElementById('tela-lista').style.display = 'none';
     document.getElementById('nav-bar').style.display = 'none';
     document.getElementById('tela-conversa').style.display = 'flex';
-    
+
     document.getElementById('conversa-nome').textContent = nome;
-    document.getElementById('conversa-avatar').innerHTML = tipo === 'GRUPO' 
-        ? '<div class="avatar" style="width: 44px; height: 44px; font-size: 1.2rem; background: var(--cor-secundaria); color: var(--cor-primaria-escura);">👥</div>'
-        : `<div class="avatar" style="width: 44px; height: 44px; font-size: 1.2rem;">${nome.charAt(0)}</div>`;
-    
-    document.getElementById('area-mensagens').innerHTML = '<div style="text-align: center; margin-top: 40px; color: var(--cor-texto-suave); font-weight: bold;">A sincronizar...</div>';
-    
+    document.getElementById('conversa-avatar').innerHTML = tipo === 'GRUPO'
+        ? `<div class="avatar avatar-md" style="background:var(--verde-claro);color:var(--verde-escuro);font-size:1.3rem;">👥</div>`
+        : `<div class="avatar avatar-md">${nome.charAt(0).toUpperCase()}</div>`;
+
+    document.getElementById('area-mensagens').innerHTML = '<div class="spinner">A sincronizar...</div>';
+
     carregarMensagens();
     loopMensagens = setInterval(carregarMensagens, 3000);
 }
@@ -156,8 +152,7 @@ function abrirConversa(tipo, id, nome) {
 function fecharConversa() {
     clearInterval(loopMensagens);
     chatAtivo = { tipo: null, id: null, nome: null };
-    
-    // Limpa a URL se tiver vindo de um redirecionamento de grupo
+
     if (grupoIdAbertura) {
         const url = new URL(window.location);
         url.searchParams.delete('grupo');
@@ -167,12 +162,12 @@ function fecharConversa() {
     document.getElementById('tela-conversa').style.display = 'none';
     document.getElementById('nav-bar').style.display = 'flex';
     document.getElementById('tela-lista').style.display = 'block';
-    carregarLista(); 
+    carregarLista();
 }
 
 async function carregarMensagens() {
     try {
-        let url = chatAtivo.tipo === 'PRIVADO' 
+        const url = chatAtivo.tipo === 'PRIVADO'
             ? `${API_URL}/chat/${usuario.id}/${chatAtivo.id}`
             : `${API_URL}/comunidades/${chatAtivo.id}/mensagens?usuarioId=${usuario.id}`;
 
@@ -180,10 +175,10 @@ async function carregarMensagens() {
         if (!r.ok) return;
         const mensagens = await r.json();
         const area = document.getElementById('area-mensagens');
-        
+
         if (mensagens.length === 0) {
-            if(area.innerHTML.includes('sincronizar')) {
-                area.innerHTML = '<div style="background: var(--cor-painel); border: 2px solid var(--cor-borda); border-radius: 16px; padding: 24px; text-align: center; margin: 20px;"><p style="font-size: 1.2rem; color: var(--cor-texto); font-weight: bold;">Seja o primeiro a enviar uma mensagem!</p></div>';
+            if (area.innerHTML.includes('spinner') || area.innerHTML.includes('sincronizar')) {
+                area.innerHTML = '<div class="empty-state" style="margin-top:32px;"><div class="icone">💬</div><p>Seja o primeiro a enviar uma mensagem!</p></div>';
             }
             return;
         }
@@ -191,17 +186,17 @@ async function carregarMensagens() {
         let html = '';
         mensagens.forEach(m => {
             const souEu = m.remetenteId === usuario.id || (m.autor && m.autor.id === usuario.id) || m.usuario_id === usuario.id;
-            const cssClasse = souEu ? 'bolha-minha' : 'bolha-outro';
-            const nomeGrupo = (!souEu && chatAtivo.tipo === 'GRUPO') ? `<div class="autor-grupo">${m.autor ? m.autor.nome : 'Membro'}</div>` : '';
-            
-            html += `<div class="bolha-chat ${cssClasse}">${nomeGrupo}${m.conteudo}</div>`;
+            const nomeGrupo = (!souEu && chatAtivo.tipo === 'GRUPO')
+                ? `<p class="balao-autor">${m.autor ? m.autor.nome : 'Membro'}</p>`
+                : '';
+            html += `<div class="balao ${souEu ? 'balao-meu' : 'balao-outro'}">${nomeGrupo}${m.conteudo}</div>`;
         });
 
         if (area.innerHTML !== html) {
             area.innerHTML = html;
-            area.scrollTop = area.scrollHeight; 
+            area.scrollTop = area.scrollHeight;
         }
-    } catch (e) { console.log("Erro no chat"); }
+    } catch (e) {}
 }
 
 async function enviarMensagem() {
@@ -210,8 +205,7 @@ async function enviarMensagem() {
     if (!texto) return;
 
     const area = document.getElementById('area-mensagens');
-    if(area.innerHTML.includes('primeira a enviar')) area.innerHTML = '';
-    area.innerHTML += `<div class="bolha-chat bolha-minha" style="opacity:0.6;">${texto}</div>`;
+    area.innerHTML += `<div class="balao balao-meu" style="opacity:.6;">${texto}</div>`;
     area.scrollTop = area.scrollHeight;
     input.value = '';
 
@@ -224,17 +218,12 @@ async function enviarMensagem() {
             url = `${API_URL}/comunidades/${chatAtivo.id}/mensagens`;
             bodyData = { usuarioId: usuario.id, conteudo: texto };
         }
-
-        await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(bodyData)
-        });
+        await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(bodyData) });
         carregarMensagens();
-    } catch (e) { alert("Falha ao enviar mensagem."); }
+    } catch (e) { alert('Falha ao enviar mensagem.'); }
 }
 
-document.getElementById('input-msg').addEventListener('keypress', function (e) {
+document.getElementById('input-msg').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') enviarMensagem();
 });
 
@@ -245,7 +234,6 @@ if (window.visualViewport) {
     });
 }
 
-// Inicializa
 if (grupoIdAbertura) {
     mudarAba('grupos');
 } else {
