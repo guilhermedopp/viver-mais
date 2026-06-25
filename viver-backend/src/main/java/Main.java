@@ -59,8 +59,7 @@ public class Main {
 
             String authHeader = ctx.header("Authorization");
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                ctx.status(401).result("Acesso Negado: Token JWT ausente.");
-                return;
+                throw new io.javalin.http.UnauthorizedResponse("Acesso Negado: Token JWT ausente.");
             }
             try {
                 String token = authHeader.replace("Bearer ", "");
