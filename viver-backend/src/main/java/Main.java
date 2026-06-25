@@ -36,7 +36,7 @@ public class Main {
         MensagemDAO msgDAO = new MensagemDAO();
         MensagemGrupoDAO msgGrupoDAO = new MensagemGrupoDAO();
 
-        // ── WEBSOCKETS (Observer) ──────────────────────────────────────────
+        // ── WEBSOCKETS (Observer em tempo real) ───────────────────────────
         app.ws("/ws/notificacoes/{uid}", ws -> {
             ws.onConnect(ctx -> {
                 int uid = Integer.parseInt(ctx.pathParam("uid"));
@@ -48,13 +48,14 @@ public class Main {
             });
         });
 
-        // ── FILTRO JWT ────────────────────────────────────────────────────
+        // ── FILTRO JWT ─────────────────────────────────────────────────────
         app.before("/api/*", ctx -> {
             String path = ctx.path();
-            if (path.equals("/api/login") || path.equals("/api/cadastro") 
-                || path.equals("/api/auth/google") || path.equals("/api/auth/completar-perfil") 
-                || path.contains("/disponivel")) return;
-            
+            // Rotas públicas que não precisam de token
+            if (path.equals("/api/login") || path.equals("/api/cadastro")
+                    || path.equals("/api/auth/google") || path.equals("/api/auth/completar-perfil")
+                    || path.contains("/disponivel")) return;
+
             String authHeader = ctx.header("Authorization");
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
                 ctx.status(401).result("Acesso Negado: Token JWT ausente.");
@@ -68,13 +69,12 @@ public class Main {
             }
         });
 
-        // ── AUTH E REAÇÕES ────────────────────────────────────────────────
+        // ── AUTH ──────────────────────────────────────────────────────────
         app.post("/api/login", ctx -> {
             try {
                 DadosLogin d = ctx.bodyAsClass(DadosLogin.class);
                 UsuarioVO u = usuarioBO.login(d.email, d.senha);
-                String token = gerarToken(u);
-                ctx.json(Map.of("token", token, "usuario", u));
+                ctx.json(Map.of("token", gerarToken(u), "usuario", u));
             } catch (Exception e) { ctx.status(401).result(e.getMessage()); }
         });
 
@@ -87,15 +87,6 @@ public class Main {
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
 
-        app.post("/api/posts/{id}/reagir", ctx -> {
-            try {
-                int postId = Integer.parseInt(ctx.pathParam("id"));
-                DadosInteracao d = ctx.bodyAsClass(DadosInteracao.class);
-                ctx.result(usuarioBO.processarReacao(d.usuarioId, postId, d.tipo) ? "reagiu" : "removeu");
-            } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
-        });
-
-        // ── GOOGLE OAUTH ──────────────────────────────────────────────────
         app.post("/api/auth/google", ctx -> {
             try {
                 DadosGoogle d = ctx.bodyAsClass(DadosGoogle.class);
@@ -103,22 +94,18 @@ public class Main {
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("GET");
                 if (conn.getResponseCode() != 200) throw new Exception("Token Google inválido.");
-                
                 StringBuilder sb = new StringBuilder();
                 try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
                     String line; while ((line = br.readLine()) != null) sb.append(line);
                 }
                 String json = sb.toString();
                 String googleId = extrairCampo(json, "sub");
-                String email = extrairCampo(json, "email");
-                String nome = extrairCampo(json, "name");
-                String foto = extrairCampo(json, "picture");
-                
+                String email    = extrairCampo(json, "email");
+                String nome     = extrairCampo(json, "name");
+                String foto     = extrairCampo(json, "picture");
                 UsuarioVO usuario = usuarioBO.loginOuCadastrarGoogle(googleId, nome, email, foto);
-                String token = gerarToken(usuario);
                 boolean precisaCompletar = usuario.getNickname() == null || usuario.getDataNascimento() == null;
-                
-                ctx.json(Map.of("token", token, "usuario", usuario, "precisaCompletar", precisaCompletar));
+                ctx.json(Map.of("token", gerarToken(usuario), "usuario", usuario, "precisaCompletar", precisaCompletar));
             } catch (Exception e) { ctx.status(401).result(e.getMessage()); }
         });
 
@@ -151,16 +138,17 @@ public class Main {
 
         app.post("/api/posts/{id}/ver", ctx -> {
             try {
-                postDAO.marcarComoVisto(ctx.bodyAsClass(DadosInteracao.class).usuarioId, Integer.parseInt(ctx.pathParam("id")));
+                postDAO.marcarComoVisto(ctx.bodyAsClass(DadosInteracao.class).usuarioId,
+                        Integer.parseInt(ctx.pathParam("id")));
                 ctx.status(200).result("ok");
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
 
+        // BUG CORRIGIDO: rota /api/posts/{id}/reagir definida UMA ÚNICA VEZ (era duplicada)
         app.post("/api/posts/{id}/reagir", ctx -> {
             try {
                 int postId = Integer.parseInt(ctx.pathParam("id"));
                 DadosInteracao d = ctx.bodyAsClass(DadosInteracao.class);
-                // Chamada correta ao método do UsuarioBO
                 ctx.result(usuarioBO.processarReacao(d.usuarioId, postId, d.tipo) ? "reagiu" : "removeu");
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
@@ -188,7 +176,8 @@ public class Main {
                 if (email != null && !email.isEmpty()) u = usuarioDAO.buscarPorEmail(email);
                 else if (nickname != null && !nickname.isEmpty()) u = usuarioDAO.buscarPorNickname(nickname.replace("@", ""));
                 if (u == null) { ctx.status(404).result("Usuário não encontrado."); return; }
-                ctx.json(Map.of("id", u.getId(), "nome", u.getNome(), "nickname", u.getNickname() != null ? u.getNickname() : ""));
+                ctx.json(Map.of("id", u.getId(), "nome", u.getNome(),
+                        "nickname", u.getNickname() != null ? u.getNickname() : ""));
             } catch (Exception e) { ctx.status(500).result(e.getMessage()); }
         });
 
@@ -196,7 +185,8 @@ public class Main {
             try {
                 int excluirId = 0;
                 try { excluirId = Integer.parseInt(ctx.queryParam("excluirId")); } catch (Exception ignored) {}
-                ctx.json(Map.of("disponivel", usuarioDAO.nicknameDisponivel(ctx.pathParam("nick").replace("@", ""), excluirId)));
+                ctx.json(Map.of("disponivel",
+                        usuarioDAO.nicknameDisponivel(ctx.pathParam("nick").replace("@", ""), excluirId)));
             } catch (Exception e) { ctx.status(500).result(e.getMessage()); }
         });
 
@@ -205,7 +195,8 @@ public class Main {
                 int id = Integer.parseInt(ctx.pathParam("id"));
                 UsuarioVO u = usuarioDAO.buscarPorId(id);
                 if (u == null) { ctx.status(404).result("Não encontrado."); return; }
-                ctx.json(Map.of("usuario", u, "posts", postDAO.listarPorUsuario(id), "estatisticas", usuarioDAO.buscarEstatisticas(id)));
+                ctx.json(Map.of("usuario", u, "posts", postDAO.listarPorUsuario(id),
+                        "estatisticas", usuarioDAO.buscarEstatisticas(id)));
             } catch (Exception e) { ctx.status(500).result(e.getMessage()); }
         });
 
@@ -357,28 +348,32 @@ public class Main {
     }
 
     private static String extrairCampo(String json, String campo) {
-        java.util.regex.Matcher m = java.util.regex.Pattern.compile("\"" + campo + "\"\\s*:\\s*\"([^\"]+)\"").matcher(json);
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile(
+                "\"" + campo + "\"\\s*:\\s*\"([^\"]+)\"").matcher(json);
         return m.find() ? m.group(1) : "";
     }
 
     private static String gerarToken(UsuarioVO u) {
-        return JWT.create().withSubject(String.valueOf(u.getId())).withClaim("email", u.getEmail())
-            .withExpiresAt(new java.util.Date(System.currentTimeMillis() + 86400000)).sign(Algorithm.HMAC256(JWT_SECRET));
+        return JWT.create()
+                .withSubject(String.valueOf(u.getId()))
+                .withClaim("email", u.getEmail())
+                .withExpiresAt(new java.util.Date(System.currentTimeMillis() + 86_400_000L))
+                .sign(Algorithm.HMAC256(JWT_SECRET));
     }
 
     // DTOs
-    public static class DadosLogin { public String email, senha; public DadosLogin() {} }
-    public static class DadosCadastro { public String nome, nickname, email, senha, dataNascimento; public DadosCadastro() {} }
-    public static class DadosGoogle { public String credential; public DadosGoogle() {} }
-    public static class DadosCompletarPerfil { public int usuarioId; public String nickname, dataNascimento; public DadosCompletarPerfil() {} }
-    public static class DadosInteracao { public int usuarioId; public String texto; public String tipo; public DadosInteracao() {} }
-    public static class DadosPost { public String texto, imagem, destinoTipo; public int destinoId; public UsuarioVO autor; public DadosPost() {} }
-    public static class DadosNovaComunidade { public String nome, descricao; public int criadorId; public DadosNovaComunidade() {} }
-    public static class DadosEditarGrupo { public int usuarioId; public String nome, descricao, fotoGrupo; public DadosEditarGrupo() {} }
-    public static class DadosFoto { public String base64; public DadosFoto() {} }
-    public static class DadosMensagem { public int remetenteId, destinatarioId; public String conteudo; public DadosMensagem() {} }
-    public static class DadosMensagemGrupo { public int usuarioId; public String conteudo; public DadosMensagemGrupo() {} }
-    public static class DadosConvite { public int convidanteId, convidadoId; public DadosConvite() {} }
-    public static class DadosRespostaConvite { public int usuarioId; public boolean aceitar; public DadosRespostaConvite() {} }
-    public static class DadosNickname { public String nickname; public DadosNickname() {} }
+    public static class DadosLogin           { public String email, senha;                                                                   public DadosLogin() {} }
+    public static class DadosCadastro        { public String nome, nickname, email, senha, dataNascimento;                                   public DadosCadastro() {} }
+    public static class DadosGoogle          { public String credential;                                                                     public DadosGoogle() {} }
+    public static class DadosCompletarPerfil { public int usuarioId; public String nickname, dataNascimento;                                 public DadosCompletarPerfil() {} }
+    public static class DadosInteracao       { public int usuarioId; public String texto, tipo;                                             public DadosInteracao() {} }
+    public static class DadosPost            { public String texto, imagem, destinoTipo; public int destinoId; public UsuarioVO autor;        public DadosPost() {} }
+    public static class DadosNovaComunidade  { public String nome, descricao; public int criadorId;                                         public DadosNovaComunidade() {} }
+    public static class DadosEditarGrupo     { public int usuarioId; public String nome, descricao, fotoGrupo;                               public DadosEditarGrupo() {} }
+    public static class DadosFoto            { public String base64;                                                                         public DadosFoto() {} }
+    public static class DadosMensagem        { public int remetenteId, destinatarioId; public String conteudo;                               public DadosMensagem() {} }
+    public static class DadosMensagemGrupo   { public int usuarioId; public String conteudo;                                                public DadosMensagemGrupo() {} }
+    public static class DadosConvite         { public int convidanteId, convidadoId;                                                        public DadosConvite() {} }
+    public static class DadosRespostaConvite { public int usuarioId; public boolean aceitar;                                                 public DadosRespostaConvite() {} }
+    public static class DadosNickname        { public String nickname;                                                                       public DadosNickname() {} }
 }
