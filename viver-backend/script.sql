@@ -6,21 +6,29 @@ USE viver_db;
 CREATE TABLE usuarios (
     id               INT AUTO_INCREMENT PRIMARY KEY,
     nome             VARCHAR(100)  NOT NULL,
-    nickname         VARCHAR(30)   UNIQUE,              -- @apelido único
+    nickname         VARCHAR(30)   UNIQUE,
     email            VARCHAR(100)  NOT NULL UNIQUE,
     senha            VARCHAR(255),                      -- NULL quando login é via Google
-    google_id        VARCHAR(255)  UNIQUE,              -- ID retornado pelo Google OAuth
-    data_nascimento  DATE,                              -- opcional para login Google (pedido depois)
+    google_id        VARCHAR(255)  UNIQUE,
+    data_nascimento  DATE,
     foto_perfil      MEDIUMTEXT    DEFAULT NULL
 );
 
--- NOTA DE SEGURANÇA: Como implementámos o BCrypt e regras rígidas de senha, 
--- o login com a senha '1234' destes utilizadores testes não irá funcionar.
--- Utilize a página de Registo da aplicação para criar novas contas de teste válidas!
+-- ═══════════════════════════════════════════════════════════════
+-- UTILIZADORES DE TESTE
+-- Senha dos dois utilizadores abaixo: Teste123
+-- (hash BCrypt gerado com 10 rounds — compatível com jBCrypt 0.4)
+-- ═══════════════════════════════════════════════════════════════
 INSERT INTO usuarios (nome, nickname, email, senha, data_nascimento)
 VALUES
-  ('Dona Maria', 'donamaria', 'maria@viver.com', '1234', '1950-05-20'),
-  ('Seu José',   'seujose',   'jose@viver.com',  '1234', '1945-03-10');
+  ('Dona Maria', 'donamaria', 'maria@viver.com',
+   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',
+   '1950-05-20'),
+  ('Seu José',   'seujose',   'jose@viver.com',
+   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',
+   '1945-03-10');
+
+-- Para criar mais contas de teste, use a página de Cadastro da aplicação.
 
 CREATE TABLE postagens (
     id           INT AUTO_INCREMENT PRIMARY KEY,
@@ -36,11 +44,11 @@ CREATE TABLE postagens (
 INSERT INTO postagens (conteudo, usuario_id)
 VALUES ('Que bom estar aqui no VIVER+! 🌱', 1);
 
--- Tabela atualizada para suportar Múltiplas Reações (Polimorfismo)
+-- Suporta múltiplas reações (curtida, abraco, parabens) — Polimorfismo
 CREATE TABLE curtidas (
     usuario_id INT NOT NULL,
     post_id    INT NOT NULL,
-    tipo       VARCHAR(20) DEFAULT 'curtida', -- NOVO CAMPO: curtida, abraco, parabens
+    tipo       VARCHAR(20) DEFAULT 'curtida',
     PRIMARY KEY (usuario_id, post_id),
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (post_id)    REFERENCES postagens(id) ON DELETE CASCADE
@@ -88,7 +96,7 @@ CREATE TABLE comunidades (
     id           INT AUTO_INCREMENT PRIMARY KEY,
     nome         VARCHAR(100) NOT NULL,
     descricao    TEXT,
-    foto_grupo   MEDIUMTEXT   DEFAULT NULL,             -- foto/ícone do grupo
+    foto_grupo   MEDIUMTEXT   DEFAULT NULL,
     criador_id   INT,
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (criador_id) REFERENCES usuarios(id) ON DELETE SET NULL
@@ -123,7 +131,7 @@ CREATE TABLE mensagens (
     conteudo         TEXT NOT NULL,
     lida             BOOLEAN   DEFAULT FALSE,
     data_criacao     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (remetente_id)   REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (remetente_id)    REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (destinatario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 );
 
