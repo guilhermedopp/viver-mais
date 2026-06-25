@@ -53,7 +53,6 @@
 
 <script src="js/api.js"></script>
 <script>
-const API_URL = 'http://localhost:8080/api';
 const usuario = JSON.parse(localStorage.getItem('usuarioLogado'));
 if (!usuario) window.location.href = 'index.html';
 else document.getElementById('saudacao').textContent = `Olá, ${usuario.nome.split(' ')[0]}! 👋`;
@@ -203,7 +202,8 @@ async function carregarFeed() {
 
 // WebSocket para notificações em tempo real
 try {
-  const ws = new WebSocket(`ws://localhost:8080/ws/notificacoes/${usuario.id}`);
+  const wsHost = API_URL.replace(/^https?/, 'ws').replace('/api', '');
+  const ws = new WebSocket(`${wsHost}/ws/notificacoes/${usuario.id}`);
   ws.onmessage = (e) => {
     if (e.data === 'NOVA_NOTIFICACAO') {
       const b = document.getElementById('badge-notif');

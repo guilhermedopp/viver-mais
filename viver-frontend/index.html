@@ -98,6 +98,33 @@
 <script src="js/api.js"></script>
 <script src="js/pwa-setup.js"></script>
 <script>
+  document.getElementById('form-login').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const senha = document.getElementById('senha').value;
+    const msgEl = document.getElementById('msg-login');
+    msgEl.style.display = 'none';
+    try {
+      const res = await fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, senha })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        localStorage.setItem('jwtToken', data.token);
+        localStorage.setItem('usuarioLogado', JSON.stringify(data.usuario));
+        window.location.href = 'feed.html';
+      } else {
+        msgEl.textContent = await res.text();
+        msgEl.style.display = 'block';
+      }
+    } catch (_) {
+      msgEl.textContent = 'Não foi possível conectar ao servidor VIVER+.';
+      msgEl.style.display = 'block';
+    }
+  });
+
   function toggleSenha() {
     const inp = document.getElementById('senha');
     inp.type = inp.type === 'password' ? 'text' : 'password';

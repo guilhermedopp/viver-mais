@@ -3,8 +3,7 @@
 // Responsabilidades: URL da API, Segurança JWT e Acessibilidade.
 // ═══════════════════════════════════════════════════════════════
 
-// O IP do seu computador na rede local (para o telemóvel encontrar o backend)
-const API_URL = 'http://192.168.0.52:8080/api';
+const API_URL = 'http://localhost:8080/api';
 
 (function () {
     const fetchOriginal = window.fetch.bind(window);
