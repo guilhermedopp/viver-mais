@@ -8,7 +8,7 @@ Rede social de partilha de momentos e socialização desenvolvida com foco em **
 
 | Módulo | Descrição |
 |---|---|
-| Feed | Publicar textos e fotos, curtir/reagir (❤️ Curtida / 🫂 Abraço / 👏 Parabéns), comentar, filtrar por "todos" ou "seguindo" |
+| Feed | Publicar textos e fotos, curtir/reagir (❤️ Curtida / 🫂 Abraço / 👏 Parabéns), comentar, filtrar por "todos" ou "seguindo"; posts de comunidades exibem badge identificador e são filtrados corretamente do feed geral |
 | Pesquisa | Barra de busca de usuários por nome ou @apelido no feed |
 | Perfil próprio | Foto, @apelido editável, estatísticas (posts, seguidores, seguindo) |
 | Perfil público | Ver perfil de outro usuário, seguir/deixar de seguir, abrir chat direto |
@@ -112,7 +112,8 @@ viver-mais/
     ├── css/ style.css
     ├── sw.js               # Service Worker (network-first, cache v5)
     ├── manifest.json
-    └── package.json        # Scripts npm (dev, watch)
+    └── package.json        # Scripts npm (dev, watch, test)
+testes.mjs                  # Suite de testes automatizados (Playwright)
 ```
 
 ---
@@ -236,6 +237,7 @@ Acesse: **http://localhost:3000**
 |---|---|
 | `npm run dev` | Inicia backend + frontend em paralelo |
 | `npm run watch` | Backend com recompilação automática ao salvar |
+| `npm run test` | Executa a suite de testes automatizados (Playwright) |
 | `mvn clean compile exec:java -Dexec.mainClass=Main` | Apenas o backend |
 | `npx serve viver-frontend` | Apenas o frontend |
 
@@ -249,6 +251,34 @@ Após executar o `script.sql`:
 |---|---|---|
 | Dona Maria | maria@viver.com | Teste123 |
 | Seu José | jose@viver.com | Teste123 |
+
+---
+
+## Testes Automatizados
+
+O projeto inclui uma suite de testes end-to-end (`testes.mjs`) baseada em [Playwright](https://playwright.dev/), cobrindo 74 cenários de API e UI.
+
+**Pré-requisito:** backend em `:8080` e frontend em `:3000` já iniciados.
+
+```bash
+# Em terminais separados:
+npm run backend
+npm run frontend
+
+# Depois:
+npm run test
+```
+
+| Seção | O que é testado |
+|---|---|
+| Autenticação | Login, cadastro, token JWT |
+| Feed / Posts | Criar post, reagir, comentar, filtrar por "seguindo" |
+| Perfil | Atualizar foto, @apelido, estatísticas |
+| Seguir | Seguir/deixar de seguir, verificação de estado |
+| Chat privado | Enviar mensagem, marcar como lida, listar conversas |
+| Comunidades | Criar grupo, convidar membro, aceitar convite, chat de grupo |
+| Notificações | Listar, marcar como lida, contador |
+| UI (Playwright) | Fluxo de login, navegação, abertura de chat por URL |
 
 ---
 
