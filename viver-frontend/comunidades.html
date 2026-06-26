@@ -155,7 +155,7 @@ async function criarGrupo() {
   } catch (e) { mostrarToast('Não foi possível criar o grupo.', 'erro'); }
 }
 
-function abrirChat(grupoId) { window.location.href = `chat.html?grupo=${grupoId}`; }
+function abrirChat(grupoId) { window.location.href = `chat?grupo=${grupoId}`; }
 
 let _grupoConviteId = null;
 function convidarAlguem(grupoId, nomeGrupo) {
