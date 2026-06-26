@@ -11,13 +11,22 @@
 <div class="app">
 
   <!-- Header fixo -->
-  <header class="page-header">
+  <header class="page-header" style="display: flex; align-items: center;">
     <div class="logo-mini">
       <img src="img/logo.png" alt="VIVER+">
       <span>VIVER+</span>
     </div>
+
+    <!-- ===== NOVO: BOTÃO DE COMUNIDADE ===== -->
+    <a href="comunidades.html" style="margin-left: 12px; text-decoration: none; background-color: #17B15C; color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; display: flex; align-items: center; gap: 4px; transition: opacity 0.2s; white-space: nowrap;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+      👥 Comunidade
+    </a>
+    <!-- ===================================== -->
+
     <div style="flex:1;"></div>
-    <p id="saudacao" style="font-size:.9rem;font-weight:700;color:var(--texto-suave);"></p>
+    
+    <p id="saudacao" style="font-size:.9rem;font-weight:700;color:var(--texto-suave); margin-bottom: 0;"></p>
+    
     <button onclick="alternarAcessibilidade()" class="btn-icone" title="Alternar tamanho da letra" style="margin-left:8px;">
       <svg viewBox="0 0 24 24"><path d="M9 4v3h5v12h3V7h5V4H9zm-6 8h3v7h3v-7h3V9H3v3z"/></svg>
     </button>

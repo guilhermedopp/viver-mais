@@ -1,9 +1,17 @@
 package com.dao;
 
-import com.vo.*;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.vo.PostVO;
+import com.vo.RespostaVO;
+import com.vo.UsuarioVO;
 
 public class PostDAO {
 
@@ -60,22 +68,30 @@ public class PostDAO {
             ? "AND p.usuario_id IN (SELECT seguido_id FROM seguidores WHERE seguidor_id = ?)"
             : "";
 
+        // SQL ATUALIZADO: Filtra apenas posts de usuários ou comunidades das quais o usuário faz parte
         String sql = "SELECT p.id, p.conteudo, p.imagem, p.data_criacao, p.destino_tipo, " +
                      "u.id AS uid, u.nome, u.email, u.foto_perfil, u.data_nascimento, " +
                      "(SELECT COUNT(*) FROM curtidas c WHERE c.post_id = p.id) AS total_curtidas, " +
                      "(SELECT COUNT(*) FROM curtidas c WHERE c.post_id = p.id AND c.usuario_id = ?) AS eu_curto, " +
                      "(SELECT COUNT(*) FROM visualizacoes v WHERE v.post_id = p.id AND v.usuario_id = ?) AS eu_vi " +
                      "FROM postagens p JOIN usuarios u ON p.usuario_id = u.id " +
-                     "WHERE 1=1 " + condicaoSeguidos +
+                     "WHERE (p.destino_tipo = 'USUARIO' OR (p.destino_tipo = 'COMUNIDADE' AND p.destino_id IN " +
+                     "(SELECT comunidade_id FROM membros_comunidade WHERE usuario_id = ?))) " +
+                     condicaoSeguidos +
                      " ORDER BY p.data_criacao DESC";
 
         List<PostVO> lista = new ArrayList<>();
         try (Connection conn = ConexaoDB.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, usuarioLogadoId); 
-            stmt.setInt(2, usuarioLogadoId); 
-            if (soSeguidos) stmt.setInt(3, usuarioLogadoId); 
+            stmt.setInt(1, usuarioLogadoId); // eu_curto
+            stmt.setInt(2, usuarioLogadoId); // eu_vi
+            stmt.setInt(3, usuarioLogadoId); // subquery membros_comunidade
+            
+            int paramIndex = 4;
+            if (soSeguidos) {
+                stmt.setInt(paramIndex, usuarioLogadoId);
+            }
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -148,7 +164,6 @@ public class PostDAO {
         return lista;
     }
 
-    // ── ATUALIZADO: Suporte a Múltiplas Reações (Polimorfismo) ─────────────────
     public boolean alternarCurtida(int usuarioId, int postId, String tipo) throws Exception {
         String check = "SELECT 1 FROM curtidas WHERE usuario_id = ? AND post_id = ?";
         try (Connection conn = ConexaoDB.conectar();
@@ -162,7 +177,6 @@ public class PostDAO {
                     }
                     return false;
                 } else {
-                    // Grava o "tipo" da reação na base de dados
                     try (PreparedStatement i = conn.prepareStatement(
                             "INSERT INTO curtidas (usuario_id, post_id, tipo) VALUES (?, ?, ?)")) {
                         i.setInt(1, usuarioId); 

@@ -10,7 +10,6 @@
 <body>
 <div class="app">
 
-    <!-- Lista de contactos -->
     <div id="tela-lista">
         <header class="page-header">
             <div class="logo-mini">
@@ -20,7 +19,7 @@
             <h1 style="font-size:1.3rem;font-weight:800;flex:1;text-align:right;">Mensagens</h1>
         </header>
 
-        <div class="filtros">
+        <div class="filtros" style="top: 69px;">
             <button class="filtro ativo" id="btn-amigos" onclick="mudarAba('amigos')" style="flex:1;">Amigos</button>
             <button class="filtro"       id="btn-grupos" onclick="mudarAba('grupos')" style="flex:1;">Grupos</button>
         </div>
@@ -30,7 +29,6 @@
         </div>
     </div>
 
-    <!-- Conversa (overlay full-screen) -->
     <div id="tela-conversa" class="chat-overlay">
         <div class="chat-header">
             <button onclick="fecharConversa()" class="btn-icone" aria-label="Voltar">
@@ -70,8 +68,9 @@ let chatAtivo = { tipo: null, id: null, nome: null };
 let loopMensagens = null;
 
 const urlParams = new URLSearchParams(window.location.search);
-const grupoIdAbertura = urlParams.get('grupo');
-const usuarioIdAbertura = urlParams.get('usuario');
+// CORREÇÃO: Usar 'let' em vez de 'const' para podermos limpar a variável ao fechar a conversa
+let grupoIdAbertura = urlParams.get('grupo');
+let usuarioIdAbertura = urlParams.get('usuario');
 
 function mudarAba(aba) {
     abaAtual = aba;
@@ -122,8 +121,9 @@ async function carregarLista() {
                     </div>
                 </div>`).join('');
 
+            // CORREÇÃO: Conversão forte para Number para garantir que identifica o grupo corretamente
             if (grupoIdAbertura && chatAtivo.id === null) {
-                const grp = grupos.find(x => x.id == grupoIdAbertura);
+                const grp = grupos.find(x => Number(x.id) === Number(grupoIdAbertura));
                 if (grp) abrirConversa('GRUPO', grp.id, grp.nome);
             }
         }
@@ -154,6 +154,9 @@ function fecharConversa() {
     chatAtivo = { tipo: null, id: null, nome: null };
 
     if (grupoIdAbertura || usuarioIdAbertura) {
+        // CORREÇÃO: Limpar as variáveis da memória para que ao fechar a conversa, ele não volte a abrir automaticamente
+        grupoIdAbertura = null; 
+        usuarioIdAbertura = null;
         const url = new URL(window.location);
         url.searchParams.delete('grupo');
         url.searchParams.delete('usuario');
@@ -235,14 +238,6 @@ if (window.visualViewport) {
     });
 }
 
-if (grupoIdAbertura) {
-    mudarAba('grupos');
-} else if (usuarioIdAbertura) {
-    carregarLista().then(() => abrirConversaUsuario(parseInt(usuarioIdAbertura)));
-} else {
-    carregarLista();
-}
-
 async function abrirConversaUsuario(uid) {
     try {
         const r = await fetch(`${API_URL}/usuarios/${uid}`);
@@ -251,6 +246,18 @@ async function abrirConversaUsuario(uid) {
         abrirConversa('PRIVADO', u.id, u.nome);
     } catch (_) {}
 }
+
+// CORREÇÃO: Envolver a verificação de abertura num evento DOMContentLoaded.
+// Assim, ele aguarda o ecrã desenhar antes de tentar forçar o clique na aba 'Grupos', impedindo que vá para 'Amigos' acidentalmente.
+document.addEventListener('DOMContentLoaded', () => {
+    if (grupoIdAbertura) {
+        mudarAba('grupos');
+    } else if (usuarioIdAbertura) {
+        carregarLista().then(() => abrirConversaUsuario(parseInt(usuarioIdAbertura)));
+    } else {
+        carregarLista();
+    }
+});
 </script>
 </body>
 </html>
