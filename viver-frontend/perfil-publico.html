@@ -42,7 +42,7 @@ const eu = JSON.parse(localStorage.getItem('usuarioLogado'));
 if (!eu) { window.location.href = 'index.html'; throw new Error('Não autenticado'); }
 const perfilId = parseInt(new URLSearchParams(window.location.search).get('id'));
 if (isNaN(perfilId) || perfilId <= 0) { window.location.href = 'feed.html'; throw new Error('ID inválido'); }
-if (perfilId === eu.id) { window.location.href = 'perfil.html'; }
+if (perfilId === eu.id) { window.location.href = 'perfil.html'; throw new Error('Próprio perfil'); }
 
 async function carregarPerfil() {
   try {

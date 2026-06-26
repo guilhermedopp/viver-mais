@@ -1,4 +1,5 @@
 -- VIVER+ — Script Final do Banco de Dados
+SET NAMES 'utf8mb4';
 DROP DATABASE IF EXISTS viver_db;
 CREATE DATABASE viver_db;
 USE viver_db;
@@ -22,10 +23,10 @@ CREATE TABLE usuarios (
 INSERT INTO usuarios (nome, nickname, email, senha, data_nascimento)
 VALUES
   ('Dona Maria', 'donamaria', 'maria@viver.com',
-   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',
+   '$2a$10$5ppyaQoyAY4bqRgx1xHCROlnuTbX/CU7DyRrFi/rdRf3ZZ8.slljC',
    '1950-05-20'),
-  ('Seu José',   'seujose',   'jose@viver.com',
-   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',
+  (CONVERT(0x536575204A6F73C3A9 USING utf8mb4), 'seujose', 'jose@viver.com',
+   '$2a$10$5ppyaQoyAY4bqRgx1xHCROlnuTbX/CU7DyRrFi/rdRf3ZZ8.slljC',
    '1945-03-10');
 
 -- Para criar mais contas de teste, use a página de Cadastro da aplicação.
@@ -42,7 +43,7 @@ CREATE TABLE postagens (
 );
 
 INSERT INTO postagens (conteudo, usuario_id)
-VALUES ('Que bom estar aqui no VIVER+! 🌱', 1);
+VALUES ('Que bom estar aqui no VIVER+!', 1);
 
 -- Suporta múltiplas reações (curtida, abraco, parabens) — Polimorfismo
 CREATE TABLE curtidas (

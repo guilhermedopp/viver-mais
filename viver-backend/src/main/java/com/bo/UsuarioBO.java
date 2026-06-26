@@ -80,7 +80,8 @@ public class UsuarioBO {
     }
 
     // ── Postagem ──────────────────────────────────────────────────────────
-    public PostVO criarPostagem(UsuarioVO autor, String texto, String imagem) throws Exception {
+    public PostVO criarPostagem(UsuarioVO autor, String texto, String imagem,
+                                String destinoTipo, int destinoId) throws Exception {
         if (texto == null || texto.trim().isEmpty())
             throw new Exception("A mensagem não pode estar vazia.");
         if (texto.length() > MAX_POST)
@@ -92,6 +93,10 @@ public class UsuarioBO {
 
         PostVO post = new PostVO(0, texto, autor);
         post.setImagem(imagem);
+        if ("COMUNIDADE".equals(destinoTipo) && destinoId > 0) {
+            post.setDestinoTipo("COMUNIDADE");
+            post.setDestino(new com.vo.ComunidadeVO(destinoId, "", ""));
+        }
         PostVO salvo = postDao.salvar(post);
 
         // Observer: notifica seguidores
@@ -104,8 +109,12 @@ public class UsuarioBO {
         return salvo;
     }
 
+    public PostVO criarPostagem(UsuarioVO autor, String texto, String imagem) throws Exception {
+        return criarPostagem(autor, texto, imagem, "USUARIO", autor.getId());
+    }
+
     public PostVO criarPostagem(UsuarioVO autor, String texto) throws Exception {
-        return criarPostagem(autor, texto, null);
+        return criarPostagem(autor, texto, null, "USUARIO", autor.getId());
     }
 
     // ── Reações (Substitui a antiga Curtida para usar Polimorfismo) ───────

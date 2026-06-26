@@ -23,6 +23,17 @@
     </button>
   </header>
 
+  <!-- Pesquisa -->
+  <div class="pesquisa-section">
+    <div class="pesquisa-container">
+      <svg class="pesquisa-icone" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <input type="search" class="pesquisa-input" id="pesquisa-input"
+             placeholder="Pesquisar pessoa pelo nome ou @apelido"
+             autocomplete="off" oninput="pesquisarUsuarios()">
+      <div class="pesquisa-resultados" id="pesquisa-resultados" style="display:none;"></div>
+    </div>
+  </div>
+
   <!-- Filtros -->
   <div class="filtros">
     <button class="filtro ativo" id="btn-todos"     onclick="filtrar('todos')">Todos</button>
@@ -61,6 +72,64 @@ if (!usuario) {
 document.getElementById('saudacao').textContent = `Olá, ${usuario.nome.split(' ')[0]}! 👋`;
 
 let todosPosts = [], filtroAtual = 'todos';
+
+function navegarPerfil(id) {
+  if (id === usuario.id) window.location.href = 'perfil.html';
+  else window.location.href = `perfil-publico.html?id=${id}`;
+}
+
+// ── Pesquisa de utilizadores ──────────────────────────────
+let todosUsuarios = null, timerPesquisa;
+
+async function carregarTodosUsuarios() {
+  if (todosUsuarios) return todosUsuarios;
+  try {
+    const r = await fetch(`${API_URL}/usuarios`);
+    if (r.ok) todosUsuarios = await r.json();
+  } catch (_) {}
+  return todosUsuarios || [];
+}
+
+async function pesquisarUsuarios() {
+  clearTimeout(timerPesquisa);
+  const q = document.getElementById('pesquisa-input').value.trim().toLowerCase();
+  const box = document.getElementById('pesquisa-resultados');
+  if (q.length < 2) { box.style.display = 'none'; return; }
+  timerPesquisa = setTimeout(async () => {
+    const lista = await carregarTodosUsuarios();
+    const filtrados = lista.filter(u =>
+      u.id !== usuario.id && (
+        u.nome.toLowerCase().includes(q) ||
+        (u.nickname && u.nickname.toLowerCase().includes(q.replace('@', '')))
+      )
+    ).slice(0, 7);
+    if (!filtrados.length) {
+      box.innerHTML = '<div class="pesquisa-vazio">Nenhuma pessoa encontrada</div>';
+    } else {
+      box.innerHTML = filtrados.map(u => {
+        const av = u.fotoPerfil
+          ? `<img src="${u.fotoPerfil}" class="avatar avatar-sm" alt="${u.nome}">`
+          : `<div class="avatar avatar-sm">${u.nome.charAt(0).toUpperCase()}</div>`;
+        return `<div class="pesquisa-item" onclick="irParaPerfil(${u.id})">
+          ${av}
+          <div><strong>${u.nome}</strong>${u.nickname ? `<small>@${u.nickname}</small>` : ''}</div>
+        </div>`;
+      }).join('');
+    }
+    box.style.display = 'block';
+  }, 280);
+}
+
+function irParaPerfil(id) {
+  document.getElementById('pesquisa-resultados').style.display = 'none';
+  document.getElementById('pesquisa-input').value = '';
+  navegarPerfil(id);
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.pesquisa-container'))
+    document.getElementById('pesquisa-resultados').style.display = 'none';
+});
 
 async function carregarBadgeNotif() {
   try {
@@ -113,9 +182,9 @@ function renderCard(post) {
   if (post.respostas?.length) {
     respostasHtml = `<div class="respostas">${post.respostas.map(r => `
       <div class="resposta">
-        <a href="perfil-publico.html?id=${r.autor.id}">${avatar(r.autor,'sm')}</a>
+        <a href="perfil-publico.html?id=${r.autor.id}" onclick="navegarPerfil(${r.autor.id});return false;" style="display:flex;flex-shrink:0;">${avatar(r.autor,'sm')}</a>
         <div class="resposta-balao">
-          <a href="perfil-publico.html?id=${r.autor.id}" class="resposta-autor">${r.autor.nome}</a>
+          <a href="perfil-publico.html?id=${r.autor.id}" onclick="navegarPerfil(${r.autor.id});return false;" class="resposta-autor">${r.autor.nome}</a>
           <p class="resposta-texto">${r.conteudo}</p>
         </div>
       </div>`).join('')}</div>`;
@@ -125,9 +194,9 @@ function renderCard(post) {
   art.className = `post-card${!post.visto ? ' novo' : ''}`;
   art.innerHTML = `
     <div class="post-card-header">
-      <a href="perfil-publico.html?id=${post.autor.id}" style="text-decoration:none;">${avatar(post.autor)}</a>
+      <a href="perfil-publico.html?id=${post.autor.id}" onclick="navegarPerfil(${post.autor.id});return false;" style="text-decoration:none;display:flex;flex-shrink:0;">${avatar(post.autor)}</a>
       <div class="info">
-        <a href="perfil-publico.html?id=${post.autor.id}" class="post-autor">${post.autor.nome}</a>
+        <a href="perfil-publico.html?id=${post.autor.id}" onclick="navegarPerfil(${post.autor.id});return false;" class="post-autor">${post.autor.nome}</a>
         <p class="post-data">${data}${!post.visto ? ' <span class="post-tag-novo">Novo</span>' : ''}</p>
       </div>
     </div>

@@ -144,7 +144,7 @@ public class Main {
         app.post("/api/posts", ctx -> {
             try {
                 DadosPost d = ctx.bodyAsClass(DadosPost.class);
-                ctx.status(201).json(usuarioBO.criarPostagem(d.autor, d.texto, d.imagem));
+                ctx.status(201).json(usuarioBO.criarPostagem(d.autor, d.texto, d.imagem, d.destinoTipo, d.destinoId));
             } catch (Exception e) { ctx.status(400).result(e.getMessage()); }
         });
 
