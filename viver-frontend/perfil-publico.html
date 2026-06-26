@@ -73,7 +73,7 @@ async function carregarPerfil() {
           class="btn ${sigo ? 'btn-secundario' : 'btn-primario'}" style="flex:1;">
           ${sigo ? '✅ Seguindo' : '➕ Seguir'}
         </button>
-        <button onclick="window.location.href='chat.html'"
+        <button onclick="window.location.href='chat.html?usuario=${perfilId}'"
           class="btn btn-secundario" style="flex:1;">
           💬 Mensagem
         </button>

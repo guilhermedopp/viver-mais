@@ -71,6 +71,7 @@ let loopMensagens = null;
 
 const urlParams = new URLSearchParams(window.location.search);
 const grupoIdAbertura = urlParams.get('grupo');
+const usuarioIdAbertura = urlParams.get('usuario');
 
 function mudarAba(aba) {
     abaAtual = aba;
@@ -152,9 +153,10 @@ function fecharConversa() {
     clearInterval(loopMensagens);
     chatAtivo = { tipo: null, id: null, nome: null };
 
-    if (grupoIdAbertura) {
+    if (grupoIdAbertura || usuarioIdAbertura) {
         const url = new URL(window.location);
         url.searchParams.delete('grupo');
+        url.searchParams.delete('usuario');
         window.history.replaceState({}, '', url);
     }
 
@@ -235,8 +237,19 @@ if (window.visualViewport) {
 
 if (grupoIdAbertura) {
     mudarAba('grupos');
+} else if (usuarioIdAbertura) {
+    carregarLista().then(() => abrirConversaUsuario(parseInt(usuarioIdAbertura)));
 } else {
     carregarLista();
+}
+
+async function abrirConversaUsuario(uid) {
+    try {
+        const r = await fetch(`${API_URL}/usuarios/${uid}`);
+        if (!r.ok) return;
+        const { usuario: u } = await r.json();
+        abrirConversa('PRIVADO', u.id, u.nome);
+    } catch (_) {}
 }
 </script>
 </body>
