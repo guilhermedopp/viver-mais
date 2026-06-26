@@ -1,4 +1,4 @@
-const CACHE_NAME = 'viver-mais-v4';
+const CACHE_NAME = 'viver-mais-v5';
 
 const ARQUIVOS_CACHE = [
   './',

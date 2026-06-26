@@ -75,7 +75,7 @@ let todosPosts = [], filtroAtual = 'todos';
 
 function navegarPerfil(id) {
   if (id === usuario.id) window.location.href = 'perfil.html';
-  else window.location.href = `perfil-publico.html?id=${id}`;
+  else window.location.href = `perfil-publico?id=${id}`;
 }
 
 // ── Pesquisa de utilizadores ──────────────────────────────
@@ -182,9 +182,9 @@ function renderCard(post) {
   if (post.respostas?.length) {
     respostasHtml = `<div class="respostas">${post.respostas.map(r => `
       <div class="resposta">
-        <a href="perfil-publico.html?id=${r.autor.id}" onclick="navegarPerfil(${r.autor.id});return false;" style="display:flex;flex-shrink:0;">${avatar(r.autor,'sm')}</a>
+        <a href="perfil-publico?id=${r.autor.id}" onclick="navegarPerfil(${r.autor.id});return false;" style="display:flex;flex-shrink:0;">${avatar(r.autor,'sm')}</a>
         <div class="resposta-balao">
-          <a href="perfil-publico.html?id=${r.autor.id}" onclick="navegarPerfil(${r.autor.id});return false;" class="resposta-autor">${r.autor.nome}</a>
+          <a href="perfil-publico?id=${r.autor.id}" onclick="navegarPerfil(${r.autor.id});return false;" class="resposta-autor">${r.autor.nome}</a>
           <p class="resposta-texto">${r.conteudo}</p>
         </div>
       </div>`).join('')}</div>`;
@@ -194,9 +194,9 @@ function renderCard(post) {
   art.className = `post-card${!post.visto ? ' novo' : ''}`;
   art.innerHTML = `
     <div class="post-card-header">
-      <a href="perfil-publico.html?id=${post.autor.id}" onclick="navegarPerfil(${post.autor.id});return false;" style="text-decoration:none;display:flex;flex-shrink:0;">${avatar(post.autor)}</a>
+      <a href="perfil-publico?id=${post.autor.id}" onclick="navegarPerfil(${post.autor.id});return false;" style="text-decoration:none;display:flex;flex-shrink:0;">${avatar(post.autor)}</a>
       <div class="info">
-        <a href="perfil-publico.html?id=${post.autor.id}" onclick="navegarPerfil(${post.autor.id});return false;" class="post-autor">${post.autor.nome}</a>
+        <a href="perfil-publico?id=${post.autor.id}" onclick="navegarPerfil(${post.autor.id});return false;" class="post-autor">${post.autor.nome}</a>
         <p class="post-data">${data}${!post.visto ? ' <span class="post-tag-novo">Novo</span>' : ''}</p>
       </div>
     </div>
