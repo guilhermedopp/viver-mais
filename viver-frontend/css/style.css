@@ -33,13 +33,14 @@
 /* ── Reset & Base ─────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { min-height: 100%; -webkit-text-size-adjust: 100%; }
+html { height: 100%; -webkit-text-size-adjust: 100%; }
 
 body {
   font-family: 'Nunito', Arial, sans-serif;
   background: var(--verde-fundo);
   color: var(--texto);
-  min-height: 100vh;
+  height: 100%;
+  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -56,8 +57,8 @@ input, textarea, select { font-size: 16px !important; font-family: 'Nunito', Ari
 .app {
   width: 100%;
   max-width: 480px;
-  min-height: 100vh;
-  padding-bottom: var(--h-nav);
+  height: 100%;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
@@ -66,7 +67,8 @@ input, textarea, select { font-size: 16px !important; font-family: 'Nunito', Ari
 .pagina-auth {
   width: 100%;
   max-width: 480px;
-  min-height: 100vh;
+  height: 100%;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
 }
@@ -741,7 +743,10 @@ input, textarea, select { font-size: 16px !important; font-family: 'Nunito', Ari
 
 /* ── Feed container ───────────────────────────────────── */
 .feed {
-  padding: 12px 12px 0;
+  padding: 12px 12px calc(var(--h-nav) + 12px);
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 /* ── Perfil ───────────────────────────────────────────── */
@@ -1124,7 +1129,19 @@ body.fonte-grande .card         { padding: 24px; }
 
 /* ── Página de conteúdo com padding ──────────────────────  */
 .page-content {
-  padding: 16px;
+  padding: 16px 16px calc(var(--h-nav) + 16px);
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* Chat: container da lista de conversas */
+#tela-lista {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
 }
 
 @media (max-width: 480px) {
